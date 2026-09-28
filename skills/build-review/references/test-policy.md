@@ -6,25 +6,21 @@ instead of re-deriving it.
 
 ## The failure this prevents
 
-A test proves the layer where it **asserts**, not the layers it happens to **pass through**. An
-end-to-end test that traverses a branch exercises one path through it; it says nothing about the
-other paths, and it cannot fail when a second branch is wrong. Treating it as proof of the code
-it traversed is **level substitution**, and it is the most common way a green suite ships a
-broken branch table.
+A proof may settle a behaviour across layers only when all of these are true:
 
-So obligations **add up rather than substitute**. When code that decides something is reached
-across a boundary - a route, a queue, a scheduled job, a CLI entry point - two different claims
-are in play and each needs its own asserted proof:
+- it executes the real path through the changed decision rather than replacing it with a mock or
+  stub;
+- its input isolates the claimed behaviour from alternative causes, and its assertion names the
+  value, state or side effect the checklist claims;
+- a targeted behaviour-level fault makes that assertion fail, rather than failing earlier in
+  setup or for an unrelated reason;
+- every outcome-changing branch and entry point in a decision added or touched by the diff, a
+  changed contract, binding source or checklist claim has a named discriminating proof.
 
-- the **entry point's contract**: it accepts what it should, rejects what it should, returns the
-  right shape, persists or emits what it promised. Proven where the boundary really is, with the
-  real transport.
-- the **decision table inside**: every branch that changes the outcome, asserted case by case,
-  isolated from the transport so the cases can be enumerated at all.
-
-The second one is what gets lost. It disappears whenever a requirement is phrased as an
-observable outcome, because the observable outcome names the entry point and the decision hides
-behind it.
+Crossing a layer is neither proof by itself nor a reason by itself to demand another test. When
+the conditions above hold, one proof may settle both the boundary contract and the internal
+decision. When one fails, require evidence for that specific gap. An explicit, applicable repo
+rule may still require proof at a particular level.
 
 ## 1. Does the repo already answer this?
 
@@ -36,7 +32,8 @@ this change touches:
 2. **How much of its input space must the proof assert to count?**
 
 If the declaration answers both for every touched layer, follow it and skip the rest of this
-file. If either is unanswered for code that decides something, derive the missing rows.
+file. If either is unanswered for code that decides something, identify the behaviour or branch
+the current proofs do not settle and derive rows only for that gap.
 
 A statement answers neither question when it only says **where** tests live or how they are
 named, **how** to run them, **how a test is built** (which dependencies are real and which are
@@ -52,6 +49,11 @@ layer and is never enumerated.
 Layer names lie. A file named like a service can be a pass-through, and a handler that looks like
 plumbing can hold the densest decision table in the change. Classify each candidate on a signal
 you can point at.
+
+A candidate is a decision added or touched by the diff, or one whose contract the diff changes.
+Touching one branch brings every outcome row of that decision into scope, because precedence can
+change across rows. Reading through a separate, unrelated pre-existing decision does not bring it
+into scope and does not create a new proof obligation.
 
 **Instrumentation** - the body forwards its arguments to one call, or maps one shape onto another
 with no conditional deciding the result. Its correctness is its consumer's problem; a test over
@@ -69,8 +71,9 @@ other. Those names are what `Coverage` joins each proof against, and a set that 
 as a number cannot be joined at all: the member you left out of the sentence is the one that ends
 up with no proof and is never missed.
 
-**The level follows the branch, not the observation.** A requirement phrased as an outcome at the
-boundary does not discharge the code behind it. Decide the level from where the branch lives.
+**The proof follows the behaviour at risk, not automatically the file containing the branch.** A
+boundary proof discharges an internal decision only when it meets the four conditions above;
+otherwise name the branch, entry point or assertion still missing evidence.
 
 ## 3. Derive from the code, not from the current suite
 
@@ -99,7 +102,7 @@ rows above. Use the repo's own level names, locations and commands; invent none.
 
 | Code | Required proofs | Coverage expectation |
 | --- | --- | --- |
-| Decides, and is reached across a boundary | one at the boundary **and** one at its own layer | the contract at the boundary; one asserted case per row of the decision table at its own layer |
+| Decides, and is reached across a boundary | proof(s) meeting the four conditions above; one proof may settle boundary and decision | every required outcome-changing row has a named discriminating assertion; fault injection follows the Verifier's distinct assertion surfaces and limit |
 | Decides, not reached across a boundary | one at its own layer | one asserted case per row of the decision table |
 | Entry point or adapter that decides nothing | one at the boundary | accepted input, each rejected input, each error path |
 | Instrumentation, pass-throughs | none of its own | covered by its consumer's proof |
@@ -111,8 +114,8 @@ Evidence:
 - closest analogue in the repo: <file>, same shape, already proven at this level with <n> cases
 - the module has <n> proofs at this level today, which the table deliberately does not match
 
-Cost: <n> proofs at their own layer, across <n> files. Without these rows, <n> decision tables
-are proven only by a path that happens to traverse them.
+Cost: <n> additional proofs for <behaviours or branches the current evidence does not settle>,
+across <n> files. Without these rows, the named gap can remain wrong while every proof stays green.
 ```
 
 A floor, never a ceiling, and a target rather than a description of what exists today. State the
