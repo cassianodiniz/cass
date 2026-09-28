@@ -1,7 +1,7 @@
 ---
 name: build-review
 description: "Use quando uma feature já construída vai ser revisada antes do merge e já existem a checklist do que foi prometido (`.checks/<feature>.md`), o diff `<base>..HEAD` e a issue/spec original; também com /build-review ou com o sim ao convite do /implementar ou do /gpt-implementar. Não use pra planejar nem construir, nem quando ainda não há checklist."
-license: os textos em references/ são cópias verbatim — Matt Pocock (CC-BY-4.0, github.com/mattpocock) e a skill implement (Tech Leads Club, CC-BY-4.0)
+license: matt-code-review.md e verify.md são cópias verbatim — Matt Pocock (CC-BY-4.0, github.com/mattpocock) e Tech Leads Club (CC-BY-4.0); as demais referências são adaptações locais do TLC Implement (CC-BY-4.0)
 ---
 
 # Build Review — três revisores sobre o mesmo diff
@@ -14,7 +14,7 @@ Um maestro. Ele **não revisa com texto próprio**: dispara três subagentes ind
 
 Os três revisores respondem perguntas diferentes, e por isso não se substituem:
 
-- **Standards** (`references/matt-code-review.md`, eixo Standards) — o código segue os padrões documentados da casa + a base fixa de "maus cheiros"? É palpite, não veredito.
+- **Standards** (`references/matt-code-review.md`, eixo Standards) — o código segue os padrões documentados da casa + a base fixa de "maus cheiros"? Smell ou preferência é conselho; defeito demonstrado entra no portão.
 - **Spec** (`references/matt-code-review.md`, eixo Spec) — o código faz o que a issue pediu? Falta algo, sobrou algo, ou implementou errado?
 - **Fiscal** (`references/verify.md`) — cada item da checklist está *provado*? Roda a prova, confere a asserção, e **injeta defeito** pra provar que os testes pegam uma regressão. Devolve PASS/FAIL.
 
@@ -43,8 +43,9 @@ Um subagente por revisor, no mesmo turno, cada um com o briefing **verbatim** do
 
 1. **Standards** — siga `references/matt-code-review.md`, eixo Standards, com a base de maus cheiros colada por inteiro (o subagente não tem outro acesso a ela).
 2. **Spec** — siga `references/matt-code-review.md`, eixo Spec, com a issue/spec.
-3. **Fiscal** — siga `references/verify.md` do começo ao fim, **todos os passos, incluindo a injeção de defeito**. Ele recebe a checklist, o diff, a fonte, e roda só leitura (a injeção acontece num `git worktree` isolado, nunca na árvore real).
+3. **Fiscal** — siga `references/verify.md` do começo ao fim, **todos os passos, incluindo a injeção de defeito**, e inclua verbatim no briefing a resolução local abaixo. Ele recebe a checklist, o diff, a fonte, e roda só leitura (a injeção acontece num `git worktree` isolado, nunca na árvore real).
    - **Force o perfil `standard` no mínimo** (`ui` se a feature tem telas). O `verify.md` assume `light` por padrão, e `light` pula exatamente a injeção de defeito, a enumeração de cobertura e as regras de teste — que são o motivo de existir a build-review. Diga o perfil no prompt do Fiscal; não deixe ele cair no padrão.
+   - Ao julgar uma prova entre camadas, esta regra local prevalece sobre instruções ou exemplos contrários de `verify.md`: inspecione somente as dependências necessárias para confirmar o caminho real e o isolamento do comportamento; mutante só morre quando a asserção relevante falha, não quando setup ou outra causa encerra o comando; política explícita e aplicável do repositório continua obrigatória junto da checklist, mas o formato histórico da suíte sozinho não cria uma regra de nível. No relatório, registre `Claim | caminho real (file:line) | input isolado | asserção (file:line) | falha dirigida e saída | branches/entradas exigidas (origem, total e mapa n/n) | veredito`. Inclua todas as linhas de resultado de uma decisão adicionada ou tocada pelo diff, contratos alterados, fontes vinculantes e checklist; decisão preexistente fora desse conjunto não cria prova nova.
 
 O Fiscal faz julgamento pesado (mutação, cobertura) — não rode ele no modelo econômico. Standards e Spec também são julgamento.
 
@@ -54,7 +55,7 @@ A saída É exatamente estes quatro blocos, nesta ordem:
 
 ```
 ## Portão
-<PASS ou FAIL — este é o veredito do FISCAL>
+<PASS ou FAIL — resultado conjunto segundo as regras abaixo>
 Standards e Spec: <nº de achados em cada, o pior de cada eixo>
 
 ## Standards
@@ -69,9 +70,9 @@ Standards e Spec: <nº de achados em cada, o pior de cada eixo>
 
 No Portão, diga o que vem: PASS → "posso subir e abrir a PR?"; FAIL → "posso devolver os achados à skill que construiu (`/implementar` ou `/gpt-implementar`) para consertar?". Só age com o sim.
 
-Regras da junção, que vêm dos próprios textos-fonte:
+Regras da junção:
 
-- **O portão é do Fiscal.** Só ele faz afirmação binária (o Matt não dá veredito de propósito). Standards e Spec entram como conselho que o usuário lê — um "mau cheiro" não reprova o merge sozinho.
+- **O portão parte do Fiscal e incorpora defeitos demonstrados pelos outros eixos.** É FAIL se o Fiscal falha ou se Spec ou Standards demonstra, com evidência, requisito ausente ou contradito, bug, risco de segurança ou regressão concreta. Smell, preferência, nit, recomendação ou teste adicional sem comportamento distinto ficam não bloqueantes. Na dúvida de classificação, não promova opinião a bloqueio: registre a incerteza e peça decisão.
 - **Não reordene entre blocos e não funda num placar único.** Os eixos são separados de propósito: um passa e o outro falha, e juntar esconde isso. Reporte o pior *dentro de cada* bloco, nunca um vencedor entre eles.
 - **Spec e o passo 1 do Fiscal se encostam** (código×pedido vs checklist×fonte). Achado dobrado às vezes é cobertura, não erro — deixe os dois falarem.
 
@@ -81,7 +82,7 @@ Regras da junção, que vêm dos próprios textos-fonte:
 |---|---|
 | Fundir os três numa lista única "do mais grave ao menos grave" | apaga a separação de eixos do Matt; é o que um agente sozinho faz por padrão |
 | Deixar o Fiscal pular a injeção de defeito | vira uma revisão que aceita teste decorativo (verde que não prova nada) |
-| Um smell do Standards reprovar o merge | o portão é do Fiscal; o Matt é conselho |
+| Um smell do Standards reprovar o merge | só defeito demonstrado entra no portão; preferência continua conselho |
 | Rodar dentro de um subagente | subagente não abre subagente; os três nascem mortos |
 | Resumir os textos de `references/` no prompt | o valor está no texto verbatim; resumir é reintroduzir o buraco |
 
