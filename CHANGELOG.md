@@ -1,5 +1,9 @@
 # Changelog — cass (antigo Titan)
 
+## 3.3.2 — 2026-09-28
+
+- **`build-review` sincronizada com `skills-cassiano`.** Defeitos graves demonstrados por Standards ou Spec passam a bloquear; uma prova entre camadas que detecta a regressão pode satisfazer o requisito. A versão do plugin sobe para que instalações em cache recebam a atualização.
+
 ## 3.3.1 — 2026-09-25
 
 - **Fica claro quem constrói em cada uma.** `implementar`: o agente da própria conversa constrói, e ele pode ser o Claude, o Codex, o Grok ou outro. `gpt-implementar`: o Claude orquestra e subagentes GPT (no Codex) constroem. Antes os textos diziam "o Claude constrói" e "o GPT constrói", o que dava a entender que a `implementar` só roda no Claude. Mudou no mapa `docs/qual-sua-situacao.svg` (caixas mais largas, com duas linhas), no README, no manifesto e na passagem de bastão da `spec-plan` e da `planejar`.
