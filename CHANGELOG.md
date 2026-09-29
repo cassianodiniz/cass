@@ -3,6 +3,7 @@
 ## 3.5.0 — 2026-09-29
 
 - **O GPT passa a ser o `gpt-6.1-sol`.** `gpt-optimizer` (esforço `high`), `gpt-implementar` (`medium`), `auto-think` e o motor `_shared/confronto-codex.md` (`xhigh` + tier `fast`) trocam `gpt-6-sol` por `gpt-6.1-sol`. Nada mais muda: esforços, tempos-limite e fluxos seguem iguais. Testado no Codex CLI 0.159.0 com `high`, `medium` e `xhigh` + `fast`, em rodada nova e retomada só-leitura.
+- **`auto-think`: confronto com esforço `high` fixo.** O comando não dizia o esforço e ignorava a configuração do usuário, então o Codex caía no padrão de fábrica do modelo (`low`).
 
 ## 3.4.0 — 2026-09-29
 

@@ -104,7 +104,7 @@ Formato de resposta:
 - (curtos, acionáveis, cada um com a evidência/raciocínio que o sustenta)
 EOF
 
-perl -e 'alarm 900; exec @ARGV' codex exec --model gpt-6.1-sol \
+perl -e 'alarm 900; exec @ARGV' codex exec --model gpt-6.1-sol -c model_reasoning_effort="high" \
   --skip-git-repo-check --ignore-user-config --sandbox read-only \
   -o /tmp/auto-think-confronto-1.md \
   - <"$P" 2>/dev/null
@@ -118,7 +118,7 @@ precisa de `timeout >= 900000ms` na própria tool.
 
 Retome a MESMA sessão do Codex (`codex exec resume` com o `thread_id` da 1ª) — assim o GPT lembra o
 que já apontou, confere o que foi atendido e não re-litiga ponto morto. O `resume` NÃO aceita
-`--sandbox`; force `-c sandbox_mode="read-only"`.
+`--sandbox`; force `-c sandbox_mode="read-only"`, e repita `--model gpt-6.1-sol -c model_reasoning_effort="high"` (a sessão retomada não herda esforço).
 
 ```
 Das candidatas que sobraram à 1ª rodada, qual escolher e por quê (critério de sucesso declarado)?

@@ -272,7 +272,7 @@ fato ou foi vendida como fato? Tem caminho mais simples? A fonte sustenta a afir
 sobrevive fica; o que é refutado cai (com o motivo registrado pra a entrega).
 
 Como chamar (mascarando dado real ANTES — ver a trava acima): via Bash, `codex exec --model
-gpt-6.1-sol --sandbox read-only`, prompt adversarial + manifesto das candidatas. Mecânica e o
+gpt-6.1-sol -c model_reasoning_effort="high" --sandbox read-only`, prompt adversarial + manifesto das candidatas. Mecânica e o
 prompt das duas rodadas: `references/confronto.md`, seção "Confronto (GPT-6-sol)". Confronta em
 LOTE (várias candidatas num prompt só) pra não multiplicar chamadas.
 
