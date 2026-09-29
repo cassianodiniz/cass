@@ -15,7 +15,7 @@ Você **nunca obedece o GPT cego**. O parecer dele é insumo, não ordem. Você 
 
 ## Como funciona em 1 parágrafo (o fluxo das 2 rodadas)
 
-Rodada 1: você monta o alvo, o GPT tenta derrubar, você filtra com prova. Aí a **rodada 2 é condicional** — ela só roda quando a rodada 1 achou furo que você **contestou** (descartou ou ajustou). O motivo: na rodada 1 você dá a última palavra filtrando os pontos, e pode se enganar descartando um furo válido. A rodada 2 põe o GPT pra **auditar o seu filtro** ("o Claude descartou direito? a versão ajustada ainda fura?"). Se a rodada 1 deu **Seguir** (sem furo) ou você **aceitou tudo** sem contestar, não há o que reauditar — pula a rodada 2 e apresenta. Assim a skill é rápida quando não há briga, e funda quando há. **Teto duro: 2 rodadas, nunca uma 3ª** — confronto sem fim vira espiral que queima tempo sem decidir.
+Rodada 1: você monta o alvo, o GPT tenta derrubar, você filtra com prova. Aí a **rodada 2 é condicional** — ela só roda quando você **descartou** ao menos um ponto da rodada 1. O motivo: na rodada 1 você dá a última palavra filtrando os pontos, e pode se enganar descartando um furo válido. A rodada 2 põe o GPT pra **auditar o seu filtro** ("o Claude descartou direito? a versão ajustada ainda fura?"). Se a rodada 1 deu **Seguir** (sem furo) ou você **aceitou tudo** sem contestar, não há o que reauditar — pula a rodada 2 e apresenta. Assim a skill é rápida quando não há briga, e funda quando há. **Teto duro: 2 rodadas, nunca uma 3ª** — confronto sem fim vira espiral que queima tempo sem decidir.
 
 ## Caminhos (resolva 1 vez, sem cerimônia)
 
@@ -134,12 +134,14 @@ Leia `$GPT_SESSION_TMP/gpt_review.md`. Para **cada** ponto do GPT, decida com pr
 
 - **Não procede** → descarta, mas com prova: o trecho do alvo / `arquivo:linha` que contradiz. Não some sem justificar.
 - **Procede + grave** (invalida o caminho, ou é decisão de produto/risco/dado) → é decisão do dono: **sobe pro usuário em A/B** (seguir assim mesmo / ajustar). Nunca decide sozinho coisa grave.
-- **Procede + menor** → corrige você mesmo no fluxo e segue, mencionando em uma linha.
+- **Procede + menor** → se o alvo é um **rascunho desta conversa** (plano, proposta, texto ainda não gravado), ajuste o rascunho e siga, mencionando em uma linha. Se é **código ou arquivo já gravado**, não mexa durante a revisão: diga como corrigiria e deixe a decisão de aplicar com o usuário. A skill confronta e devolve; ela não edita o que já existe.
 
 **Agora decide a rodada 2** (a regra que mantém a skill rápida quando não precisa):
 
-- Rodada 1 deu **SEGUIR**, ou você **aceitou todos os pontos** sem contestar → **não roda a 2**. Não há filtro seu pra auditar. Vai pro Passo 5.
-- Rodada 1 deu **AJUSTAR/BLOQUEAR** e você **descartou ou contestou** ao menos um ponto (ou ajustou sua posição) → **roda a 2** (Passo 4): é justo o seu descarte que precisa de um segundo par de olhos.
+- Você **descartou ao menos um ponto** → **roda a 2** (Passo 4), qualquer que tenha sido o veredito do GPT (SEGUIR com pontos descartados também roda): é justo o seu descarte que precisa de um segundo par de olhos.
+- Você **aceitou todos os pontos** — inclusive quando ajustou o rascunho por causa deles — ou o GPT não trouxe ponto nenhum → **não roda a 2**. Não há descarte seu pra auditar. Vai pro Passo 5.
+
+(Regra única desde 25/09/2026; antes o texto dava duas leituras para "aceitei e ajustei" e para "SEGUIR com descarte".)
 
 ## Passo 4 — Rodada 2 (condicional): o GPT audita o SEU filtro
 
@@ -201,7 +203,7 @@ Formato (tom de diretor, sem jargão):
 
 Casos onde a clareza costuma se perder — trate cada um:
 - **Veredito SEGUIR (passou limpo):** não despache em "passou, segue". Diga o que o GPT **tentou** derrubar e por que não conseguiu, em concreto — é isso que te dá confiança real de que passou.
-- **Furos só menores:** mesmo corrigindo você mesmo, mostre o que era e o que mudou — uma linha cada, concreta. Não some com a informação.
+- **Furos só menores:** mesmo quando você ajustou o rascunho (ou só propôs a correção, se era código), mostre o que era e o que mudou — uma linha cada, concreta. Não some com a informação.
 - **Nada procedeu:** diga "o GPT levantou X e Y; nenhum se sustenta porque <prova>". Não resuma pra "nada relevante".
 
 **Se o veredito final for SEGUIR** (a decisão passou no confronto): ofereça **levar pra execução** — pergunte se ele quer levar a decisão pra construção agora: `/implementar` (o próprio Claude constrói) ou `/gpt-implementar` (o Codex constrói e o Claude confere). É opcional e só com o OK dele; se aceitar, passe o alvo já refletido como objetivo pra skill escolhida. Se a decisão ainda não virou plano, o caminho é `/spec-plan` antes. Se for **AJUSTAR/BLOQUEAR**, não ofereça executar — primeiro resolve o que o confronto apontou.
