@@ -272,7 +272,7 @@ fato ou foi vendida como fato? Tem caminho mais simples? A fonte sustenta a afir
 sobrevive fica; o que é refutado cai (com o motivo registrado pra a entrega).
 
 Como chamar (mascarando dado real ANTES — ver a trava acima): via Bash, `codex exec --model
-gpt-6-sol --sandbox read-only`, prompt adversarial + manifesto das candidatas. Mecânica e o
+gpt-6.1-sol --sandbox read-only`, prompt adversarial + manifesto das candidatas. Mecânica e o
 prompt das duas rodadas: `references/confronto.md`, seção "Confronto (GPT-6-sol)". Confronta em
 LOTE (várias candidatas num prompt só) pra não multiplicar chamadas.
 
@@ -370,7 +370,7 @@ gasta no máximo: **2 rodadas de confronto** (1ª em todas as candidatas, 2ª no
 consegue cumprir; matar por relógio, não.
 
 **4. O confronto GPT (passos 3 e 6) tem 15 min — passou disso, travou.** Cada chamada
-`codex exec --model gpt-6-sol` vai envelopada num teto de 15 min que o SO mata sozinho
+`codex exec --model gpt-6.1-sol` vai envelopada num teto de 15 min que o SO mata sozinho
 (o `perl -e 'alarm 900'` — `timeout` puro não existe no Mac, `perl` existe no Mac e no Windows).
 Comando exato: `references/confronto.md`. Rodou mais de 15 min = **travou**, ponto. O processo é
 morto. **Mata e refaz** — re-dispara a mesma chamada uma vez. Travou de novo → o confronto ficou

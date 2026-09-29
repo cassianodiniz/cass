@@ -187,7 +187,7 @@ No fim, oferece construir com `implementar` ou `gpt-implementar`.
 por vários ângulos e manda o GPT tentar derrubar cada ideia, duas vezes. Volta com a
 recomendada e as alternativas. Não executa nada. Antes de mandar qualquer coisa pra fora,
 troca nomes e dados pessoais por etiquetas.
-<br/>*Técnico:* confronto adversarial com Codex `gpt-6-sol` em 2 rodadas; pesquisa via `search`.
+<br/>*Técnico:* confronto adversarial com Codex `gpt-6.1-sol` em 2 rodadas; pesquisa via `search`.
 
 **`/cass:implementar`** — O agente da conversa (Claude, Codex ou outro) constrói um plano já aprovado, uma tarefa por vez: escreve
 a lista do que foi prometido com a prova de cada item, testa e salva no seu computador. No
@@ -197,7 +197,7 @@ fim, oferece a vistoria independente (`build-review`), que confere as provas com
 **`/cass:gpt-implementar`** — Mesmo trabalho do `implementar`, mas o Claude orquestra e quem
 constrói são subagentes GPT, no Codex. O Claude escreve a ordem de serviço, lê tudo o que o Codex fez como se fosse revisar o trabalho
 de um colega, e só salva o que passou na prova.
-<br/>*Técnico:* `codex exec` com `gpt-6-sol` esforço `medium`; fiscal prova cada item no HEAD; até 2 rodadas de correção antes do Claude assumir.
+<br/>*Técnico:* `codex exec` com `gpt-6.1-sol` esforço `medium`; fiscal prova cada item no HEAD; até 2 rodadas de correção antes do Claude assumir.
 
 **`/cass:build-review`** — Vistoria final antes de publicar. Três revisores que não conversam
 entre si: um confere as regras do projeto, outro se o que foi pedido foi feito, e um fiscal
@@ -214,7 +214,7 @@ peça "ataca o plano com /search" e ela procura quem já resolveu o mesmo proble
 **`/cass:gpt-optimizer`** — Segunda opinião sobre uma decisão que você já tomou. O GPT recebe
 uma ordem: tentar derrubar. Volta com Seguir, Ajustar ou Bloquear e só os furos que
 procedem. Só roda quando você chama.
-<br/>*Técnico:* Codex `gpt-6-sol` esforço `high`, só leitura; a 2ª rodada audita o seu filtro dos pontos.
+<br/>*Técnico:* Codex `gpt-6.1-sol` esforço `high`, só leitura; a 2ª rodada audita o seu filtro dos pontos.
 
 **`/cass:handoff`** — A conversa ficou longa e você quer continuar depois. A skill escreve um
 documento de passagem com o que foi decidido, o que falta e onde estão as coisas, separando

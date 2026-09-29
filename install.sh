@@ -56,7 +56,7 @@ if [ "$HAS_NPX" = "1" ]; then
   run "Gemini (gemini-api-dev)"             npx -y skills add google-gemini/gemini-skills --skill gemini-api-dev --global
 fi
 
-# ── 4. Codex CLI (o GPT: gpt-6-sol) ─────────────────────────────────────
+# ── 4. Codex CLI (o GPT: gpt-6.1-sol) ─────────────────────────────────────
 if command -v codex >/dev/null 2>&1; then
   ok "Codex CLI já instalado"; say ""
 elif [ "$HAS_NPX" = "1" ]; then

@@ -1,5 +1,9 @@
 # Changelog — cass (antigo Titan)
 
+## 3.5.0 — 2026-09-29
+
+- **O GPT passa a ser o `gpt-6.1-sol`.** `gpt-optimizer` (esforço `high`), `gpt-implementar` (`medium`), `auto-think` e o motor `_shared/confronto-codex.md` (`xhigh` + tier `fast`) trocam `gpt-6-sol` por `gpt-6.1-sol`. Nada mais muda: esforços, tempos-limite e fluxos seguem iguais. Testado no Codex CLI 0.159.0 com `high`, `medium` e `xhigh` + `fast`, em rodada nova e retomada só-leitura.
+
 ## 3.4.0 — 2026-09-29
 
 - **`gpt-implementar` enxuta (de ~2.600 para ~750 palavras).** Ela deixa de repetir as boas práticas da `implementar` e passa a mandar o Codex segui-las; fica só o manual de chamar o Codex (modelo e esforço fixos, conversa retomada pelo número exato, pedido por arquivo) e a disciplina de conferir. Testada com subagentes isolados numa tarefa de 590 linhas: cerca de 10% menos tokens do Claude e 23% menos tempo que a versão anterior, cumprindo as mesmas regras. O Claude confere pelo resultado dos testes e deixa a leitura do código para o fiscal. Depois de 2 rodadas de correção sem resolver, ela para e devolve a decisão ao usuário, em vez de o Claude terminar sozinho.

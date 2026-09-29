@@ -104,7 +104,7 @@ Formato de resposta:
 - (curtos, acionáveis, cada um com a evidência/raciocínio que o sustenta)
 EOF
 
-perl -e 'alarm 900; exec @ARGV' codex exec --model gpt-6-sol \
+perl -e 'alarm 900; exec @ARGV' codex exec --model gpt-6.1-sol \
   --skip-git-repo-check --ignore-user-config --sandbox read-only \
   -o /tmp/auto-think-confronto-1.md \
   - <"$P" 2>/dev/null

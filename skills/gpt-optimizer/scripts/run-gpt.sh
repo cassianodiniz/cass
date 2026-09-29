@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ════════════════════════════════════════════════════════════════════════
-# run-gpt.sh — chama o Codex (gpt-6-sol) como revisor adversarial e grava o
+# run-gpt.sh — chama o Codex (gpt-6.1-sol) como revisor adversarial e grava o
 # parecer limpo num arquivo. Encapsula a chamada pra não errar o stdin
 # (codex exec trava esperando stdin se rodado sem redirecionar a entrada).
 #
@@ -59,9 +59,9 @@ run_codex () {
     # --model e --ignore-user-config são obrigatórios aqui: sem eles o resume lê o
     # `model` do ~/.codex/config.toml, que o app do Codex reescreve sozinho ao
     # atualizar. A sessão retomada NÃO carrega o modelo da rodada 1.
-    # Modelo padrão: gpt-6-sol, esforço high (22/09/2026; era gpt-6-astra).
+    # Modelo padrão: gpt-6.1-sol, esforço high (29/09/2026; era gpt-6-sol, antes gpt-6-astra).
     codex exec resume "$TID" \
-      --model gpt-6-sol \
+      --model gpt-6.1-sol \
       -c model_reasoning_effort="$EFFORT" \
       -c sandbox_mode="read-only" \
       --skip-git-repo-check \
@@ -71,7 +71,7 @@ run_codex () {
     rc=$?
   else
     codex exec \
-      --model gpt-6-sol \
+      --model gpt-6.1-sol \
       -c model_reasoning_effort="$EFFORT" \
       --skip-git-repo-check \
       --ignore-user-config \
