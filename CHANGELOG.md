@@ -1,5 +1,12 @@
 # Changelog — cass (antigo Titan)
 
+## 3.4.0 — 2026-09-29
+
+- **`gpt-implementar` enxuta (de ~2.600 para ~750 palavras).** Ela deixa de repetir as boas práticas da `implementar` e passa a mandar o Codex segui-las; fica só o manual de chamar o Codex (modelo e esforço fixos, conversa retomada pelo número exato, pedido por arquivo) e a disciplina de conferir. Testada com subagentes isolados numa tarefa de 590 linhas: cerca de 10% menos tokens do Claude e 23% menos tempo que a versão anterior, cumprindo as mesmas regras. O Claude confere pelo resultado dos testes e deixa a leitura do código para o fiscal. Depois de 2 rodadas de correção sem resolver, ela para e devolve a decisão ao usuário, em vez de o Claude terminar sozinho.
+- **`implementar`: sai a frase "a sessão não delega a outros agentes".** Nos testes de pressão, o Claude a citava para ignorar um pedido de delegar ao Codex. O relatório final passa a ser mais objetivo e a pergunta "posso rodar a vistoria?" vai para o fim, junto do resto do que depende do usuário.
+- **`gpt-optimizer`: a regra da segunda rodada fica uma só.** A rodada 2 roda sempre que o Claude descartou ao menos um ponto da rodada 1, e não roda quando aceitou tudo. Furo menor em código já gravado vira proposta de correção; só rascunho da conversa é ajustado na hora.
+- **Créditos.** O Tech Club passa a constar como co-autor: forneceu insumos para as skills de revisão e de implementação.
+
 ## 3.3.2 — 2026-09-28
 
 - **`build-review` sincronizada com `skills-cassiano`.** Defeitos graves demonstrados por Standards ou Spec passam a bloquear; uma prova entre camadas que detecta a regressão pode satisfazer o requisito. A versão do plugin sobe para que instalações em cache recebam a atualização.

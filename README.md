@@ -72,7 +72,7 @@ Não é uma skill: é um guia que instala duas ferramentas (RTK + Ponytail) pro 
 </tr>
 </table>
 
-**Autoria:** Cassiano Diniz · **Co-autoria:** Thales Laray (skill `planejar`)
+**Autoria:** Cassiano Diniz · **Co-autoria:** Thales Laray (skill `planejar`) e Tech Club, que forneceu insumos para as skills de revisão e de implementação (`build-review`, `implementar` e `gpt-implementar`)
 
 ---
 
