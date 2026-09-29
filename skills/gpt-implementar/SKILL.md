@@ -11,7 +11,7 @@ Seu papel é coordenar, não reconstruir. O contexto desta sessão é o recurso 
 
 ## Largada
 
-Uma mensagem só: qual issue, modelo `gpt-6-sol` com esforço `medium`, e o comando de prova (da spec; se ela não tiver, do manifesto/CI do repo). Espere o sim.
+Uma mensagem só: qual issue, modelo `gpt-6.1-sol` com esforço `medium`, e o comando de prova (da spec; se ela não tiver, do manifesto/CI do repo). Espere o sim.
 
 ## Contrato pro Codex (um só, pra entrega inteira)
 
@@ -27,9 +27,9 @@ Escreva num arquivo temporário (`P=$(mktemp)`), nesta ordem:
 
 ```bash
 OUT=/tmp/gpt-implementar-<nome do checklist>.txt
-codex exec --model gpt-6-sol -c model_reasoning_effort="medium" --yolo --json -o "$OUT" - <"$P" 2>/dev/null | grep '"type":"thread.started"'
+codex exec --model gpt-6.1-sol -c model_reasoning_effort="medium" --yolo --json -o "$OUT" - <"$P" 2>/dev/null | grep '"type":"thread.started"'
 # correção, na MESMA sessão do Codex:
-codex exec resume "<thread_id>" --model gpt-6-sol -c model_reasoning_effort="medium" --dangerously-bypass-approvals-and-sandbox --json -o "$OUT" - <"$P2" 2>/dev/null >/dev/null
+codex exec resume "<thread_id>" --model gpt-6.1-sol -c model_reasoning_effort="medium" --dangerously-bypass-approvals-and-sandbox --json -o "$OUT" - <"$P2" 2>/dev/null >/dev/null
 ```
 
 - Guarde o `thread_id` da linha `thread.started`. Nunca `--last`: pega a conversa errada, e um id errado cai na última conversa sem dar erro.

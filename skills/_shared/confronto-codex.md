@@ -54,7 +54,7 @@ O padrão é: o prompt vai por **stdin** (não como argumento), com **teto de 15
 resposta cai num arquivo de saída.
 
 ```bash
-perl -e 'alarm 900; exec @ARGV' codex exec --model gpt-6-sol \
+perl -e 'alarm 900; exec @ARGV' codex exec --model gpt-6.1-sol \
   -c model_reasoning_effort="xhigh" \
   -c service_tier="fast" \
   --skip-git-repo-check --ignore-user-config --sandbox read-only \
@@ -80,7 +80,7 @@ perl -e 'alarm 900; exec @ARGV' codex exec --model gpt-6-sol \
   vez; travou de novo → "Codex fora" (seção 5). Usa `perl` porque o `timeout` puro não existe
   no Mac; no Linux dá pra trocar por `timeout 900`.
 - **Esforço e tier:** o comando acima já vem em `xhigh` + `service_tier="fast"` (o padrão do
-  `auto-think`: máximo de raciocínio na via rápida do gpt-6-sol). O `fast` precisa ser explícito
+  `auto-think`: máximo de raciocínio na via rápida do gpt-6.1-sol). O `fast` precisa ser explícito
   porque `--ignore-user-config` ignora o tier do config global. Uma skill que queira esforço
   menor numa checagem leve troca `xhigh` por `high` no comando dela.
 - **Atalho:** a skill irmã `/cass:gpt-optimizer` (no mesmo plugin) traz o `run-gpt.sh`,
@@ -98,7 +98,7 @@ que é novo.
 **Rodada 1** — capture o `thread_id` (o identificador da conversa) do stream JSON:
 
 ```bash
-perl -e 'alarm 900; exec @ARGV' codex exec --model gpt-6-sol \
+perl -e 'alarm 900; exec @ARGV' codex exec --model gpt-6.1-sol \
   -c model_reasoning_effort="xhigh" -c service_tier="fast" \
   --skip-git-repo-check --ignore-user-config --sandbox read-only --json \
   -o /tmp/confronto-review.md \
@@ -116,7 +116,7 @@ Do JSON `{"type":"thread.started","thread_id":"..."}` extraia `THREAD_ID`. O par
 # o modelo da rodada 1, e o app do Codex reescreve o `model` do config sozinho ao atualizar
 # (visto em 09/07/2026: o `model` do config mudou sozinho pra um modelo que a CLI da época recusava com HTTP 400).
 perl -e 'alarm 900; exec @ARGV' codex exec resume "$THREAD_ID" \
-  --model gpt-6-sol -c sandbox_mode="read-only" -c model_reasoning_effort="xhigh" \
+  --model gpt-6.1-sol -c sandbox_mode="read-only" -c model_reasoning_effort="xhigh" \
   --skip-git-repo-check --ignore-user-config --json -o /tmp/confronto-review.md \
   - < /tmp/confronto-rodada-N.md 2>/dev/null >/dev/null
 ```
