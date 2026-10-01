@@ -1,5 +1,11 @@
 # Changelog — cass (antigo Titan)
 
+## 4.2.0 — 2026-10-01
+
+- **`ask-me`: toda pergunta com opções tem número, inclusive a de conflito (⚠️).** A numeração é uma só por rodada, com as ⚠️ primeiro. Antes, a pergunta de conflito vinha sem número e uma resposta curta como "a" podia ser de qualquer pergunta.
+- **Fechamento mais simples.** A pergunta final passa a ter duas opções: gerar o pedido ou alterar/adicionar algo. Sai a linha de recomendação, porque ali não há mais o que recomendar.
+- **Ajuste no fechamento reabre a entrevista.** Se a resposta for uma mudança, ela conta como resposta nova: a skill refaz a conferência com os limites já combinados e pergunta quantas rodadas forem necessárias antes de fechar de novo, em vez de deduzir sozinha o que a mudança implica.
+
 ## 4.1.0 — 2026-10-01
 
 - **`build-review`: resposta final curta e com a decisão no fim.** Os três relatórios (Standards, Spec, Fiscal) passam a ir inteiros para `.checks/<feature>.review.md`. No chat vêm quatro partes: *Veredito*, *O que não trava*, *O que trava* e *O que preciso de você*. Cada defeito aparece uma vez, em palavras, com quem achou; o que ficou sem proteção vai junto numa linha "Sem teste que avise se parar de funcionar"; códigos de item e nomes de arquivo ficam só no arquivo.
