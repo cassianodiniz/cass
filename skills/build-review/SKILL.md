@@ -51,36 +51,56 @@ O Fiscal faz julgamento pesado (mutação, cobertura) — não rode ele no model
 
 ## Junta sem misturar
 
-A saída É exatamente estes quatro blocos, nesta ordem:
+Os três relatórios vão **inteiros**, cada um sob seu título (`## Standards`, `## Spec`, `## Fiscal`), para `.checks/<feature>.review.md`. É lá que os eixos ficam separados e completos.
+
+A mensagem ao usuário É estas quatro partes, nesta ordem, na língua e no nível de quem vai ler:
 
 ```
-## Portão
-<PASS ou FAIL — resultado conjunto segundo as regras abaixo>
-Standards e Spec: <nº de achados em cada, o pior de cada eixo>
+## Veredito
+<PASS ou FAIL> — <uma frase: por quê>
 
-## Standards
-<relatório do subagente Standards, verbatim ou levemente limpo>
+## O que não trava
+<uma linha por eixo: quantos conselhos e o maior deles>
 
-## Spec
-<relatório do subagente Spec, verbatim ou levemente limpo>
+## O que trava
+- <cada defeito que a pessoa veria no uso, UM por linha, em palavras; entre parênteses, quem achou>
+- Sem teste que avise se parar de funcionar: <todas as partes que ficam sem proteção, numa linha só, separadas por ponto e vírgula> (<quem achou>)
 
-## Fiscal
-<veredito PASS/FAIL do Fiscal + as tabelas de evidência>
+Relatórios completos: .checks/<feature>.review.md
+
+## O que preciso de você
+1. <cada decisão que os relatórios deixaram para o usuário: o que é, em uma frase; (a) … → o que acontece; (b) … → o que acontece; Recomendo (x), porque …> — sem decisão, este item não existe: não escreva "não há decisão"
+2. <por último, a próxima ação — ver abaixo>
 ```
 
-No Portão, diga o que vem: PASS → "posso subir e abrir a PR?"; FAIL → "posso devolver os achados à skill que construiu (`/implementar` ou `/gpt-implementar`) para consertar?". Só age com o sim.
+"O que trava" leva todo motivo de FAIL que os relatórios trazem: cada defeito demonstrado por Spec ou Standards e cada lacuna do Fiscal (item sem prova ou com prova parcial, mutante sobrevivente, linha de test-policy não atendida, contradição com o desenho). Um motivo achado por mais de um revisor aparece uma vez, com os nomes de todos. As lacunas de proteção entram todas na linha "Sem teste que avise se parar de funcionar", cada uma nomeada: juntar é só para caber, nenhuma some. O conserto recebe a lista completa do arquivo.
+
+Códigos de item (C21, C33…) e caminhos de arquivo ficam no arquivo e no pedido de conserto, não na mensagem: quem lê a mensagem decide pelo que acontece no app, não pelo número do item.
+
+"O que preciso de você" leva toda decisão que um relatório deixou para o usuário. A única exceção é correção com um só jeito certo e que não muda o app (texto da checklist, nome, comentário): essa vai no conserto sem pergunta; cite em uma linha em "O que não trava" ("vai junto no conserto: …").
+
+A linha "Sem teste que avise…" leva toda lacuna da lista de lacunas do Fiscal (item não provado, prova parcial, mutante sobrevivente, caso sem teste, ponto do desenho que nada confere), esteja ou não ligada a um item da checklist. Sugestão de teste de Spec ou Standards, sem falha apontada ("provavelmente passa"), é conselho e fica em "O que não trava". O que já está listado como defeito de uso não se repete nessa linha.
+
+O último item de "O que preciso de você" é a próxima ação, dizendo quem vai fazer:
+- PASS → "Posso subir e abrir a PR?"
+- FAIL, construído nesta sessão (`/implementar`; a vistoria roda na mesma sessão por decisão do usuário) → "Posso consertar aqui mesmo, nesta sessão que construiu, numa rodada de conserto?"
+- FAIL, construído pelo Codex (`/gpt-implementar`) → "Posso devolver ao Codex, num pedido novo com a lista, para uma rodada de conserto?" — mesmo que as rodadas de conserto dele já tenham acabado.
+- FAIL e nada diz quem construiu → pergunte quem construiu, no lugar da pergunta de sim/não.
+- FAIL numa vistoria que vem depois de uma rodada de conserto pós-vistoria → não repita a oferta. Pare e dê as saídas como decisão: (a) mais uma rodada com quem construiu → …; (b) consertar nesta sessão → …; (c) aceitar e registrar o que falta → …; Recomendo (x), porque … Esta regra prevalece sobre o limite de três rodadas do `verify.md`.
+
+Só age com o sim. Se não há decisão a tomar, "O que preciso de você" tem só a próxima ação. Nada vem antes do "## Veredito" nem depois da última pergunta: aviso, nota ou resumo extra entram numa das quatro partes ou saem.
 
 Regras da junção:
 
 - **O portão parte do Fiscal e incorpora defeitos demonstrados pelos outros eixos.** É FAIL se o Fiscal falha ou se Spec ou Standards demonstra, com evidência, requisito ausente ou contradito, bug, risco de segurança ou regressão concreta. Smell, preferência, nit, recomendação ou teste adicional sem comportamento distinto ficam não bloqueantes. Na dúvida de classificação, não promova opinião a bloqueio: registre a incerteza e peça decisão.
-- **Não reordene entre blocos e não funda num placar único.** Os eixos são separados de propósito: um passa e o outro falha, e juntar esconde isso. Reporte o pior *dentro de cada* bloco, nunca um vencedor entre eles.
-- **Spec e o passo 1 do Fiscal se encostam** (código×pedido vs checklist×fonte). Achado dobrado às vezes é cobertura, não erro — deixe os dois falarem.
+- **Os eixos ficam separados no arquivo.** Na mensagem, cada defeito que trava diz quem o achou, e "O que não trava" dá o maior conselho de cada eixo, sem eleger um vencedor entre eles.
+- **Spec e o passo 1 do Fiscal se encostam** (código×pedido vs checklist×fonte). Achado dobrado às vezes é cobertura, não erro — no arquivo, os dois falam; na mensagem, ele aparece uma vez com os dois nomes.
 
 ## Erros comuns
 
 | Erro | Por que quebra |
 |---|---|
-| Fundir os três numa lista única "do mais grave ao menos grave" | apaga a separação de eixos do Matt; é o que um agente sozinho faz por padrão |
+| Reescrever os três relatórios num só, sem dizer quem achou o quê | apaga a separação de eixos do Matt; é o que um agente sozinho faz por padrão |
 | Deixar o Fiscal pular a injeção de defeito | vira uma revisão que aceita teste decorativo (verde que não prova nada) |
 | Um smell do Standards reprovar o merge | só defeito demonstrado entra no portão; preferência continua conselho |
 | Rodar dentro de um subagente | subagente não abre subagente; os três nascem mortos |
@@ -88,7 +108,7 @@ Regras da junção:
 
 ## Red flags — pare
 
-- "Vou juntar tudo num relatório só pra ficar mais limpo"
+- "Vou reescrever os três relatórios num texto meu e não guardar os originais"
 - "Os testes já passam, não preciso injetar defeito"
 - "Não tem commit-marco, mas dá pra deduzir a base pelo git log"
 - "Não tem checklist, mas dá pra o Fiscal revisar mesmo assim"
