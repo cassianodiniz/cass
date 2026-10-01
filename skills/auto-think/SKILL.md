@@ -1,6 +1,6 @@
 ---
 name: auto-think
-description: "Use quando o usuário invocar /auto-think, ou pedir uma recomendação com veredito sobre um problema difícil, uma decisão que pesa ou uma escolha entre caminhos possíveis — inclusive qual solução a documentação oficial e a prática de mercado sustentam — e aceitar que o estudo leve tempo. Não executa nada. Não use pra parecer rápido sobre uma decisão já tomada (/gpt-optimizer), pra buscar um fato ou número com fonte (/search), pra desenhar produto novo do zero (/planejar) nem pra construir (/implementar ou /gpt-implementar)."
+description: "Use quando o usuário invocar /auto-think, ou pedir uma recomendação com veredito sobre um problema difícil, uma decisão que pesa ou uma escolha entre caminhos possíveis — inclusive qual solução a documentação oficial e a prática de mercado sustentam — e aceitar que o estudo leve tempo. Não executa nada. Não use pra parecer rápido sobre uma decisão já tomada (/gpt-optimizer), pra buscar um fato ou número com fonte (/search) nem pra construir (/implementar ou /gpt-implementar)."
 ---
 
 # auto-think
@@ -17,7 +17,6 @@ de decisão ("vale a pena trocar Y por Z"), de investigação ("por que isso aco
 resolve"), ou de pesquisa pura ("o que o mundo já resolveu sobre isto").
 
 **A fronteira que define tudo:**
-- `/planejar` = desenhar um PRODUTO novo do zero antes de codar.
 - `/spec-plan` = a solução já foi escolhida e precisa virar um plano construível (spec + tarefas).
 - `/implementar` ou `/gpt-implementar` = EXECUTAR uma tarefa e entregar feito.
 - `auto-think` = ESTUDAR um problema a fundo e entregar solução(ões) recomendada(s). Não executa.

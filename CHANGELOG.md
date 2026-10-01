@@ -1,5 +1,11 @@
 # Changelog — cass (antigo Titan)
 
+## 4.0.0 — 2026-10-01
+
+- **Sai a skill `planejar`.** O plugin fica com nove skills. Junto saem as ferramentas que só ela pedia: superpowers, Taste Skill, find-skills, `/pesquisa` + Perplexity, o plugin Cloudflare, gemini-api-dev, o MCP do Stitch, a `GEMINI_API_KEY` e o firecrawl. O `install.sh` agora instala só o plugin e o Codex CLI; o `INSTALL.md` lista só Codex, Exa e context7. Quem já instalou essas ferramentas não perde nada: elas só deixam de ser pedidas.
+- **Mapa de entrada com três jornadas** (`docs/qual-sua-situacao.svg` e README): *Sei onde ajustar* vai direto na `spec-plan`; *Pesquisar ideias* passa por `ask-me` e `search`; *Feature nova* passa por `ask-me` e `auto-think`. As três terminam na `spec-plan`. Dali em diante nada muda: `implementar` ou `gpt-implementar`, depois `build-review`.
+- **`auto-think`** deixa de citar a `/planejar` na descrição e na fronteira entre skills.
+
 ## 3.5.0 — 2026-09-29
 
 - **O GPT passa a ser o `gpt-6.1-sol`.** `gpt-optimizer` (esforço `high`), `gpt-implementar` (`medium`), `auto-think` e o motor `_shared/confronto-codex.md` (`xhigh` + tier `fast`) trocam `gpt-6-sol` por `gpt-6.1-sol`. Nada mais muda: esforços, tempos-limite e fluxos seguem iguais. Testado no Codex CLI 0.159.0 com `high`, `medium` e `xhigh` + `fast`, em rodada nova e retomada só-leitura.
