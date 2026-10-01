@@ -1,20 +1,17 @@
 # Instalar o plugin `cass` (e o que ele usa por fora)
 
-O plugin `cass` (skills `ask-me`, `planejar`, `spec-plan`, `auto-think`, `implementar`, `gpt-implementar`, `search`, `build-review`, `handoff`, `gpt-optimizer`) **orquestra** ferramentas externas —
+O plugin `cass` (skills `ask-me`, `spec-plan`, `auto-think`, `implementar`, `gpt-implementar`, `search`, `build-review`, `handoff`, `gpt-optimizer`) **orquestra** ferramentas externas —
 ele não empacota elas. Este arquivo reúne tudo que precisa instalar pra ele rodar completo.
 
-A boa notícia: nada disso trava o plugin. A `planejar` tem um **preflight (Fase 0)** que confere
-o que está presente e avisa o que falta — só para de verdade se faltar uma dependência **crítica**.
-O que tem fallback, degrada sozinho.
+A boa notícia: nada disso trava o plugin. Se faltar alguma ferramenta, a skill que depende dela
+avisa e segue do jeito que dá.
 
 ---
 
 ## 0. Autoinstall — um comando
 
-O `install.sh` instala **tudo que dá** sozinho, via a CLI `claude` (`claude plugin install`),
-`npx` e `npm`: o próprio plugin cass, os plugins externos (superpowers, cloudflare), as skills
-via npx (taste-skill, find-skills, gemini-api-dev), o **Codex CLI** (se faltar) e o MCP do Stitch
-(se você passar a chave). Não precisa mais colar `/plugin` na mão.
+O `install.sh` instala **tudo que dá** sozinho, via a CLI `claude` (`claude plugin install`) e
+`npm`: o próprio plugin cass e o **Codex CLI** (se faltar). Não precisa colar `/plugin` na mão.
 
 **Numa máquina que ainda não tem o plugin** (bootstrap direto do GitHub):
 ```bash
@@ -23,18 +20,16 @@ curl -fsSL https://raw.githubusercontent.com/cassianodiniz/cass/main/install.sh 
 
 **Se já tem o plugin** (roda da pasta dele, ou peça pro Claude *"roda o install.sh do cass"*):
 ```bash
-bash install.sh                          # instala tudo que dá
-STITCH_API_KEY=suachave bash install.sh  # + configura o MCP do Stitch
-SKIP_PLUGIN=1 bash install.sh            # só as dependências (não reinstala o cass)
+bash install.sh                # instala tudo que dá
+SKIP_PLUGIN=1 bash install.sh  # só as dependências (não reinstala o cass)
 ```
 
 **Só sobra o que depende de chave/conta sua** (o script avisa no fim):
 - `codex login` — uma vez, interativo (se ele instalou o Codex agora)
-- `GEMINI_API_KEY` — grátis em https://aistudio.google.com/apikey (mockups da planejar)
-- `/pesquisa` + Perplexity — vêm do curso/seu provedor; sem eles a planejar pula a pesquisa web
-- MCPs `context7`/`firecrawl` — conforme seu provedor (opcionais, degradam sozinhos)
+- conta no **Exa** — pra `search`
+- MCP `context7` — conforme seu provedor (opcional)
 
-Depois, **reinicie o Claude Code** pra carregar os plugins. As tabelas abaixo são a referência
+Depois, **reinicie o Claude Code** pra carregar o plugin. As tabelas abaixo são a referência
 item-por-item, caso queira instalar na mão.
 
 ---
@@ -48,45 +43,24 @@ Pelo `/plugin`, adicione o marketplace e instale:
 /plugin install cass@cass
 ```
 
-Depois as skills ficam disponíveis como `/cass:planejar`, `/cass:gpt-implementar`, `/cass:handoff` e assim por diante.
+Depois as skills ficam disponíveis como `/cass:ask-me`, `/cass:gpt-implementar`, `/cass:handoff` e assim por diante.
 
 > Instalou o antigo `Titan` pelo catálogo `cassiano.diniz`? Esse catálogo saiu do ar. Remova com
 > `/plugin uninstall Titan@cassiano.diniz` e `/plugin marketplace remove cassiano.diniz`, e instale o `cass` acima.
 
 ---
 
-## 2. Críticas (sem fallback — o preflight PARA se faltar)
+## 2. Críticas (a skill que usa perde a função principal sem elas)
 
 | Ferramenta | Quem usa | Como instalar |
 |---|---|---|
-| **superpowers** (`brainstorming`, `writing-plans`) | `planejar` Fases 1 e 5 | `/plugin marketplace add obra/superpowers-marketplace`<br/>`/plugin install superpowers@superpowers-marketplace` |
-| **Taste Skill** (`design-taste-frontend`) | `planejar` Fase 4 (só se houver tela) | `npx skills add https://github.com/Leonxlnx/taste-skill --skill "design-taste-frontend"` |
 | **Codex CLI** ≥ 0.156 (constrói + revisor `gpt-6.1-sol`) | `gpt-implementar` (constrói a partir da spec), `gpt-optimizer` e `auto-think` (confronto) | Instalar o Codex CLI da OpenAI e logar. Sem ele, o `gpt-implementar` não constrói (o Claude assume, com garantia menor); em risco alto, fica BLOQUEADO até voltar. |
 | **Exa** (busca web com procedência) | `search` (pesquisa profunda) | Conta Exa: OAuth no MCP do Exa, ou variável `EXA_API_KEY` (chave grátis em https://dashboard.exa.ai/api-keys). Sem ela, a `search` não roda. |
 
 ---
 
-## 3. Com fallback (degradam sozinhas — o preflight só informa)
+## 3. Opcional
 
 | Ferramenta | Quem usa | Como instalar |
 |---|---|---|
-| **find-skills** | `planejar` Fase 6 (acha skill de auditoria por domínio) | `npx skills add https://github.com/vercel-labs/skills --skill find-skills` |
-| **/pesquisa** (busca profunda) + **Perplexity** | `planejar` Fase 1 — descoberta de "como já resolveram isso" (prior art) | A skill `/pesquisa` é distribuída pelo curso do professor (operacaoautonomia.escoladeautomacao.com.br). Precisa do MCP **Perplexity** ativo; sem ele, a descoberta cai pra varredura leve. |
-| **Cloudflare** (skills de plataforma) | `planejar` Fases 3 e 6 (Workers/D1/R2/KV) | `/plugin marketplace add cloudflare/skills`<br/>`/plugin install cloudflare@cloudflare` |
-| **gemini-api-dev** | `planejar` Fase 4 (mockups Nano Banana) e Fase 3 (escolha de modelo de IA) | `npx skills add google-gemini/gemini-skills --skill gemini-api-dev --global` |
-| **Google Stitch (MCP)** | `planejar` Fase 4 (telas estruturadas) | `claude mcp add stitch --transport http https://stitch.googleapis.com/mcp --header "X-Goog-Api-Key: SUA_CHAVE" -s user` |
-| **GEMINI_API_KEY** (env) | `planejar` Fase 4 (mockups visuais) | Criar grátis em https://aistudio.google.com/apikey e exportar como variável de ambiente |
-| **context7** (MCP) | `planejar` Fase 3 (doc oficial atualizada) | Adicionar o MCP context7 conforme seu provedor |
-| **firecrawl** (MCP) | `planejar` Fases 2 e 3 (raspar sites/artigos) | Adicionar o MCP firecrawl; sem ele, cai pra `curl r.jina.ai` → `WebFetch` |
-
----
-
-## 4. Conferir se está tudo lá
-
-Rode `/planejar` em qualquer ideia: o **preflight da Fase 0** lista, em uma linha, o que está
-presente, o que está indisponível e qual fallback será usado. É a forma oficial de auditar a
-instalação — não precisa conferir item por item na mão.
-
-> Observação honesta: `/pesquisa`, `context7` e `firecrawl` não têm um comando público único
-> aqui porque dependem do seu provedor/curso. Os demais têm o comando exato acima, do jeito que
-> o professor passou.
+| **context7** (MCP) | `auto-think` e `gpt-optimizer` (documentação oficial atualizada da tecnologia em questão) | Adicionar o MCP context7 conforme seu provedor |

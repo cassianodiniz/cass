@@ -1,47 +1,37 @@
 # cass — pensar antes de fazer, construir com prova, conferir antes de confiar
 
-Dez skills pra trabalhar com IA no Claude Code sem cair nas armadilhas de sempre: a IA
+Nove skills pra trabalhar com IA no Claude Code sem cair nas armadilhas de sempre: a IA
 que sai construindo antes de entender o pedido, que diz "pronto" sem ter testado, que
 inventa número de pesquisa. Cada skill resolve um desses momentos e pode ser chamada
 sozinha. Serve pra qualquer projeto.
 
 <p align="center">
-  <img src="docs/qual-sua-situacao.svg" width="680" alt="Mapa de porta de entrada: qual é a sua situação? Coisa nova: ask-me e search; se for um produto inteiro, planejar. Mudar um projeto que já funciona: ask-me pra tarefa pequena, spec-plan se tem várias etapas. Já sei mais ou menos: ask-me, search atacando o plano, gpt-optimizer. Não sei o que fazer: ask-me, auto-think, spec-plan. Com o plano pronto, implementar ou gpt-implementar constroem e build-review confere, com volta ao construtor quando reprova. A qualquer momento, handoff.">
+  <img src="docs/qual-sua-situacao.svg" width="680" alt="Mapa de porta de entrada, com três jornadas. Sei onde ajustar: direto na spec-plan. Pesquisar ideias: ask-me e depois search. Feature nova: ask-me e depois auto-think. As três seguem pra spec-plan. Com o plano pronto, implementar ou gpt-implementar constroem e build-review confere, com volta ao construtor quando reprova. A qualquer momento, handoff.">
 </p>
 
 ## Como eu uso no dia a dia
 
-Quase tudo começa na **`/cass:ask-me`**. Ela serve pra qualquer coisa, não só pra código:
-organizar uma pasta, montar uma planilha, escrever uma mensagem, mudar um sistema. Ela te
-entrevista até o pedido ficar claro e te entrega um texto pronto pra colar no agente. Depois,
-depende da sua situação:
+São três portas de entrada, e as três terminam no mesmo lugar: a **`/cass:spec-plan`**, que
+transforma o que foi decidido em um plano com tarefas pequenas.
 
-**🌱 Coisa nova, que ainda não existe**
+**🔧 Sei onde ajustar**
+- Você já sabe o que quer mudar. Vá direto na `/cass:spec-plan`.
+
+**🔎 Pesquisar ideias**
+1. `/cass:ask-me` pra organizar o que você quer descobrir. Ela te entrevista até o pedido
+   ficar claro.
+2. `/cass:search` pra achar referências: quem já fez algo parecido e como, com a fonte de
+   cada número.
+3. `/cass:spec-plan` pra transformar o que você achou em tarefas.
+
+**🌱 Feature nova**
 1. `/cass:ask-me` pra organizar a ideia.
-2. `/cass:search` pra achar referências: quem já fez algo parecido e como.
-3. Se for um **produto inteiro** (com telas, login, banco de dados), vá direto na
-   `/cass:planejar`. Ela faz a pesquisa de mercado, escolhe a tecnologia (Supabase,
-   Cloudflare…) e desenha as telas antes de qualquer código.
+2. `/cass:auto-think` pra decidir o caminho. Ela pesquisa a fundo, o Claude propõe uma
+   conclusão, o GPT tenta derrubar (em até 2 rodadas) e você recebe um veredito.
+3. `/cass:spec-plan` pra transformar o caminho escolhido em tarefas.
 
-**🔧 Mudar um projeto que já funciona**
-- Tarefa pequena (trocar um texto, uma cor, um número): `/cass:ask-me` e pronto.
-- Tem várias etapas: `/cass:spec-plan`, que fatia o trabalho em tarefas pequenas. Se você
-  começou na `ask-me`, ela mesma oferece levar o pedido pra `spec-plan` no fim.
-
-**🤔 Já sei mais ou menos o que fazer**
-1. `/cass:ask-me` pra pensar junto.
-2. Peça: *"ataca o plano com /search"*. Ela procura na internet quem já resolveu o mesmo
-   problema e mostra onde o seu plano pode melhorar.
-3. Peça: *"revisa com gpt-optimizer"*. O GPT dá uma segunda olhada em tudo o que foi achado
-   e tenta derrubar, em até 2 rodadas.
-
-É a versão rápida e manual do que a `auto-think` faz sozinha e mais a fundo.
-
-**🧭 Tenho um problema e não sei o que fazer**
-1. `/cass:ask-me` pra organizar o problema.
-2. `/cass:auto-think` pra resolver. Ela pesquisa a fundo, o Claude propõe uma conclusão, o
-   GPT tenta derrubar (em até 2 rodadas) e você recebe um veredito.
-3. Escolheu o caminho? `/cass:spec-plan` transforma ele em tarefas.
+A `ask-me` também serve fora desse fluxo, pra qualquer atividade, não só código: organizar
+uma pasta, montar uma planilha, escrever uma mensagem.
 
 **Depois, em todos os casos:** com o plano pronto, `/cass:implementar` (o agente da
 conversa constrói: Claude, Codex ou outro) ou `/cass:gpt-implementar` (o Claude orquestra
@@ -72,7 +62,7 @@ Não é uma skill: é um guia que instala duas ferramentas (RTK + Ponytail) pro 
 </tr>
 </table>
 
-**Autoria:** Cassiano Diniz · **Co-autoria:** Thales Laray (skill `planejar`) e Tech Club, que forneceu insumos para as skills de revisão e de implementação (`build-review`, `implementar` e `gpt-implementar`)
+**Autoria:** Cassiano Diniz · **Co-autoria:** Tech Club, que forneceu insumos para as skills de revisão e de implementação (`build-review`, `implementar` e `gpt-implementar`)
 
 ---
 
@@ -85,7 +75,7 @@ Não é uma skill: é um guia que instala duas ferramentas (RTK + Ponytail) pro 
 /plugin install cass@cass
 ```
 
-Reinicie o Claude Code. As skills aparecem como `/cass:planejar`, `/cass:spec-plan` etc.
+Reinicie o Claude Code. As skills aparecem como `/cass:ask-me`, `/cass:spec-plan` etc.
 
 **2. As ferramentas que algumas skills usam por fora.** Um comando no terminal instala o que
 dá automático (Mac/Linux; no Windows, pelo Git Bash):
@@ -94,8 +84,8 @@ dá automático (Mac/Linux; no Windows, pelo Git Bash):
 curl -fsSL https://raw.githubusercontent.com/cassianodiniz/cass/main/install.sh | SKIP_PLUGIN=1 bash
 ```
 
-Fica manual só o que depende de conta sua: o **`codex login`** (as skills que usam o GPT), a
-conta no **Exa** (a `search`) e a **GEMINI_API_KEY** (mockups da `planejar`). Detalhe item a
+Fica manual só o que depende de conta sua: o **`codex login`** (as skills que usam o GPT) e a
+conta no **Exa** (a `search`). Detalhe item a
 item no **[INSTALL.md](INSTALL.md)**.
 
 > Nenhuma dependência trava o plugin: se faltar alguma, a skill avisa e segue do jeito que dá.
@@ -109,7 +99,6 @@ Comece pela sua situação, não pelo nome da skill.
 | Quando você... | Use | O que recebe no fim |
 |---|---|---|
 | quer **ser entrevistado antes** de mandar uma tarefa pro agente, pra ele não sair do pedido | `/cass:ask-me` | um pedido fechado, pronto pra colar: o que fazer, o que não fazer e quando parar e perguntar |
-| tem a ideia de um **produto que ainda não existe** e quer saber se vale e como fazer | `/cass:planejar` | um plano completo, com pesquisa de mercado, tecnologia e telas, já revisado |
 | quer **mudar ou acrescentar algo** num projeto, ou tem uma ideia solta que precisa virar tarefas | `/cass:spec-plan` | um plano fatiado em tarefas pequenas, sem dúvida em aberto |
 | tem um **problema difícil e ainda não sabe a resposta** | `/cass:auto-think` | a opção recomendada e as alternativas, cada uma com o porquê |
 | tem um **plano aprovado** e quer que o agente da própria conversa construa (Claude, Codex ou outro) | `/cass:implementar` | o trabalho pronto e testado, salvo no seu computador |
@@ -125,12 +114,9 @@ Comece pela sua situação, não pelo nome da skill.
 
 Algumas skills fazem trabalhos vizinhos. A diferença está no **momento** em que você está.
 
-### Pensar: `planejar`, `spec-plan` ou `auto-think`?
+### Pensar: `spec-plan` ou `auto-think`?
 
-- **`planejar`** é pra algo **totalmente novo**, que ainda não existe e pede pesquisa de
-  mercado: quem já faz isso, pra quem é, que tecnologia usar, como vão ser as telas. É a
-  mais longa das três.
-- **`spec-plan`** é pra todo o resto: uma função nova num sistema que já existe, uma mudança,
+- **`spec-plan`** é pra quando você **já sabe o que quer**: uma função nova num sistema que já existe, uma mudança,
   uma ideia que você já sabe o que é mas ainda não virou tarefa. Ela te entrevista até não
   sobrar dúvida e fatia o trabalho.
 - **`auto-think`** é pra quando **você ainda não sabe a resposta**. Ela não planeja nem
@@ -160,7 +146,7 @@ GitHub sem o seu OK. Muda só **quem digita o código**:
 
 ---
 
-## As dez skills
+## As nove skills
 
 Cada linha: o que faz em português claro, e o detalhe técnico pra quem programa.
 
@@ -171,12 +157,6 @@ já deu. No fim, entrega o pedido pronto pro agente. Serve pra qualquer
 atividade, não só código. Se o pedido for uma mudança em código com várias etapas, oferece
 levar pra `spec-plan`. Não executa nada sem o seu sim.
 <br/>*Técnico:* árvore de decisões resolvida por fronteira; fatos do ambiente ela busca sozinha; pedido final com Objetivo / Pronto quando / Fazer / NÃO fazer / Parar e perguntar.
-
-**`/cass:planejar`** — Você conta a ideia de um produto novo e a skill conduz em etapas:
-pesquisa de mercado, o que o produto precisa fazer, qual tecnologia usar, como vão ser as
-telas e um plano de construção revisado por outros agentes. Você aprova cada etapa. Não
-escreve código.
-<br/>*Técnico:* 9 fases com portão de aprovação; requisitos em EARS; stack com viés Cloudflare; auditoria multiagente; entrega plano + `features.json`.
 
 **`/cass:spec-plan`** — Transforma uma mudança ou ideia em um plano com tarefas pequenas.
 Pergunta em rodadas curtas, sempre com opções e uma recomendação, até não sobrar dúvida.
