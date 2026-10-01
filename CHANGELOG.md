@@ -2,9 +2,8 @@
 
 ## 4.0.0 — 2026-10-01
 
-- **Sai a skill `planejar`.** O plugin fica com nove skills. Junto saem as ferramentas que só ela pedia: superpowers, Taste Skill, find-skills, `/pesquisa` + Perplexity, o plugin Cloudflare, gemini-api-dev, o MCP do Stitch, a `GEMINI_API_KEY` e o firecrawl. O `install.sh` agora instala só o plugin e o Codex CLI; o `INSTALL.md` lista só Codex, Exa e context7. Quem já instalou essas ferramentas não perde nada: elas só deixam de ser pedidas.
+- **Instalação mais leve.** O plugin fica com nove skills. O `install.sh` instala só o plugin e o Codex CLI, e o `INSTALL.md` lista só Codex, Exa e context7.
 - **Mapa de entrada com três jornadas** (`docs/qual-sua-situacao.svg` e README): *Sei onde ajustar* vai direto na `spec-plan`; *Pesquisar ideias* passa por `ask-me` e `search`; *Feature nova* passa por `ask-me` e `auto-think`. As três terminam na `spec-plan`. Dali em diante nada muda: `implementar` ou `gpt-implementar`, depois `build-review`.
-- **`auto-think`** deixa de citar a `/planejar` na descrição e na fronteira entre skills.
 
 ## 3.5.0 — 2026-09-29
 
@@ -24,12 +23,12 @@
 
 ## 3.3.1 — 2026-09-25
 
-- **Fica claro quem constrói em cada uma.** `implementar`: o agente da própria conversa constrói, e ele pode ser o Claude, o Codex, o Grok ou outro. `gpt-implementar`: o Claude orquestra e subagentes GPT (no Codex) constroem. Antes os textos diziam "o Claude constrói" e "o GPT constrói", o que dava a entender que a `implementar` só roda no Claude. Mudou no mapa `docs/qual-sua-situacao.svg` (caixas mais largas, com duas linhas), no README, no manifesto e na passagem de bastão da `spec-plan` e da `planejar`.
+- **Fica claro quem constrói em cada uma.** `implementar`: o agente da própria conversa constrói, e ele pode ser o Claude, o Codex, o Grok ou outro. `gpt-implementar`: o Claude orquestra e subagentes GPT (no Codex) constroem. Antes os textos diziam "o Claude constrói" e "o GPT constrói", o que dava a entender que a `implementar` só roda no Claude. Mudou no mapa `docs/qual-sua-situacao.svg` (caixas mais largas, com duas linhas), no README, no manifesto e na passagem de bastão da `spec-plan`.
 
 ## 3.3.0 — 2026-09-25
 
 - **`gpt-builder` passa a se chamar `gpt-implementar`.** Ela faz o mesmo trabalho da `implementar`; só muda quem digita o código (o GPT, e o Claude confere). O nome novo deixa o par visível: `/cass:implementar` e `/cass:gpt-implementar`. Quem digitar o nome antigo ainda cai nela, porque a descrição cita `/gpt-builder`. Citações atualizadas em todas as skills, no README, no INSTALL, no instalador e no mapa `docs/qual-sua-situacao.svg`.
-- **Descrições reescritas em 6 skills** (`auto-think`, `gpt-implementar`, `planejar`, `build-review`, `gpt-optimizer`, `search`). A descrição passa a dizer só **quando** usar a skill, não o passo a passo de como ela trabalha: quando resume o método, o agente tende a seguir o resumo e pular a skill. A `build-review` também passa a citar o convite do `/gpt-implementar`, não só o do `/implementar`. Teste cego com 10 agentes Sonnet (22 pedidos, 5 rodadas por versão): as descrições antigas acertaram 109 de 110, as novas 110 de 110.
+- **Descrições reescritas em 5 skills** (`auto-think`, `gpt-implementar`, `build-review`, `gpt-optimizer`, `search`). A descrição passa a dizer só **quando** usar a skill, não o passo a passo de como ela trabalha: quando resume o método, o agente tende a seguir o resumo e pular a skill. A `build-review` também passa a citar o convite do `/gpt-implementar`, não só o do `/implementar`. Teste cego com 10 agentes Sonnet (22 pedidos, 5 rodadas por versão): as descrições antigas acertaram 109 de 110, as novas 110 de 110.
 
 ## 3.2.0 — 2026-09-24
 
@@ -52,7 +51,7 @@ O plugin passa a se chamar **`cass`** (antes `Titan`) e o repositório passa a s
 - **Instalação consertada.** O README mandava usar o catálogo `cassianodiniz/cassiano.diniz`, que não existe mais. Agora o repositório traz `.claude-plugin/marketplace.json`: `/plugin marketplace add cassianodiniz/cass` + `/plugin install cass@cass`. `install.sh` e `INSTALL.md` acompanham.
 - **Um modelo só pra falar com o GPT: `gpt-6-sol`.** `gpt-optimizer` (esforço `high`), `auto-think` e o motor `_shared/confronto-codex.md` (antes `gpt-5.6-sol`/`gpt-5.6-terra`) e o leitor cego do `handoff` (antes `gpt-5.6-terra`). O `gpt-6-sol` recusa `service_tier="flex"` (HTTP 400), então o `gpt-optimizer` e o `handoff` deixaram de pedir essa via. Testado com chamada real, rodada 1 e rodada 2.
 - **Sincronizadas com as versões locais:** `spec-plan` (oferece os dois construtores no fim), `implementar` (relatório abre pelo que precisa do usuário), `build-review` (relatório abre pelo veredito), `gpt-builder` (passa a usar as referências do `implementar`; a pasta `references/` própria saiu), `gpt-optimizer` e `handoff` (ganha `references/leitor-cego.md` e o aviso de árvore suja).
-- **Auditoria de funcionamento:** removidas as citações a skills que não vêm no plugin (`/revisar`, `/gpt-review`, `/codex-build`, `/setup-matt-pocock-skills`); corrigidos dois links quebrados em `build-review/references/checklist-format.md`; tirados trechos que se dirigiam ao autor como se fosse o usuário; `planejar` passa a oferecer `implementar`/`gpt-builder` pra construir o plano; `auto-think` passa a citar `spec-plan` na fronteira.
+- **Auditoria de funcionamento:** removidas as citações a skills que não vêm no plugin (`/revisar`, `/gpt-review`, `/codex-build`, `/setup-matt-pocock-skills`); corrigidos dois links quebrados em `build-review/references/checklist-format.md`; tirados trechos que se dirigiam ao autor como se fosse o usuário; `auto-think` passa a citar `spec-plan` na fronteira.
 - **README reescrito** pra quem está começando: guia "Qual eu uso?", seção sobre as skills parecidas, detalhe técnico de cada uma, link pros estudos de IA do autor e o prompt de instalação do guia de economia de tokens.
 
 ## 2.4.0 — 2026-09-20
@@ -77,7 +76,6 @@ Sincroniza `spec-plan` e `implementar` com as versões locais evoluídas, remove
 - **Legado "grelhar" removido** de `plugin.json`, README, FLUXOGRAMA, da descrição do `spec-plan` e do corpo do `gpt-builder` (resquício da skill de origem). No lugar: "sabatina até o entendimento comum".
 - **Documentação corrigida:** README e FLUXOGRAMA diziam "sete skills" — são **nove**. Descrição do `auto-think` passa a apontar os dois executores.
 - Removido resíduo `/setup-matt-pocock-skills` em `spec-plan/references/rules-phase-2-spec.md`.
-- **`planejar` substituída pela versão do mentor (Thales) por inteiro** — traz a leva de endurecimento das Fases 2A/4/6/7/8/9 (busca em tiers, realidade do plano Cloudflare, `Falha se:`, `Recursos nomeados`, correção serial com auditoria de costuras, `prova` no features.json + portão `validar-features.js`) e a expansão de `auth-multitenancy.md`. Consequência: sai o caminho de design **Claude Design** (a versão do mentor tem só `design-lab` e `design-taste-frontend`) e as referências `codex-revisor.md`/`descoberta-prior-art.md`, que não existem na versão dele. O `evals/evals.json` foi mantido, mas é da versão anterior.
 
 ## 2.2.0 — 2026-09-15
 
@@ -102,7 +100,7 @@ Troca do executor e duas skills novas de especificação e pesquisa. **Quebra** 
 - **`search` — skill nova.** Pesquisa profunda via **Exa** com procedência: cada número volta com a página, a frase e a data em que foi lido. Requer conta Exa (OAuth ou `EXA_API_KEY`). O destino de arquivamento é uma pasta local `search-findings/` na pasta de trabalho.
 - **`auto-think` — confronto de volta pro Codex/GPT.** A v1.8.0 tinha trocado o confronto pra Opus (portabilidade); volta pro **Codex/GPT** (mecânica da fonte local), mantendo a trava de mascarar dado real antes de qualquer coisa sair pra fora.
 - **`gpt-optimizer`** — sem mudança de modelo (segue `gpt-5.6-sol`).
-- **`planejar` e `handoff`** — inalteradas, exceto a referência ao executor, que passou de `auto-gptworker` pra `gpt-builder`.
+- **`handoff`** — inalterada, exceto a referência ao executor, que passou de `auto-gptworker` pra `gpt-builder`.
 - **Limpeza:** `_shared/codex-constroi.md` removido (só a `auto-gptworker` usava); referências cruzadas religadas.
 
 ## 1.9.0 — 2026-07-15
@@ -110,7 +108,7 @@ Troca do executor e duas skills novas de especificação e pesquisa. **Quebra** 
 Remove a skill `auto-worker` (Claude executa sozinho) — o plugin passa a ter **uma única skill executora**, a `auto-gptworker` (Codex constrói, Claude revisa o diff).
 
 - **`auto-worker` removida.** O contrato de segurança/verificação que ela trazia (`references/protocolo.md`) e o verificador de selo (`scripts/verify-selo.sh`) foram movidos pra `_shared/` — continuam usados por `auto-gptworker` e `auto-think`, agora como propriedade compartilhada do plugin, não de uma skill específica.
-- **Referências reescritas** em `auto-gptworker`, `auto-think`, `_shared/confronto-codex.md`, `gpt-optimizer` e `planejar` (a "ponte de execução" do fim do plano agora oferece `/auto-gptworker`, com a linguagem ajustada pro modelo invertido: Codex constrói, Claude audita o diff — não é mais "Claude executa sozinho").
+- **Referências reescritas** em `auto-gptworker`, `auto-think`, `_shared/confronto-codex.md` e `gpt-optimizer` (a "ponte de execução" do fim do plano agora oferece `/auto-gptworker`, com a linguagem ajustada pro modelo invertido: Codex constrói, Claude audita o diff — não é mais "Claude executa sozinho").
 - **README.md e FLUXOGRAMA.md atualizados** (tabela de comandos, texto e os dois diagramas Mermaid) pra refletir `auto-gptworker` como a skill executora.
 - **Limite honesto:** os dois diagramas Mermaid (README e FLUXOGRAMA) já divergiam um pouco um do outro antes desta mudança (drift pré-existente, não introduzido aqui); ambos foram corrigidos de forma independente, mas não foram reconciliados entre si.
 
@@ -131,7 +129,7 @@ Versiona melhorias que já estavam na fonte local (pós-25/06) mas sem número d
 - **handoff — teste do "leitor cego" (Codex)** + script `skills/handoff/scripts/cold-read.sh`, âncora de validade/HEAD, ficha de decisão (ADR) pra decisão de chat, primeira ação obrigatória de conferência, e entrega como prompt colável.
 - **auto-worker — carimbo de versão (sha256)** do pacote revisado, ligado ao motor compartilhado.
 - **auto-think — trava de entrada** (espelha o pedido, confirma o alvo antes de cavar).
-- **_shared — motor do Codex com variantes por skill** (fonte única) + `planejar` trocando Perplexity→Exa.
+- **_shared — motor do Codex com variantes por skill** (fonte única).
 
 > Nota: a versão local mantém as menções pessoais (nome, `/zaprepair`); no repo público esses trechos foram neutralizados. Local e público ficam no mesmo número (1.7.0), conteúdo idêntico exceto pela personalização.
 
@@ -153,7 +151,7 @@ Versiona melhorias que já estavam na fonte local (pós-25/06) mas sem número d
 ### Mudado
 - **Skill `gpt-refletir` renomeada para `gpt-optimizer`.** Acionamento agora `/Titan:gpt-optimizer` (gatilhos novos: "chama o optimizer", "roda o optimizer") — os de função seguem iguais ("reflete isso", "advogado do diabo", "contraponto", "acha o furo", "/gpt"). A função não mudou (o GPT continua tentando derrubar a decisão); só o nome mudou.
 - **Skill `auto-prompt` renomeada para `auto-worker`.** Acionamento agora `/Titan:auto-worker` (gatilhos novos: "liga o worker", "chama o worker", "manda o worker") — os de função seguem ("modo largar", "larga isso pros agentes", "roda isso sozinho"). Comportamento idêntico; só o nome mudou.
-- **Referências cruzadas atualizadas:** `auto-think` e `planejar` agora apontam pra `/Titan:auto-worker`; `gpt-optimizer` oferece execução via `/Titan:auto-worker`; `auto-think` cita `/Titan:gpt-optimizer` como a porta de parecer rápido. Manifesto (`plugin.json`), README, FLUXOGRAMA, INSTALL e install.sh refletem os nomes novos.
+- **Referências cruzadas atualizadas:** `auto-think` agora aponta pra `/Titan:auto-worker`; `gpt-optimizer` oferece execução via `/Titan:auto-worker`; `auto-think` cita `/Titan:gpt-optimizer` como a porta de parecer rápido. Manifesto (`plugin.json`), README, FLUXOGRAMA, INSTALL e install.sh refletem os nomes novos.
 
 ## 1.5.0 — 2026-06-18
 
@@ -167,7 +165,7 @@ Versiona melhorias que já estavam na fonte local (pós-25/06) mas sem número d
 ## 1.4.0 — 2026-06-18
 
 ### Mudado
-- **Plugin renomeado de `dev` para `Titan`.** Acionamento agora é `Titan:planejar`, `Titan:auto-prompt`, `Titan:auto-think`, `Titan:handoff`, `Titan:gpt-blindagem`. Caminho do `$GPT` no `gpt-blindagem` passou a resolver pela própria pasta da skill (não mais cravado em `dev/`), pra funcionar em qualquer instalação.
+- **Plugin renomeado de `dev` para `Titan`.** Acionamento agora é `Titan:auto-prompt`, `Titan:auto-think`, `Titan:handoff`, `Titan:gpt-blindagem`. Caminho do `$GPT` no `gpt-blindagem` passou a resolver pela própria pasta da skill (não mais cravado em `dev/`), pra funcionar em qualquer instalação.
 
 ## 1.3.0 — 2026-06-16
 
@@ -187,7 +185,7 @@ Versiona melhorias que já estavam na fonte local (pós-25/06) mas sem número d
 
 ### Mudado
 - **auto-think (confronto):** passou a rodar **sempre em `gpt-5.5` · `xhigh` · `service_tier="fast"`** — esforço máximo de raciocínio na via rápida do gpt-5.5. O `fast` vai explícito no comando porque o confronto roda com `--ignore-user-config` (ignora o tier do config global do Codex). Antes era `high` "salvo quando pesado"; agora é xhigh fixo. Sincronizado no motor `_shared/confronto-codex.md`, no `auto-think/SKILL.md` e no `auto-think/references/confronto.md`.
-- **_shared/confronto-codex.md:** `--full-auto` (deprecado pelo Codex 0.130) trocado por `--sandbox workspace-write` equivalente. `planejar` mantém seu próprio esforço (high na checagem leve, xhigh na sanidade) — não herda o xhigh fixo do auto-think.
+- **_shared/confronto-codex.md:** `--full-auto` (deprecado pelo Codex 0.130) trocado por `--sandbox workspace-write` equivalente.
 
 ## 1.2.2 — 2026-06-16
 
@@ -200,8 +198,8 @@ Versiona melhorias que já estavam na fonte local (pós-25/06) mas sem número d
 
 ### Corrigido
 - **auto-think:** removidos os dois blocos de comando do Codex que estavam **copiados inline** no `SKILL.md` (passo 3 e trava #4). Eles divergiam do motor: usavam três nomes de arquivo temporário diferentes (`/tmp/autothink-confronto.md`, `/tmp/autothink-input.md`) contra o `/tmp/confronto-input.md` que o motor sela com hash, e estavam sem as flags `--ignore-user-config --full-auto`. Seguindo o inline ao pé da letra, o selo (hash) podia nunca bater. Agora o comando mora num lugar só (`_shared/confronto-codex.md`) e o `SKILL.md` só aponta pra ele. Também: typo "régra"→"regra" e corte da repetição da regra de mascarar dado.
-- **auto-prompt:** o comando do crítico (Codex) ganhou o **teto de 15 min** (`perl -e 'alarm 900'`) que faltava — era o único da família rodando `codex exec` cru, sem nada que matasse um Codex travado. Alinha com auto-think/planejar/_shared.
-- **_shared/confronto-codex.md:** o cálculo do selo usava `sha256sum` cru, que **não existe no Mac de fábrica** (só `shasum -a 256`) — o passo do selo do auto-think e do planejar quebraria numa máquina sem ele. Agora testa e cai pro `shasum`, igual o `verify-selo.sh` já fazia.
+- **auto-prompt:** o comando do crítico (Codex) ganhou o **teto de 15 min** (`perl -e 'alarm 900'`) que faltava — era o único da família rodando `codex exec` cru, sem nada que matasse um Codex travado. Alinha com auto-think/_shared.
+- **_shared/confronto-codex.md:** o cálculo do selo usava `sha256sum` cru, que **não existe no Mac de fábrica** (só `shasum -a 256`) — o passo do selo do auto-think quebraria numa máquina sem ele. Agora testa e cai pro `shasum`, igual o `verify-selo.sh` já fazia.
 
 ## 1.2.0 — 2026-06-15
 
@@ -209,36 +207,33 @@ Versiona melhorias que já estavam na fonte local (pós-25/06) mas sem número d
 - **auto-think:** o ângulo **Precedente** agora prioriza a **fonte oficial do domínio** antes da web aberta. Quando o problema é claramente de uma tecnologia com dono (Cloudflare, Supabase, React, Postgres…), o agente do ângulo puxa a **documentação oficial via `context7`** (sempre disponível, independente do Perplexity — segura o estudo mesmo se a busca web tropeçar) e, se houver, consulta uma **skill de boas práticas instalada** daquele domínio (match FORTE por fornecedor/framework + tarefa, no máx. 1 por domínio, rodando em subagente isolado pra não inchar a thread). É **condicional** ao enquadramento (passo 1) marcar o problema como "domínio técnico com dono claro" — não vira survey de skill em todo problema. Skill útil **não instalada → nunca para o ciclo**: segue com doc oficial + boas práticas gerais (a falta vira *achado*, não parada). **Aviso de skill faltante graduado:** se só poliria → nota `🅿️ opcional` com oferta de instalar+refazer; se mudaria a resposta → recomendação cai pra 🟡 Hipótese, diagnóstico não fecha como certeza e o aviso sobe pro topo da entrega (na dúvida, rebaixa por criticidade do domínio). Refazer declara o custo (ciclo inteiro de novo), lista todas as faltantes de uma vez, teto de 1 refação. Desenhado e confrontado pelo próprio `/auto-think` (4 ângulos paralelos + 2 rodadas de Codex).
 
 ### Mudado
-- **planejar + auto-think:** o mecanismo de **confronto com o Codex** foi extraído pra um motor compartilhado único — `skills/_shared/confronto-codex.md` — usado pelas duas skills (espelha o padrão de "uma fonte da verdade só"). Some a duplicação: como invocar sem travar, mascarar dado antes, **selo de versão** (hash anti-versão-velha), regra de ouro de filtrar com prova e o fallback se o Codex cair moram num lugar só. Cada skill mantém apenas o que é dela (a `planejar` as duas chamadas de sanidade; a `auto-think` o manifesto e os prompts adversariais das 2 rodadas) e aponta pro motor. Efeito colateral bom: a `planejar` herdou o teto de 15 min e o selo de versão que só a `auto-think` tinha. Comportamento idêntico; só a fiação mudou.
-- **docs (FLUXOGRAMA + README):** sincronizados pra refletir as **4 skills**. O `auto-think` (adicionado na 1.1.0) não aparecia no fluxograma nem no README, que ainda diziam "três skills". Agora o `auto-think` é a 4ª porta do fluxograma, ao lado do `planejar` (os dois "pensadores" que alimentam o executor `auto-prompt`), com o ciclo dele (enquadra → ângulos em paralelo → 2 rodadas de Codex → soluções com veredito → oferece executar). Estilo/cores do mermaid preservados. README passou a listar as 4 skills, a relação pensadores→executor e o motor de confronto compartilhado.
+- **auto-think:** o mecanismo de **confronto com o Codex** foi extraído pra um motor compartilhado único — `skills/_shared/confronto-codex.md` (espelha o padrão de "uma fonte da verdade só"). Some a duplicação: como invocar sem travar, mascarar dado antes, **selo de versão** (hash anti-versão-velha), regra de ouro de filtrar com prova e o fallback se o Codex cair moram num lugar só. A `auto-think` mantém apenas o que é dela (o manifesto e os prompts adversariais das 2 rodadas) e aponta pro motor. Comportamento idêntico; só a fiação mudou.
+- **docs (FLUXOGRAMA + README):** sincronizados pra refletir as **4 skills**. O `auto-think` (adicionado na 1.1.0) não aparecia no fluxograma nem no README, que ainda diziam "três skills". Agora o `auto-think` é a 4ª porta do fluxograma, com o ciclo dele (enquadra → ângulos em paralelo → 2 rodadas de Codex → soluções com veredito → oferece executar). Estilo/cores do mermaid preservados. README passou a listar as 4 skills, a relação pensadores→executor e o motor de confronto compartilhado.
 
 ## 1.1.0 — 2026-06-14
 
 ### Adicionado
-- **auto-think:** nova skill — modo larga-e-some pra **estudar um problema difícil até o fim** (não pra executar nem pra planejar produto). Pesquisa (web via `/pesquisa`/`deep-research` e/ou o próprio sistema do usuário), estuda de vários ângulos em paralelo, **confronta os próprios achados com o Codex** (mesmo mecanismo do `/gpt`), verifica o que se sustenta, re-cava só o que ficou aberto (loop com teto), e entrega **uma ou mais soluções com veredito** — a recomendada + alternativas viáveis + "o que o confronto matou". Para na recomendação; quem executa a escolhida é o `/auto-prompt`. Reusa o `protocolo.md` do `auto-prompt` (prova ou silêncio, fato se confere/intenção se pergunta, PROVEI vs ASSUMI). **Trava própria:** antes de qualquer coisa sair pro Codex (OpenAI) ou pra web, mascara dado real de pessoa e credencial — vai o raciocínio, não a identidade. Detalhe do confronto + selo de versão em `references/confronto.md`. Esforço (fundura/rodadas) é do usuário, a skill nunca escala sozinha.
+- **auto-think:** nova skill — modo larga-e-some pra **estudar um problema difícil até o fim** (não pra executar nem pra desenhar produto). Pesquisa (web via `/pesquisa`/`deep-research` e/ou o próprio sistema do usuário), estuda de vários ângulos em paralelo, **confronta os próprios achados com o Codex** (mesmo mecanismo do `/gpt`), verifica o que se sustenta, re-cava só o que ficou aberto (loop com teto), e entrega **uma ou mais soluções com veredito** — a recomendada + alternativas viáveis + "o que o confronto matou". Para na recomendação; quem executa a escolhida é o `/auto-prompt`. Reusa o `protocolo.md` do `auto-prompt` (prova ou silêncio, fato se confere/intenção se pergunta, PROVEI vs ASSUMI). **Trava própria:** antes de qualquer coisa sair pro Codex (OpenAI) ou pra web, mascara dado real de pessoa e credencial — vai o raciocínio, não a identidade. Detalhe do confronto + selo de versão em `references/confronto.md`. Esforço (fundura/rodadas) é do usuário, a skill nunca escala sozinha.
 
 ## 1.0.3 — 2026-06-14
 
 ### Mudado
-- **Titan:** plugin **neutralizado (white-label)** — qualquer pessoa instala e adota como próprio. Removidas as menções ao Praxios e ao claudex (manifesto, README, `auto-prompt`, referências da `planejar`); o nome do marketplace `cassiano-local` virou instrução genérica no README e no `INSTALL.md`; referência a `smart-claudex:findbugs` virou exemplo genérico. **Autoria preservada:** Cassiano Diniz (autor) + Thales Laray (co-autor, novo campo `contributors` no manifesto e crédito no README). Nenhum caminho de máquina, credencial ou dado pessoal embutido — confirmado por varredura.
+- **Titan:** plugin **neutralizado (white-label)** — qualquer pessoa instala e adota como próprio. Removidas as menções ao Praxios e ao claudex (manifesto, README, `auto-prompt`); o nome do marketplace `cassiano-local` virou instrução genérica no README e no `INSTALL.md`; referência a `smart-claudex:findbugs` virou exemplo genérico. **Autoria preservada:** Cassiano Diniz (autor) + Thales Laray (co-autor, novo campo `contributors` no manifesto e crédito no README). Nenhum caminho de máquina, credencial ou dado pessoal embutido — confirmado por varredura.
 
 ## 1.0.2 — 2026-06-14
 
 ### Adicionado
-- **planejar:** nova etapa na Fase 1 — **"Como já resolveram isso" (prior art)**. Antes de desenhar, usa a skill `/pesquisa` pra descobrir como o problema já foi resolvido lá fora e trazer ângulos que o usuário não estava vendo. Recomendada, mas pulável. Método em `references/descoberta-prior-art.md`, com 3 travas contra "visão diferente porém pior": o jeito simples sempre na mesa (baseline) · filtro da realidade do usuário (dá pra uma pessoa só, não-programador, construir e manter?) · confronto adversarial do Codex GPT. A pesquisa informa, o usuário decide. Salva a comparação em `docs/<nome>-prior-art.md`. Fecha o gap: a `/pesquisa` estava instalada mas não era usada por nenhuma skill.
-- **Titan:** novo **`INSTALL.md`** — arquivo de auto-instalação que reúne todas as dependências externas do plugin (superpowers, taste-skill, find-skills, cloudflare, `/pesquisa`+Perplexity, gemini-api-dev, Stitch MCP, context7, firecrawl, Codex CLI) com os comandos exatos, agrupadas por crítica/com-fallback. Confirmado por investigação: tudo que o professor listou está instalado e em uso pela `planejar` — a `/pesquisa` era a única peça parada.
+- **Titan:** novo **`INSTALL.md`** — arquivo de auto-instalação que reúne todas as dependências externas do plugin (superpowers, taste-skill, find-skills, cloudflare, `/pesquisa`+Perplexity, gemini-api-dev, Stitch MCP, context7, firecrawl, Codex CLI) com os comandos exatos, agrupadas por crítica/com-fallback. Confirmado por investigação: tudo que o professor listou está instalado e em uso — a `/pesquisa` era a única peça parada.
 - **Titan:** novo **`install.sh`** — instalador guiado pra quem não curte terminal. Roda sozinho a parte automatizável (skills via `npx` + MCP do Stitch se a chave for passada) e, no fim, lista o pouco que só o usuário pode fazer (colar as linhas de `/plugin` e dar as chaves). O `INSTALL.md` ganhou uma seção "Jeito rápido" no topo separando "o script instala" × "só você faz".
 
 ## 1.0.1 — 2026-06-14
 
 ### Corrigido
 - **auto-prompt:** removidas todas as menções ao "ultracode". A descrição do plugin (vitrine do `/plugin`) dizia que a skill "liga o ultracode sozinha e calibra o esforço pelo tamanho da tarefa" — o oposto da regra interna, que deixa o esforço inteiramente na mão do usuário. Texto realinhado no manifesto, README, frontmatter, corpo da skill e `protocolo.md`. Keyword `ultracode`/`multi-agente` saiu do manifesto.
-- **planejar:** as fases agora salvam os dois pareceres do Codex que a tabela final prometia mas o passo a passo não gerava — `docs/<nome>-revisao-problema.md` (Fase 1) e `docs/<nome>-revisao-sanidade.md` (Fase 6).
-- **planejar:** removido o manual de instalação antigo (`README-install.md`, jeito `.tar.gz`). A instalação oficial é via `/plugin` → marketplace do plugin, já documentada no README.
 
 ### Mudado
 - **handoff:** em vez de despejar o documento inteiro no chat, agora **salva o `.md`**, **abre na tela** (`open` no Mac / `start` no Windows Git Bash) e **avisa o caminho** em uma linha. Só cai pro despejo no chat se não houver nenhum local gravável.
 
 ## 1.0.0
 
-- Versão inicial: três skills — `planejar` (metodologia de 8 fases), `auto-prompt` (executor Claude + crítico Codex com protocolo de segurança) e `handoff` (passagem de bastão entre sessões).
+- Versão inicial: `auto-prompt` (executor Claude + crítico Codex com protocolo de segurança) e `handoff` (passagem de bastão entre sessões).
