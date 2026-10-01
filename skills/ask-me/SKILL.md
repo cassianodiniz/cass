@@ -15,7 +15,7 @@ A round has at most 4 questions. If the frontier is bigger, ask the 4 whose answ
 
 Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a later round, not this one. A settled decision is not asked again unless the user reopens it.
 
-From the second round on, every round opens with a check: list each limit the user already set ("nada", "nunca", "só", "fixo", "sem", "fica como está") and, next to it, whether any new answer touches it (✓ or ⚠️). Read limits literally: "nada pode ser apagado" covers empty folders too. When unsure, mark ⚠️ — asking costs one line. Each ⚠️ becomes a question naming both and asking which holds. Before adding any other question to a round with a ⚠️, ask yourself: "if the user picks option a (keep the old rule), does this question still make sense?" If not, it waits for the next round.
+From the second round on, every round opens with a check: list each limit the user already set ("nada", "nunca", "só", "fixo", "sem", "fica como está") and, next to it, whether any new answer touches it (✓ or ⚠️). Read limits literally: "nada pode ser apagado" covers empty folders too. When unsure, mark ⚠️ — asking costs one line. Each ⚠️ becomes a numbered question naming both and asking which holds. Before adding any other question to a round with a ⚠️, ask yourself: "if the user picks option a (keep the old rule), does this question still make sense?" If not, it waits for the next round.
 
 Finding facts is your job, never the user's. When a frontier question needs a fact from the environment, repository, tools, or other available sources, find it yourself; don't ask the user for anything you could look up once access is available. Don't block on it: an unresolved fact is an unsettled prerequisite, so only the questions downstream of it wait; ask the rest of the frontier now. The decisions are the user's: put each to them and wait.
 
@@ -30,19 +30,19 @@ Conferi com o combinado:
  ✓ "<limite 1>"
  ⚠️ "<limite 2>" × "<resposta nova>"
 
-⚠️ Antes você disse "<decisão anterior>", agora "<resposta nova>". Qual vale?
+⚠️ 1 - Antes você disse "<decisão anterior>", agora "<resposta nova>". Qual vale?
  a) <a anterior>
  b) <a nova>
  c) <as duas, combinadas assim: …>
  ✅ <letra> — <por quê>
 
-📝 1 - <pergunta>
+📝 2 - <pergunta>
  a) <opção>
  b) <opção>
  c) <opção>
  ✅ <letra recomendada> — <por quê, em uma frase>
 
-📝 2 - <pergunta>
+📝 3 - <pergunta>
  a) <opção>
  b) <opção>
  ✅ <letra recomendada> — <por quê, em uma frase>
@@ -50,21 +50,19 @@ Conferi com o combinado:
 Assumindo (corrija se estiver errado): <padrões óbvios, uma linha cada>
 ```
 
-The user can answer in short form ("1a 2c") or in their own words.
+Every block that offers lettered options carries a number, the ⚠️ ones included, in one sequence per round (⚠️ first, then 📝). The user answers in short form ("1a 2c") or in their own words, and a block without a number leaves them with a bare letter that could belong to any question.
 
 ## Closing
 
 When the frontier is empty and no ⚠️ is open, ask one last question, in a message of its own (after the check, if any):
 
 ```
-📝 Fechamos? Quer que eu transforme isso no pedido pronto pro agente?
+📝 Fechamos? Quer que eu transforme isso no pedido pronto pra IA?
  a) Sim, pode gerar
- b) Antes, quero ajustar alguns pontos
- c) Quero só revisar o entendimento comigo primeiro
- ✅ <a if nothing is pending; otherwise b, naming what is pending>
+ b) Se quiser alterar ou adicionar algo, é só me falar
 ```
 
-The closing question goes alone and ends the message; the brief comes only after the user answers "a" to it. A "pode fechar" said earlier means it's time to ask the closing question, not to skip it. Then deliver it in one block, ready to paste to the agent. Every item comes from an answer or a stated assumption the user did not correct: if you can't point to where the user said it, it stays out.
+Use this text as is: two options, no number (it is the only question in the message) and no ✅ line, since the frontier is already empty and there is nothing left to recommend. The closing question goes alone and ends the message; the brief comes only after the user answers "a" to it. If the user answers with a change or an addition instead, the interview is open again: a change is a new answer, and it usually brings decisions of its own that nobody has discussed yet. Recompute the frontier, run the check against the limits already set, and ask as many rounds as it takes, in the usual format, until the frontier is empty again; only then ask the closing question again. Don't fill in what the change implies by guessing just because the interview seemed finished. A "pode fechar" said earlier means it's time to ask the closing question, not to skip it. Then deliver it in one block, ready to paste to the agent. Every item comes from an answer or a stated assumption the user did not correct: if you can't point to where the user said it, it stays out.
 
 ```
 Objetivo: <o que é pra fazer, em uma frase>
