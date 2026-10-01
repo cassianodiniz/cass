@@ -1,5 +1,11 @@
 # Changelog — cass (antigo Titan)
 
+## 4.1.0 — 2026-10-01
+
+- **`build-review`: resposta final curta e com a decisão no fim.** Os três relatórios (Standards, Spec, Fiscal) passam a ir inteiros para `.checks/<feature>.review.md`. No chat vêm quatro partes: *Veredito*, *O que não trava*, *O que trava* e *O que preciso de você*. Cada defeito aparece uma vez, em palavras, com quem achou; o que ficou sem proteção vai junto numa linha "Sem teste que avise se parar de funcionar"; códigos de item e nomes de arquivo ficam só no arquivo.
+- **A pergunta final diz quem faz o conserto.** Passou: "posso subir e abrir a PR?". Reprovou: consertar na própria sessão (`implementar`) ou devolver ao Codex num pedido novo (`gpt-implementar`), mesmo com as rodadas dele gastas. Sem saber quem construiu, ela pergunta. Numa segunda vistoria que reprova depois do conserto, ela para e dá três saídas com recomendação.
+- Testada de ponta a ponta em cinco cenários, com sessão real e os três revisores rodando. O que os revisores conferem e quando a vistoria reprova não mudou.
+
 ## 4.0.0 — 2026-10-01
 
 - **Instalação mais leve.** O plugin fica com nove skills. O `install.sh` instala só o plugin e o Codex CLI, e o `INSTALL.md` lista só Codex, Exa e context7.
