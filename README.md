@@ -184,7 +184,7 @@ fim, oferece a vistoria independente (`build-review`), que confere as provas com
 **`/cass:gpt-implementar`** — Mesmo trabalho do `implementar`, mas o Claude orquestra e quem
 constrói são subagentes GPT, no Codex. O Claude escreve a ordem de serviço, lê tudo o que o Codex fez como se fosse revisar o trabalho
 de um colega, e só salva o que passou na prova.
-<br/>*Técnico:* `codex exec` com `gpt-6.1-sol` esforço `medium`; fiscal prova cada item no HEAD; até 2 rodadas de correção antes do Claude assumir.
+<br/>*Técnico:* `codex exec` com `gpt-6.1-sol` esforço `medium`; fiscal prova cada item no HEAD; até 2 rodadas de correção; depois o Claude para e pergunta a você, sem consertar sozinho.
 
 <p align="center"><img src="docs/skill-construtoras.svg" width="720" alt="As duas construtoras começam iguais: seu sim pra tarefa, pasta limpa com marco de início e a lista de provas escrita pelo Claude antes do código. Na implementar, o agente da conversa constrói com teste antes do código, anota decisões novas, faz commits e não há fiscal no meio. Na gpt-implementar, o Claude escreve a ordem de serviço, subagentes GPT constroem no Codex, o Claude roda as provas e commita, e um fiscal confere cada asserção; se reprova, volta ao Codex até 2 vezes e depois para e pergunta. As duas terminam no relatório final e oferecem a vistoria com o seu sim."></p>
 
