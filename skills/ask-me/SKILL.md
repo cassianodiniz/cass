@@ -11,7 +11,7 @@ Interview the user relentlessly until you reach a shared understanding. Map this
 
 Work the tree in rounds. The frontier is every decision whose prerequisites are already settled: the questions you can ask now without guessing at answers you haven't heard yet. Number each question and give your recommended answer. Then wait for the user's answers before the next round.
 
-A round has at most 4 questions. If the frontier is bigger, ask the 4 whose answers unblock the most of the tree; the rest go to the next round. A decision with an obvious default is not a question: state it as an assumption in one line under the round, and the user corrects it only if wrong.
+A round has at most 4 questions. If the frontier is bigger, ask the 4 whose answers unblock the most of the tree; the rest go to the next round. A decision with an obvious default is not a question: state it as an assumption in one line under the round, and the user corrects it only if wrong. At most one question per interview may be open: a numbered block with no letters and no ✅, where "nada" is a fine answer. Use it for the sample in Shared understanding; if no sample fits the task and you can't write options for what makes the result good without guessing, use it for that, with 2 or 3 examples from what you found.
 
 Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a later round, not this one. A settled decision is not asked again unless the user reopens it.
 
@@ -22,6 +22,17 @@ Finding facts is your job, never the user's. When a frontier question needs a fa
 Simplicity must never remove required behavior, input validation at trust boundaries, error handling needed to prevent data loss, security requirements, accessibility basics, or anything explicitly agreed with the user.
 
 Write the questions in Portuguese, in plain words (the user is not a programmer).
+
+## Shared understanding
+
+The outcome of the interview is an understanding the user can recognize and correct, grounded in what they want to accomplish.
+
+1. **Discover intent.** Use the request and available context to identify the intended outcome, who it is for, and what success looks like. When that information is missing, ask one focused question about it before proposing features or an approach. Knowing the kind of task does not tell you what the user will accept.
+2. **Present a short design.** When the user will judge the result by looking at it (content, design, a rewrite), show in chat a small concrete sample of how it will come out and ask, as the interview's open question, what they would change in it. The test: would the user understand this better by seeing it than reading it?
+3. **Write back your understanding.** Summarize the intended outcome, relevant constraints, and success criteria in a short note the user can assess. Separate what they said from assumptions. Invite correction and incorporate their answer before treating this as the brief.
+4. **Carry intent into the brief.** Preserve the agreed understanding in the brief, with the success criteria in "Pronto quando". Check every item of the brief against that understanding.
+
+When the request already supplies the purpose and constraints, reflect that understanding instead of asking the same questions again. Keep the note concise; its accuracy and the opportunity to correct it matter.
 
 ## Round format
 
@@ -54,7 +65,7 @@ Every block that offers lettered options carries a number, the ⚠️ ones inclu
 
 ## Closing
 
-When the frontier is empty and no ⚠️ is open, ask one last question, in a message of its own (after the check, if any):
+When the frontier is empty and no ⚠️ is open, ask one last question, in a message of its own (after the check, if any, and the note from Shared understanding):
 
 ```
 📝 Fechamos? Quer que eu transforme isso no pedido pronto pra IA?
@@ -66,7 +77,7 @@ Use this text as is: two options, no number (it is the only question in the mess
 
 ```
 Objetivo: <o que é pra fazer, em uma frase>
-Pronto quando: <linha de chegada verificável>
+Pronto quando: <linha de chegada verificável, com os critérios de sucesso da nota>
 Fazer: <o que foi decidido, em tópicos>
 NÃO fazer: <lista específica do que ficou de fora — itens concretos, não "não exagere">
 Parar e perguntar: sempre que surgir uma decisão que não está neste pedido, antes de algo irreversível, e quando não der pra seguir sem mim. Na dúvida, pergunte.
@@ -74,6 +85,14 @@ Antes de começar: diga em uma linha o que vai fazer.
 Se tomar alguma decisão que não está neste pedido, diga em uma linha em que se baseou.
 Ao terminar: um resumo curto do que fez; marque o que não conseguiu confirmar e diga onde procurou.
 ```
+
+Before delivering the brief, look at it with fresh eyes:
+
+1. **Placeholder scan:** Any vague requirement? Fix it.
+2. **Internal consistency:** Does any item contradict another, or the agreed understanding?
+3. **Ambiguity check:** Could any requirement be interpreted two different ways? If the user's answers settle it, make it explicit; if they don't, ask before delivering.
+
+Fix any issues inline. No need to re-review — just fix and move on.
 
 If the task depends on information spread across several places (Drive, WhatsApp, e-mail, spreadsheets), add this line before "Parar e perguntar":
 
