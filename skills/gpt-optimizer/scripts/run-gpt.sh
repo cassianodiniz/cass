@@ -37,7 +37,7 @@ RAW="$(mktemp)"; ERR="$(mktemp)"
 trap 'rm -f "$RAW" "$ERR"' EXIT
 
 # Uma tentativa do Codex. Devolve 0 se produziu parecer não-vazio em $OUT.
-# - sem service_tier: o gpt-6-sol recusa "flex" (HTTP 400 "Unsupported service_tier: flex", testado 22/09/2026).
+# - sem service_tier: o gpt-6.1-sol recusa "flex" (HTTP 400 "Unsupported service_tier: flex", testado 03/10/2026; o gpt-6-sol também recusava, 22/09/2026).
 # - --sandbox read-only: o revisor recebe o alvo inteiro via stdin; é uma
 #   revisão de leitura, não pode (nem precisa) escrever no workspace.
 # - -o grava a resposta final já limpa; stdin (-) carrega o pacote inteiro sem

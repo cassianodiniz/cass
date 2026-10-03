@@ -1,4 +1,4 @@
-# Confronto via Codex GPT-6-sol — motor compartilhado
+# Confronto via Codex GPT-6.1-sol — motor compartilhado
 
 Usado pelo `/auto-think`. Este arquivo é o ÚNICO lugar onde mora a
 mecânica de chamar o Codex como segundo par de olhos: como invocar sem travar, como não mandar

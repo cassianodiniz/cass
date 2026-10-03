@@ -126,7 +126,7 @@ bash "$GPT/scripts/run-gpt.sh" "$GPT_SESSION_TMP/gpt_input.md" "$GPT_SESSION_TMP
 
 O 4º argumento (`gpt_thread.txt`) é a **memória do revisor**: na rodada 1 o script grava ali o número da sessão do GPT; na rodada 2 ele retoma essa MESMA sessão. Por isso o prompt da rodada 2 ("você é o MESMO revisor") passa a ser verdade — antes era simulado re-colando o histórico. O `resume` do Codex **não aceita `--sandbox`**: o script força `-c sandbox_mode="read-only"`, sem isso o revisor ganharia permissão de escrever. Verificado 09/07/2026.
 
-O `run-gpt.sh` roda **gpt-6.1-sol · `high`**, sem `service_tier` (o gpt-6-sol recusa `flex` com erro 400 — testado em 22/09/2026). Modelo padrão fixado em gpt-6.1-sol com esforço `high` (29/09/2026; antes era gpt-6-sol, e antes disso gpt-6-astra). Roda como **só-leitura** (`--sandbox read-only`): o revisor recebe o alvo inteiro via stdin, não precisa nem pode tocar em arquivo. Se o Codex falhar, o script **tenta de novo sozinho** e só então desiste com o motivo — você não fica sem aviso (ver **Fallback**).
+O `run-gpt.sh` roda **gpt-6.1-sol · `high`**, sem `service_tier` (o gpt-6.1-sol recusa `flex` com erro 400 — testado em 03/10/2026; o gpt-6-sol também recusava, 22/09/2026). Modelo padrão fixado em gpt-6.1-sol com esforço `high` (29/09/2026; antes era gpt-6-sol, e antes disso gpt-6-astra). Roda como **só-leitura** (`--sandbox read-only`): o revisor recebe o alvo inteiro via stdin, não precisa nem pode tocar em arquivo. Se o Codex falhar, o script **tenta de novo sozinho** e só então desiste com o motivo — você não fica sem aviso (ver **Fallback**).
 
 ## Passo 3 — Regra de ouro (filtrar a rodada 1) e decidir se vale a rodada 2
 
