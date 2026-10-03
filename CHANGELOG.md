@@ -1,5 +1,11 @@
 # Changelog — cass (antigo Titan)
 
+## 4.3.0 — 2026-10-02
+
+- **Cada skill ganhou um desenho do passo a passo no README**, na ordem em que entram no trabalho: `ask-me`, `spec-plan`, `gpt-optimizer`, `implementar` e `gpt-implementar` lado a lado, `build-review`, e depois `auto-think`, `search` e `handoff`. Em verde, os pontos em que a skill para e espera você. Os desenhos ficam em `docs/skill-*.svg` e seguem o tema claro ou escuro.
+- **Mapa do topo: revisão opcional do plano.** A `gpt-optimizer` aparece tracejada entre a `spec-plan` e as construtoras, com a nota "só pra plano grande e complexo; em mudança simples, pule".
+- **`auto-think`:** o texto ainda chamava o modelo do confronto de `GPT-6-sol`; agora diz `GPT-6.1-sol`, o mesmo que o comando já usava desde a 3.5.0.
+
 ## 4.2.0 — 2026-10-01
 
 - **`ask-me`: toda pergunta com opções tem número, inclusive a de conflito (⚠️).** A numeração é uma só por rodada, com as ⚠️ primeiro. Antes, a pergunta de conflito vinha sem número e uma resposta curta como "a" podia ser de qualquer pergunta.

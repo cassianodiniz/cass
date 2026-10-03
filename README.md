@@ -6,7 +6,7 @@ inventa número de pesquisa. Cada skill resolve um desses momentos e pode ser ch
 sozinha. Serve pra qualquer projeto.
 
 <p align="center">
-  <img src="docs/qual-sua-situacao.svg" width="680" alt="Mapa de porta de entrada, com três jornadas. Sei onde ajustar: direto na spec-plan. Pesquisar ideias: ask-me e depois search. Feature nova: ask-me e depois auto-think. As três seguem pra spec-plan. Com o plano pronto, implementar ou gpt-implementar constroem e build-review confere, com volta ao construtor quando reprova. A qualquer momento, handoff.">
+  <img src="docs/qual-sua-situacao.svg" width="680" alt="Mapa de porta de entrada, com três jornadas. Sei onde ajustar: direto na spec-plan. Pesquisar ideias: ask-me e depois search. Feature nova: ask-me e depois auto-think. As três seguem pra spec-plan. Com o plano pronto, se ele for grande e complexo, a gpt-optimizer pode atacá-lo antes da obra; em mudança simples, pule direto. Depois, implementar ou gpt-implementar constroem e build-review confere, com volta ao construtor quando reprova. A qualquer momento, handoff.">
 </p>
 
 ## Como eu uso no dia a dia
@@ -33,7 +33,9 @@ transforma o que foi decidido em um plano com tarefas pequenas.
 A `ask-me` também serve fora desse fluxo, pra qualquer atividade, não só código: organizar
 uma pasta, montar uma planilha, escrever uma mensagem.
 
-**Depois, em todos os casos:** com o plano pronto, `/cass:implementar` (o agente da
+**Depois, em todos os casos:** com o plano pronto, se ele for grande e complexo, vale pedir
+ao GPT que tente derrubá-lo antes da obra com `/cass:gpt-optimizer`; em mudança simples, pule
+esse passo. Então `/cass:implementar` (o agente da
 conversa constrói: Claude, Codex ou outro) ou `/cass:gpt-implementar` (o Claude orquestra
 subagentes GPT, mais barato), e no fim `/cass:build-review` confere
 tudo antes de publicar. A conversa ficou longa? `/cass:handoff` passa o trabalho pra uma
@@ -148,7 +150,7 @@ GitHub sem o seu OK. Muda só **quem digita o código**:
 
 ## As nove skills
 
-Cada linha: o que faz em português claro, e o detalhe técnico pra quem programa.
+Na ordem em que costumam entrar no trabalho: `ask-me`, `spec-plan`, a revisão opcional do plano (`gpt-optimizer`), as duas construtoras lado a lado e a vistoria. Depois, as portas laterais: `auto-think`, `search` e `handoff`. Cada uma tem o que faz em português claro, o detalhe técnico pra quem programa e um desenho do passo a passo. Nos desenhos, verde marca onde a skill para e espera você.
 
 **`/cass:ask-me`** — Antes de mandar uma tarefa, a skill te entrevista em rodadas curtas
 (no máximo 4 perguntas, cada uma com a resposta que ela recomenda) até os dois entenderem
@@ -158,16 +160,21 @@ atividade, não só código. Se o pedido for uma mudança em código com várias
 levar pra `spec-plan`. Não executa nada sem o seu sim.
 <br/>*Técnico:* árvore de decisões resolvida por fronteira; fatos do ambiente ela busca sozinha; pedido final com Objetivo / Pronto quando / Fazer / NÃO fazer / Parar e perguntar.
 
+<p align="center"><img src="docs/skill-ask-me.svg" width="520" alt="A ask-me busca os fatos sozinha, faz rodadas de até 4 perguntas com a resposta recomendada, espera você responder e confere cada resposta com os limites que você já deu; enquanto houver decisão em aberto, faz nova rodada. Depois pergunta se fechamos, entrega o pedido pronto pra colar e pergunta se executa ali ou leva pra spec-plan."></p>
+
 **`/cass:spec-plan`** — Transforma uma mudança ou ideia em um plano com tarefas pequenas.
 Pergunta em rodadas curtas, sempre com opções e uma recomendação, até não sobrar dúvida.
 No fim, oferece construir com `implementar` ou `gpt-implementar`.
 <br/>*Técnico:* spec + issues autocontidas em `docs/plans/<plano>/issues/`; cenários de comportamento; varredura dos "9 esquecidos" (validação, falhas, idempotência...).
 
-**`/cass:auto-think`** — Estuda um problema sem resposta pronta: pesquisa com fonte, ataca
-por vários ângulos e manda o GPT tentar derrubar cada ideia, duas vezes. Volta com a
-recomendada e as alternativas. Não executa nada. Antes de mandar qualquer coisa pra fora,
-troca nomes e dados pessoais por etiquetas.
-<br/>*Técnico:* confronto adversarial com Codex `gpt-6.1-sol` em 2 rodadas; pesquisa via `search`.
+<p align="center"><img src="docs/skill-spec-plan.svg" width="520" alt="A spec-plan entrevista em rodadas, passa pelos 9 requisitos que ninguém escreve e só segue com o seu sim. Escreve o plano fatiado em tarefas num rascunho, conta o plano em passos e pergunta se você aprova; se pedir ajuste, refaz o rascunho. Aprovado, salva em docs/plans e pergunta qual tarefa e quem constrói."></p>
+
+**`/cass:gpt-optimizer`** — Segunda opinião sobre uma decisão que você já tomou. O GPT recebe
+uma ordem: tentar derrubar. Volta com Seguir, Ajustar ou Bloquear e só os furos que
+procedem. Só roda quando você chama. Vale a pena em plano grande e complexo, entre a `spec-plan` e a construção; em mudança simples, pule.
+<br/>*Técnico:* Codex `gpt-6.1-sol` esforço `high`, só leitura; a 2ª rodada audita o seu filtro dos pontos.
+
+<p align="center"><img src="docs/skill-gpt-optimizer.svg" width="520" alt="A gpt-optimizer monta o alvo com a decisão, o porquê e o estado do código; o GPT tenta derrubar; o Claude filtra cada ponto com prova. Só se o Claude descartou algum ponto, o GPT audita esse filtro numa segunda rodada, e nunca há terceira. Sai Seguir, Ajustar ou Bloquear; se Seguir, oferece levar pra construção com o seu sim."></p>
 
 **`/cass:implementar`** — O agente da conversa (Claude, Codex ou outro) constrói um plano já aprovado, uma tarefa por vez: escreve
 a lista do que foi prometido com a prova de cada item, testa e salva no seu computador. No
@@ -179,11 +186,23 @@ constrói são subagentes GPT, no Codex. O Claude escreve a ordem de serviço, l
 de um colega, e só salva o que passou na prova.
 <br/>*Técnico:* `codex exec` com `gpt-6.1-sol` esforço `medium`; fiscal prova cada item no HEAD; até 2 rodadas de correção antes do Claude assumir.
 
+<p align="center"><img src="docs/skill-construtoras.svg" width="720" alt="As duas construtoras começam iguais: seu sim pra tarefa, pasta limpa com marco de início e a lista de provas escrita pelo Claude antes do código. Na implementar, o agente da conversa constrói com teste antes do código, anota decisões novas, faz commits e não há fiscal no meio. Na gpt-implementar, o Claude escreve a ordem de serviço, subagentes GPT constroem no Codex, o Claude roda as provas e commita, e um fiscal confere cada asserção; se reprova, volta ao Codex até 2 vezes e depois para e pergunta. As duas terminam no relatório final e oferecem a vistoria com o seu sim."></p>
+
 **`/cass:build-review`** — Vistoria final antes de publicar. Três revisores que não conversam
 entre si: um confere as regras do projeto, outro se o que foi pedido foi feito, e um fiscal
 prova cada item da lista, inclusive estragando o código de propósito pra ver se os testes
 percebem.
 <br/>*Técnico:* 3 subagentes (Standards, Spec, Fiscal) sobre `<marco>..HEAD`; injeção de defeito em `git worktree`; o veredito é do Fiscal.
+
+<p align="center"><img src="docs/skill-build-review.svg" width="600" alt="A build-review reúne o marco de início, o pedido original, a lista de provas e as regras do projeto; sem lista de provas, para. Três revisores trabalham em paralelo sem conversar: Standards confere as regras do projeto, Spec confere se fez o que foi pedido e o Fiscal prova cada item, inclusive estragando o código de propósito. Os relatórios vão inteiros pra um arquivo e sai o veredito. Aprovado: pergunta se pode subir e abrir a PR. Reprovado: pergunta se devolve a quem construiu pra uma rodada de conserto."></p>
+
+**`/cass:auto-think`** — Estuda um problema sem resposta pronta: pesquisa com fonte, ataca
+por vários ângulos e manda o GPT tentar derrubar cada ideia, duas vezes. Volta com a
+recomendada e as alternativas. Não executa nada. Antes de mandar qualquer coisa pra fora,
+troca nomes e dados pessoais por etiquetas.
+<br/>*Técnico:* confronto adversarial com Codex `gpt-6.1-sol` em 2 rodadas; pesquisa via `search`.
+
+<p align="center"><img src="docs/skill-auto-think.svg" width="520" alt="A auto-think confirma o alvo com você e, daí em diante, não interrompe: enquadra o problema, estuda por vários ângulos, manda o GPT tentar derrubar as candidatas, passa cada uma por um portão de 4 perguntas e cava de novo só o que muda a decisão. O GPT confronta os finalistas numa segunda rodada e ela entrega a recomendada e as alternativas, sem executar nada."></p>
 
 **`/cass:search`** — Pesquisa na internet sem número inventado: cada dado volta com a página,
 a frase exata e a data em que foi lido. O que não achar, ela diz que não achou. Guarda tudo
@@ -191,15 +210,14 @@ numa pasta do projeto. Serve pra pesquisar um assunto e também pra **atacar um 
 peça "ataca o plano com /search" e ela procura quem já resolveu o mesmo problema.
 <br/>*Técnico:* orquestrador Exa com subagentes; registro de procedência por número; arquivo em `search-findings/`. Precisa de conta Exa (tem plano grátis).
 
-**`/cass:gpt-optimizer`** — Segunda opinião sobre uma decisão que você já tomou. O GPT recebe
-uma ordem: tentar derrubar. Volta com Seguir, Ajustar ou Bloquear e só os furos que
-procedem. Só roda quando você chama.
-<br/>*Técnico:* Codex `gpt-6.1-sol` esforço `high`, só leitura; a 2ª rodada audita o seu filtro dos pontos.
+<p align="center"><img src="docs/skill-search.svg" width="520" alt="A search mede o tamanho da pergunta e só pergunta a profundidade quando ela é ambígua. Subagentes buscam em paralelo no Exa; ela confere o relato de cada um antes de confiar e faz nova passada se faltou cobertura. Cada número sai com página, frase e data, tudo fica guardado em search-findings e a resposta traz a fonte de cada dado."></p>
 
 **`/cass:handoff`** — A conversa ficou longa e você quer continuar depois. A skill escreve um
 documento de passagem com o que foi decidido, o que falta e onde estão as coisas, separando
 fato de suposição, e te dá um texto pronto pra colar na sessão nova.
 <br/>*Técnico:* ancorado num commit — se o trabalho da conversa estiver sem commit, para e pede o commit antes; ao começar do zero algo que surgiu, ancora no ramo principal; cada afirmação marcada `[GIT]`/`[ARQUIVO]`/`[CHAT]`/`[SUPOSIÇÃO]`.
+
+<p align="center"><img src="docs/skill-handoff.svg" width="520" alt="A handoff confere o git: se algum arquivo desta conversa está sem commit, pede o seu OK pra commitar antes de seguir. Escolhe a âncora, varre a conversa inteira, marca a origem de cada afirmação, salva o documento em .claude/handoffs e entrega um texto pronto pra colar na sessão nova."></p>
 
 ---
 

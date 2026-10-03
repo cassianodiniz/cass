@@ -1,7 +1,7 @@
 # Mecânica de modelos — específico do /auto-think
 
 **Decisão 12/09/2026 (inversão dos papéis):** a pesquisa e a síntese voltaram pra **sessão atual**
-(o próprio Claude que roda o auto-think), e o **confronto adversarial passou a ser o GPT-6-sol**
+(o próprio Claude que roda o auto-think), e o **confronto adversarial passou a ser o GPT-6.1-sol**
 (via Codex CLI). Antes (12/07/2026) era o contrário: GPT nos ângulos, Opus no confronto.
 
 Por que inverteu (racional do dono, validado numa fatia antes de cravar):
@@ -63,7 +63,7 @@ reabre todos os ângulos — só o que fecha a dúvida em aberto.
 
 ---
 
-## Confronto (passos 3 e 6) — GPT-6-sol como advogado do diabo, via Codex CLI
+## Confronto (passos 3 e 6) — GPT-6.1-sol como advogado do diabo, via Codex CLI
 
 Aqui é o único ponto do ciclo que usa o Codex. O GPT-sol tenta **DERRUBAR** o leque que a sessão
 produziu. Mecânica espelhada do `/gpt-implementar` (prompt por stdin, saída em arquivo, sandbox
