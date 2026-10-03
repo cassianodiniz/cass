@@ -86,7 +86,7 @@ mais importa pro auto-think está abaixo.
 
 O auto-think pode investigar o sistema do usuário — código, banco, arquivos — e isso pode
 esbarrar em dado real de paciente/aluno, em senha ou em chave. Agora quem sai pra fora é **o
-confronto** (passos 3 e 6: as candidatas vão pro **Codex/GPT-6-sol, OpenAI, fornecedor
+confronto** (passos 3 e 6: as candidatas vão pro **Codex/GPT-6.1-sol, OpenAI, fornecedor
 externo**) e **a pesquisa web** (a query vai pro Exa, via `/search`). A produção — ângulos,
 síntese, re-cava — fica na **sessão atual (Anthropic)**, que também é quem lê o código/banco. Logo:
 
@@ -136,7 +136,7 @@ o problema, não baixar a base.
 - **Fonte da web tem o mesmo rigor:** afirmação de blog/fórum vale menos que doc oficial. Cita
   a fonte e a data; marca como ASSUMIDO quando a fonte é fraca ou a versão não bate. Confrontar
   a pesquisa = checar se a fonte sustenta a afirmação, não só se "alguém disse na internet".
-- **Não se auto-aprova:** o confrontador é o GPT-6-sol (fornecedor OpenAI, externo), enquanto
+- **Não se auto-aprova:** o confrontador é o GPT-6.1-sol (fornecedor OpenAI, externo), enquanto
   quem produz é a sessão (Anthropic). Fornecedores diferentes nas duas pontas — o auto-think nunca
   aprova o próprio raciocínio sozinho.
 
@@ -263,8 +263,8 @@ sustenta. Junta tudo num leque — **mira ≥ 3 candidatas distintas** antes de 
 Se os ângulos convergiram todos na mesma candidata, dispara mais um ângulo (contrário ou
 radical) pra garantir que não é falta de imaginação, e não convergência real.
 
-### 3. Confrontar os achados (GPT-6-sol tenta derrubar) — 1ª rodada
-Cada achado e cada candidata passa pelo **GPT-6-sol** (via Codex CLI) como **advogado do diabo**
+### 3. Confrontar os achados (GPT-6.1-sol tenta derrubar) — 1ª rodada
+Cada achado e cada candidata passa pelo **GPT-6.1-sol** (via Codex CLI) como **advogado do diabo**
 (decisão 12/09/2026 — quem produz é a sessão/Anthropic; quem confronta é o GPT/OpenAI, fornecedores
 diferentes). O GPT tenta REFUTAR: isto resolve mesmo o problema ou só um sintoma? A premissa é
 fato ou foi vendida como fato? Tem caminho mais simples? A fonte sustenta a afirmação? O que
@@ -272,7 +272,7 @@ sobrevive fica; o que é refutado cai (com o motivo registrado pra a entrega).
 
 Como chamar (mascarando dado real ANTES — ver a trava acima): via Bash, `codex exec --model
 gpt-6.1-sol -c model_reasoning_effort="high" --sandbox read-only`, prompt adversarial + manifesto das candidatas. Mecânica e o
-prompt das duas rodadas: `references/confronto.md`, seção "Confronto (GPT-6-sol)". Confronta em
+prompt das duas rodadas: `references/confronto.md`, seção "Confronto (GPT-6.1-sol)". Confronta em
 LOTE (várias candidatas num prompt só) pra não multiplicar chamadas.
 
 ### 4. O PORTÃO DE QUALIDADE — 4 perguntas que toda candidata passa
@@ -336,7 +336,7 @@ ainda aberta**, NÃO para calado: entrega o que tem e **pergunta "ainda tem dúv
 decisão e bati o teto — continuo?"**. O teto é rede contra descontrole, não tesoura escondida.
 
 ### 6. Confrontar os sobreviventes — 2ª rodada
-Antes de entregar, os finalistas (a recomendada + as alternativas reais) voltam ao **GPT-6-sol** —
+Antes de entregar, os finalistas (a recomendada + as alternativas reais) voltam ao **GPT-6.1-sol** —
 retomando a MESMA sessão do Codex da 1ª rodada (resume), pra ele lembrar o que já apontou — agora
 com a pergunta afiada: *dessas que sobraram, qual escolher e por quê — e o que ainda fura na
 recomendada?* Essa segunda passada é o que separa "sobreviveu por sorte" de "sobreviveu de
@@ -491,7 +491,7 @@ qualitativo: escopo, reversível/destrutivo, dependência nova — nunca "leva X
 ## A mecânica de composição (provar numa fatia antes de cavar fundo)
 
 O auto-think depende de acionar outras peças: a skill `/search` pra pesquisa web (via Skill tool),
-`context7` pra doc oficial, o Codex GPT-6-sol pro confronto (via Bash, mecânica em
+`context7` pra doc oficial, o Codex GPT-6.1-sol pro confronto (via Bash, mecânica em
 `references/confronto.md`), e leitura do sistema do usuário. Antes de montar um ciclo grande num
 problema novo, **prova numa fatia pequena que a peça que você vai usar responde** (uma busca curta
 via `/search`, uma chamada de Codex de teste) — assim um problema de encaixe aparece cedo, não no

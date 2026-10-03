@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 651" width="520" height="651" role="img" aria-labelledby="t d">
+<title id="t">Como a gpt-optimizer funciona</title>
+<desc id="d">A gpt-optimizer monta o alvo com a decisão, o porquê e o estado do código; o GPT tenta derrubar; o Claude filtra cada ponto com prova. Só se o Claude descartou algum ponto, o GPT audita esse filtro numa segunda rodada, e nunca há terceira. Sai Seguir, Ajustar ou Bloquear; se Seguir, oferece levar pra construção com o seu sim.</desc>
+<style>
+svg{--tx:#1f2328;--mu:#59636e;--ln:#59636e;--hf:#e1f5ee;--hs:#0f6e56;--ht:#085041;--hu:#0f6e56;--nf:#f6f8fa;--ns:#d1d9e0;--pf:#eaeef2}
+@media (prefers-color-scheme:dark){svg{--tx:#e6edf3;--mu:#9198a1;--ln:#9198a1;--hf:#0b3a30;--hs:#5dcaa5;--ht:#e1f5ee;--hu:#9fe1cb;--nf:#151b23;--ns:#3d444d;--pf:#262c36}}
+text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;font-size:12px;fill:var(--mu)}
+.h{font-size:14px;font-weight:600;fill:var(--tx)}
+.hot rect{fill:var(--hf);stroke:var(--hs);stroke-width:1.2}
+.hot .h{fill:var(--ht)}.hot .s{fill:var(--hu)}
+.nb rect{fill:var(--nf);stroke:var(--ns);stroke-width:1}
+.gh rect{fill:var(--nf);stroke:var(--ln);stroke-width:1;stroke-dasharray:5 4}
+.ac rect{fill:var(--nf);stroke:var(--ln);stroke-width:2}
+.ln{stroke:var(--ln);stroke-width:1.2;fill:none}
+.bk{stroke:var(--hs);stroke-width:1.3;fill:none;stroke-dasharray:5 4}
+.lb{fill:var(--hs);font-weight:600}
+.ah{fill:none;stroke:var(--ln);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ahh{fill:none;stroke:var(--hs);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.pill{fill:var(--pf);stroke:var(--ns)}
+.cap{font-size:13px;font-weight:600;fill:var(--tx);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+</style>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M2 1L8 5L2 9"/></marker><marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahh" d="M2 1L8 5L2 9"/></marker></defs>
+<rect class="pill" x="60" y="20" width="260" height="34" rx="17"/><text class="h" x="190" y="42" text-anchor="middle">um plano ou decisão já tomada</text>
+<line class="ln" x1="190" y1="54" x2="190" y2="76" marker-end="url(#a)"/>
+<g class="nb"><rect x="40" y="78" width="300" height="64" rx="4"/><text class="h" x="190" y="99" text-anchor="middle">monta o alvo</text><text class="s" x="190" y="117" text-anchor="middle">o que se decide, por quê, o que foi</text><text class="s" x="190" y="134" text-anchor="middle">descartado e o estado do código</text></g>
+<line class="ln" x1="190" y1="142" x2="190" y2="164" marker-end="url(#a)"/>
+<g class="nb"><rect x="40" y="166" width="300" height="64" rx="4"/><text class="h" x="190" y="187" text-anchor="middle">rodada 1: o GPT tenta derrubar</text><text class="s" x="190" y="205" text-anchor="middle">resolve o problema certo? tem furo?</text><text class="s" x="190" y="222" text-anchor="middle">existe caminho mais simples? (só leitura)</text></g>
+<line class="ln" x1="190" y1="230" x2="190" y2="252" marker-end="url(#a)"/>
+<g class="nb"><rect x="40" y="254" width="300" height="47" rx="4"/><text class="h" x="190" y="275" text-anchor="middle">o Claude filtra cada ponto com prova</text><text class="s" x="190" y="293" text-anchor="middle">descartar sem prova não vale</text></g>
+<line class="ln" x1="190" y1="301" x2="190" y2="323" marker-end="url(#a)"/>
+<g class="nb"><rect x="40" y="325" width="300" height="64" rx="4"/><text class="h" x="190" y="346" text-anchor="middle">rodada 2: o GPT audita o filtro</text><text class="s" x="190" y="364" text-anchor="middle">o descarte do Claude estava certo?</text><text class="s" x="190" y="381" text-anchor="middle">nunca há uma 3ª rodada</text></g>
+<line class="ln" x1="190" y1="389" x2="190" y2="411" marker-end="url(#a)"/>
+<g class="nb"><rect x="40" y="413" width="300" height="47" rx="4"/><text class="h" x="190" y="434" text-anchor="middle">Seguir, Ajustar ou Bloquear</text><text class="s" x="190" y="452" text-anchor="middle">com no máximo 3 furos que mudam a decisão</text></g>
+<line class="ln" x1="190" y1="460" x2="190" y2="482" marker-end="url(#a)"/>
+<g class="hot"><rect x="40" y="484" width="300" height="47" rx="4"/><text class="h" x="190" y="505" text-anchor="middle">Seguir: quer construir agora?</text><text class="s" x="190" y="523" text-anchor="middle">Ajustar ou Bloquear: resolve antes</text></g>
+<line class="ln" x1="190" y1="531" x2="190" y2="553" marker-end="url(#a)"/>
+<rect class="pill" x="56" y="555" width="268" height="34" rx="17"/><text class="h" x="190" y="577" text-anchor="middle">implementar ou gpt-implementar</text>
+<path class="bk" d="M340 277 H362 V436 H342" marker-end="url(#b)"/>
+<text class="lb" x="370" y="342" text-anchor="start"><tspan x="370" dy="0">aceitou todos</tspan><tspan x="370" dy="15">os pontos: pula</tspan><tspan x="370" dy="15">a rodada 2</tspan></text>
+<line x1="16" y1="611" x2="504" y2="611" stroke="var(--ns)" stroke-width="1" stroke-dasharray="2 3"/>
+<g class="hot"><rect x="24" y="620" width="14" height="12" rx="2"/></g>
+<text x="44" y="630">em verde: ela para e espera você</text>
+<line class="bk" x1="252" y1="626" x2="274" y2="626"/>
+<text x="280" y="630">tracejado: volta ou atalho</text>
+</svg>
