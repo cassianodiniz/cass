@@ -1,5 +1,13 @@
 # Changelog — cass (antigo Titan)
 
+## 4.4.0 — 2026-10-03
+
+- **`ask-me`: antes de fechar, mostra um exemplo de como o resultado vai ficar e pergunta o que você mudaria.** Vale quando você vai julgar o resultado olhando: conteúdo, design, um texto reescrito. "Nada" é uma resposta válida. É a única pergunta aberta da entrevista; quando não há exemplo possível e não dá para montar opções sem chutar, ela vira a pergunta sobre o que faz o resultado ficar bom.
+- **Nota curta de entendimento antes do fechamento:** o objetivo, os limites e o que conta como sucesso, separando o que você disse do que foi suposto, para você corrigir.
+- **"Pronto quando" passa a levar os critérios de sucesso da nota**, e não só "o arquivo existe".
+- **Releitura do pedido antes de entregar:** algo vago, contraditório ou com duas leituras é corrigido; se a resposta não estiver nas suas respostas, ela pergunta antes de entregar.
+- Trechos copiados quase literais da skill `brainstorming` (obra/superpowers). Motivo: no uso real, execuções eram reprovadas por um critério de qualidade que a entrevista não perguntava. Teste de ponta a ponta em 4 situações (entrevista → pedido → execução → juiz): 15 de 20 contra 13 de 20 da versão anterior, com o mesmo número de perguntas na média.
+
 ## 4.3.1 — 2026-10-03
 
 - **Sai o nome velho do modelo nos últimos três lugares.** O título do motor de confronto (`_shared/confronto-codex.md`) e a nota sobre a opção `flex` na `gpt-optimizer` (`SKILL.md` e `run-gpt.sh`) ainda falavam do `gpt-6-sol`. A nota foi testada de novo: o `gpt-6.1-sol` também recusa `flex` com erro 400 (Codex CLI 0.159.0). Os comandos não mudam; continuam sem `service_tier`.
