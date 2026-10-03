@@ -1,5 +1,9 @@
 # Changelog — cass (antigo Titan)
 
+## 4.3.1 — 2026-10-03
+
+- **Sai o nome velho do modelo nos últimos três lugares.** O título do motor de confronto (`_shared/confronto-codex.md`) e a nota sobre a opção `flex` na `gpt-optimizer` (`SKILL.md` e `run-gpt.sh`) ainda falavam do `gpt-6-sol`. A nota foi testada de novo: o `gpt-6.1-sol` também recusa `flex` com erro 400 (Codex CLI 0.159.0). Os comandos não mudam; continuam sem `service_tier`.
+
 ## 4.3.0 — 2026-10-02
 
 - **Cada skill ganhou um desenho do passo a passo no README**, na ordem em que entram no trabalho: `ask-me`, `spec-plan`, `gpt-optimizer`, `implementar` e `gpt-implementar` lado a lado, `build-review`, e depois `auto-think`, `search` e `handoff`. Em verde, os pontos em que a skill para e espera você. Os desenhos ficam em `docs/skill-*.svg` e seguem o tema claro ou escuro.
