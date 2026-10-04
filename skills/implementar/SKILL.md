@@ -59,6 +59,10 @@ Lazy code without its check is unfinished. Non-trivial logic (a branch, a loop, 
 
 Before implementing, read [Checklist](references/checklist.md). Reuse the existing issue-specific checklist when there is one; otherwise write it from the approved source before any code. When the source comes from `$spec-plan`, use `.checks/<plan-id>-<issue-key>-<slug>.md`; for other sources, keep the checklist naming appropriate to that source. Confirm any test seam not already approved before writing tests at it.
 
+**Prévia.** Mudou tela → servidor local + autologin já na tela alterada (`preview_start` quando houver), usando a configuração existente do projeto. Abra a rota alterada em uma aba visível ao usuário com os recursos da sessão. Dado de teste, quando necessário, vai no banco **local**, nome começando por `TESTE`, valores no relatório. Nunca em produção. Confirme o critério visual e o funcionamento na própria tela antes de entregar; a prévia é para o usuário conferir, não para descobrir se funciona.
+
+Na execução delegada, a sessão coordenadora abre, inspeciona e mostra a prévia; a aba do executor pode ser privada e não substitui essa entrega. Use testes de navegador já previstos no projeto, sem instalar infraestrutura nova. Recurso indisponível ou abertura/inspeção que falhou → informe o impedimento e o que não foi verificado no relatório.
+
 Before the final response, read [Final report](references/relatorio.md). Report only the observed implementation state and the actual results this session obtained. State implementation status and independent-review status separately: local proofs run and passed here, `build-review` still pending.
 
 ## Next step (flow)
