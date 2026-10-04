@@ -14,6 +14,8 @@ Faltou uma → pergunte (perguntar é barato). Continua vago depois de perguntar
 
 **Prova nomeia um teste, não uma suíte.** `npm test` verde não diz nada sobre *este* item. Se um teste não cobre o item inteiro, liste mais de uma `Prova:`; todas precisam ficar verdes. Antes de escolher a prova, descubra os comandos reais no manifesto, task runner e CI; prefira o que já roda no CI. Não existe comando pro que o item precisa → pergunte, nunca invente: prova que não roda é pior que nenhuma.
 
+**Contrato substituído.** Quando a fonte muda um comportamento já testado, rastreie antes de construir os testes que o exercitam, inclusive por chamadores indiretos. Em `Coverage`, nomeie cada teste afetado, a expectativa substituída e uma prova discriminante para cada garantia não substituída. Se a nova consulta deixar de observar uma garantia, nomeie a observação independente que a provará ou a seam/autorização faltante como pendência. Em `Sources`, vincule a autorização de adaptação, ou marque-a como pendente. Inventário não autoriza alterar testes.
+
 ## Varredura dos 9 esquecidos
 
 Requisitos que ninguém escreve na spec. Passe por cada um e diga **onde caiu** — item `Cn`, "já existe em `<arquivo>`", ou "fora de escopo porque X". Os três são respostas completas; passar em silêncio não é.

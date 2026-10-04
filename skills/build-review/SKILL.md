@@ -44,16 +44,18 @@ Um subagente por revisor, no mesmo turno, cada um com o briefing **verbatim** do
 1. **Standards** — siga `references/matt-code-review.md`, eixo Standards, com a base de maus cheiros colada por inteiro (o subagente não tem outro acesso a ela).
 2. **Spec** — siga `references/matt-code-review.md`, eixo Spec, com a issue/spec.
 3. **Fiscal** — siga `references/verify.md` do começo ao fim, **todos os passos, incluindo a injeção de defeito**, e inclua verbatim no briefing a resolução local abaixo. Ele recebe a checklist, o diff, a fonte, e roda só leitura (a injeção acontece num `git worktree` isolado, nunca na árvore real).
-   - **Force o perfil `standard` no mínimo** (`ui` se a feature tem telas). O `verify.md` assume `light` por padrão, e `light` pula exatamente a injeção de defeito, a enumeração de cobertura e as regras de teste — que são o motivo de existir a build-review. Diga o perfil no prompt do Fiscal; não deixe ele cair no padrão.
-   - Ao julgar uma prova entre camadas, esta regra local prevalece sobre instruções ou exemplos contrários de `verify.md`: inspecione somente as dependências necessárias para confirmar o caminho real e o isolamento do comportamento; mutante só morre quando a asserção relevante falha, não quando setup ou outra causa encerra o comando; política explícita e aplicável do repositório continua obrigatória junto da checklist, mas o formato histórico da suíte sozinho não cria uma regra de nível. No relatório, registre `Claim | caminho real (file:line) | input isolado | asserção (file:line) | falha dirigida e saída | branches/entradas exigidas (origem, total e mapa n/n) | veredito`. Inclua todas as linhas de resultado de uma decisão adicionada ou tocada pelo diff, contratos alterados, fontes vinculantes e checklist; decisão preexistente fora desse conjunto não cria prova nova.
+   - **Force o perfil `standard` no mínimo** (`ui` se a feature tem telas **e o usuário pedir revisão UI**). O `verify.md` assume `light` por padrão, e `light` pula exatamente a injeção de defeito, a enumeração de cobertura e as regras de teste — que são o motivo de existir a build-review. Diga o perfil no prompt do Fiscal; não deixe ele cair no padrão.
+   - Ao julgar uma prova entre camadas, esta regra local prevalece sobre instruções ou exemplos contrários de `verify.md`: inspecione somente as dependências necessárias para confirmar o caminho real e o isolamento do comportamento; mutante só morre quando a asserção relevante falha, não quando setup ou outra causa encerra o comando; se falta executar uma falha dirigida em superfície que carrega check e ainda há margem no teto do `verify.md`, registre prova parcial e veredito não PASS; PASS escopado não encerra essa pendência; política explícita e aplicável do repositório continua obrigatória junto da checklist, mas o formato histórico da suíte sozinho não cria uma regra de nível. No relatório, registre `Claim | caminho real (file:line) | input isolado | asserção (file:line) | falha dirigida e saída | branches/entradas exigidas (origem, total e mapa n/n) | veredito`. Inclua todas as linhas de resultado de uma decisão adicionada ou tocada pelo diff, contratos alterados, fontes vinculantes e checklist; decisão preexistente fora desse conjunto não cria prova nova.
 
 O Fiscal faz julgamento pesado (mutação, cobertura) — não rode ele no modelo econômico. Standards e Spec também são julgamento.
 
+Enquanto os revisores trabalham, fale só em marcos, uma linha cada: disparei os três; terminou X; problema de ambiente (o que travou e o que foi feito). Não explique o que cada revisor faz nem antecipe achados: o resultado vem uma vez, na mensagem final.
+
 ## Junta sem misturar
 
-Os três relatórios vão **inteiros**, cada um sob seu título (`## Standards`, `## Spec`, `## Fiscal`), para `.checks/<feature>.review.md`. É lá que os eixos ficam separados e completos.
+Os três relatórios vão **inteiros**, cada um sob seu título (`## Standards`, `## Spec`, `## Fiscal`), para `.checks/<feature>.review.md`. É lá que os eixos ficam separados e completos. Para o Fiscal, abra e copie `.checks/<feature>.verified.md`; o retorno compacto no chat aponta para esse relatório, não o substitui. Se o arquivo estiver ausente, registre a ausência e peça o relatório ao Fiscal, sem inventar o conteúdo.
 
-A mensagem ao usuário É estas quatro partes, nesta ordem, na língua e no nível de quem vai ler:
+A mensagem final ao usuário É estas quatro partes, nesta ordem, na língua e no nível de quem vai ler:
 
 ```
 ## Veredito
@@ -65,6 +67,7 @@ A mensagem ao usuário É estas quatro partes, nesta ordem, na língua e no nív
 ## O que trava
 - <cada defeito que a pessoa veria no uso, UM por linha, em palavras; entre parênteses, quem achou>
 - Sem teste que avise se parar de funcionar: <todas as partes que ficam sem proteção, numa linha só, separadas por ponto e vírgula> (<quem achou>)
+- Prova impedida por ambiente ou acesso: <o que não foi verificado e qual recurso falta> (<quem achou>)
 
 Relatórios completos: .checks/<feature>.review.md
 
@@ -81,6 +84,10 @@ Códigos de item (C21, C33…) e caminhos de arquivo ficam no arquivo e no pedid
 
 A linha "Sem teste que avise…" leva toda lacuna da lista de lacunas do Fiscal (item não provado, prova parcial, mutante sobrevivente, caso sem teste, ponto do desenho que nada confere), esteja ou não ligada a um item da checklist. Sugestão de teste de Spec ou Standards, sem falha apontada ("provavelmente passa"), é conselho e fica em "O que não trava". O que já está listado como defeito de uso não se repete nessa linha.
 
+Quando uma prova existente não executou por ambiente ou acesso, ela entra em "Prova impedida por ambiente ou acesso". Se essa for a única pendência, a próxima ação pede o recurso que falta e encaminha a prova ao Fiscal quando ele estiver disponível. Se houver também defeito demonstrado ou lacuna corrigível na entrega, peça o recurso e mantenha a rota de conserto abaixo para esses achados.
+
+Quando só falta executar a falha dirigida de uma prova nominal já executada e há margem no teto do `verify.md`, a próxima ação é encaminhá-la ao Fiscal; ofereça conserto somente se essa execução demonstrar defeito ou proteção insuficiente. Esta rota precede as ofertas de conserto abaixo.
+
 O último item de "O que preciso de você" é a próxima ação, dizendo quem vai fazer:
 - PASS → "Posso subir e abrir a PR?"
 - FAIL, construído nesta sessão (`/implementar`; a vistoria roda na mesma sessão por decisão do usuário) → "Posso consertar aqui mesmo, nesta sessão que construiu, numa rodada de conserto?"
@@ -95,6 +102,12 @@ Regras da junção:
 - **O portão parte do Fiscal e incorpora defeitos demonstrados pelos outros eixos.** É FAIL se o Fiscal falha ou se Spec ou Standards demonstra, com evidência, requisito ausente ou contradito, bug, risco de segurança ou regressão concreta. Smell, preferência, nit, recomendação ou teste adicional sem comportamento distinto ficam não bloqueantes. Na dúvida de classificação, não promova opinião a bloqueio: registre a incerteza e peça decisão.
 - **Os eixos ficam separados no arquivo.** Na mensagem, cada defeito que trava diz quem o achou, e "O que não trava" dá o maior conselho de cada eixo, sem eleger um vencedor entre eles.
 - **Spec e o passo 1 do Fiscal se encostam** (código×pedido vs checklist×fonte). Achado dobrado às vezes é cobertura, não erro — no arquivo, os dois falam; na mensagem, ele aparece uma vez com os dois nomes.
+
+## Depois do conserto
+
+Terminado o conserto autorizado, o maestro dispara um **novo Fiscal independente** antes de oferecer publicação ou outra rodada. Passe a checklist e suas fontes, `<base da feature>..<novo HEAD>`, o diff do conserto e os relatórios completos da vistoria anterior, incluindo todos os motivos de FAIL dos três eixos. O Fiscal segue verbatim **Re-verifying after a fix** em `references/verify.md`: provas inteiras no novo HEAD, escopo pelo diff e pelos vereditos não PASS, evidência reaproveitada com sua origem.
+
+Se um achado anterior de Spec ou Standards não puder ser conferido por essa prova, reabra o eixo responsável para esse achado. Junte os relatórios atualizados com os anteriores explicitamente identificados, usando o mesmo formato de quatro partes. Com PASS, vale a oferta de PR; com FAIL, valem as saídas pós-conserto acima, sem iniciar outro conserto automaticamente.
 
 ## Erros comuns
 

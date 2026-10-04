@@ -1,5 +1,15 @@
 # Changelog — cass (antigo Titan)
 
+## 4.5.0 — 2026-10-04
+
+- **`spec-plan`: ao dividir o plano em partes, confere se cada parte consegue ser testada sozinha.** Antes de editar o rascunho, monta um mapa critério por critério: o que cada um precisa, quem fornece e se isso já existe quando a parte termina. Se uma parte depende de algo que só chega depois, o pedaço muda de lugar ou a peça vem antes. Nenhuma ação, resultado ou prova se perde na reorganização; o que ficar em aberto continua escrito como obrigação, não vira nota solta.
+- **`spec-plan`: a mensagem de aprovação abre dizendo em quantas partes o plano foi dividido** (ou que é uma entrega só), e explica que uma parte não é automaticamente uma PR ou um deploy separado.
+- **`implementar`: prévia na tela.** Quando a mudança mexe em tela, a skill sobe o servidor local já na tela alterada, confere o critério visual ali antes de entregar e deixa a aba aberta pra você olhar. Dado de teste só no banco local, com nome começando por `TESTE`. Se não conseguiu abrir ou conferir, diz o que ficou sem verificação.
+- **`implementar`: contrato substituído.** Quando o pedido muda um comportamento que já tinha teste, a lista de provas nomeia cada teste afetado, o que mudou nele e o que continua garantido, antes de construir. Listar o teste não autoriza alterá-lo.
+- **`build-review`: durante a vistoria, só avisos curtos** (disparei os três, terminou tal revisor, travou por ambiente); o resultado vem uma vez, no fim.
+- **`build-review`: prova que não rodou por falta de acesso ou ambiente ganha linha própria** em "O que trava", e a próxima ação pede o recurso que falta em vez de oferecer conserto do que não foi demonstrado.
+- **`build-review`: depois do conserto, um Fiscal novo confere de novo** no código consertado antes de oferecer a PR. O relatório completo do Fiscal é copiado inteiro do arquivo dele, não do resumo no chat.
+
 ## 4.4.0 — 2026-10-03
 
 - **`ask-me`: antes de fechar, mostra um exemplo de como o resultado vai ficar e pergunta o que você mudaria.** Vale quando você vai julgar o resultado olhando: conteúdo, design, um texto reescrito. "Nada" é uma resposta válida. É a única pergunta aberta da entrevista; quando não há exemplo possível e não dá para montar opções sem chutar, ela vira a pergunta sobre o que faz o resultado ficar bom.
