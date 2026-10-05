@@ -1,6 +1,6 @@
 # cass — pensar antes de fazer, construir com prova, conferir antes de confiar
 
-Nove skills pra trabalhar com IA no Claude Code sem cair nas armadilhas de sempre: a IA que
+Dez skills pra trabalhar com IA no Claude Code sem cair nas armadilhas de sempre: a IA que
 sai construindo antes de entender o pedido, que diz "pronto" sem ter testado, que inventa
 número de pesquisa. Cada skill resolve um desses momentos e pode ser chamada sozinha.
 
@@ -136,6 +136,20 @@ Ancorado num commit: se o trabalho da conversa estiver sem commit, para e pede o
 
 </details>
 
+### `/cass:otimizar-arquitetura` — quando o código precisa de uma estrutura melhor
+
+Dá ao agente um vocabulário único e poucas regras pra reorganizar código: juntar peças que só
+repassam chamada num módulo que esconde o trabalho atrás de uma porta pequena, mais fácil de
+testar e de mexer. Se você pedir, desenha essa porta de três jeitos diferentes e recomenda um.
+
+<p align="center"><img src="docs/skill-otimizar-arquitetura.svg" width="520" alt="A otimizar-arquitetura entra quando o código vai ser desenhado ou reorganizado. Fixa um vocabulário único, faz o teste da deleção em cada módulo, classifica as dependências em quatro tipos e só cria uma costura quando há dois adaptadores de verdade. Se você quiser ver alternativas, subagentes desenham a interface de três ou mais jeitos bem diferentes e ela compara e recomenda um; senão, segue direto. No fim, os testes passam a morar na interface e os antigos dos módulos rasos saem."></p>
+
+<details><summary>Detalhe técnico</summary>
+
+Módulos fundos (Ousterhout) e costuras (Feathers); 4 categorias de dependência (em processo, substituível local, remota própria com portas e adaptadores, externa com mock); "Design It Twice" com 3+ subagentes em paralelo. Criada por Matt Pocock; aqui só o nome foi traduzido (veja [Créditos](#créditos)).
+
+</details>
+
 ---
 
 ## Instalar
@@ -175,3 +189,9 @@ pra decidir qual modelo serve pra quê.
 **Autoria:** Cassiano Diniz · **Co-autoria:** Tech Club, que forneceu insumos para as skills de
 revisão e de implementação (`build-review`, `implementar` e `gpt-implementar`). Histórico de
 versões em [CHANGELOG.md](CHANGELOG.md).
+
+## Créditos
+
+A **`otimizar-arquitetura`** é a skill `codebase-design` de **[Matt Pocock](https://github.com/mattpocock/skills)**.
+Aqui só o nome foi traduzido. O conteúdo é o original, sob a licença MIT dele
+([licença](skills/otimizar-arquitetura/LICENSE) · [créditos](skills/otimizar-arquitetura/CREDITOS.md)).
