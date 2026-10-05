@@ -2,7 +2,7 @@
 
 ## 4.6.0 — 2026-10-05
 
-- **Skill nova: `otimizar-arquitetura`.** Vocabulário e regras pra desenhar ou reorganizar código em módulos fundos: muito comportamento atrás de uma interface pequena, numa costura limpa, testável pela própria interface. Traz o teste da deleção, as 4 categorias de dependência e o "Design It Twice" (3+ subagentes desenham a interface de jeitos diferentes e ela recomenda um). Conteúdo da `codebase-design` de Matt Pocock (MIT), só com o nome trocado; a licença original vai junto na pasta da skill.
+- **Skill nova: `otimizar-arquitetura`.** Vocabulário e regras pra desenhar ou reorganizar código em módulos fundos: muito comportamento atrás de uma interface pequena, numa costura limpa, testável pela própria interface. Traz o teste da deleção, as 4 categorias de dependência e o "Design It Twice" (3+ subagentes desenham a interface de jeitos diferentes e ela recomenda um). Conteúdo da `codebase-design` de Matt Pocock (MIT), só com o nome trocado; a licença original e um `CREDITOS.md` vão junto na pasta da skill, e o README ganhou uma seção de Créditos no fim.
 - README com a seção e o desenho do passo a passo da skill nova (`docs/skill-otimizar-arquitetura.svg`).
 
 ## 4.5.0 — 2026-10-04

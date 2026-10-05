@@ -146,7 +146,7 @@ testar e de mexer. Se você pedir, desenha essa porta de três jeitos diferentes
 
 <details><summary>Detalhe técnico</summary>
 
-Módulos fundos (Ousterhout) e costuras (Feathers); 4 categorias de dependência (em processo, substituível local, remota própria com portas e adaptadores, externa com mock); "Design It Twice" com 3+ subagentes em paralelo. Baseada na `codebase-design` de [Matt Pocock](https://github.com/mattpocock/skills) (licença MIT, em `skills/otimizar-arquitetura/LICENSE`), com o conteúdo original.
+Módulos fundos (Ousterhout) e costuras (Feathers); 4 categorias de dependência (em processo, substituível local, remota própria com portas e adaptadores, externa com mock); "Design It Twice" com 3+ subagentes em paralelo. Criada por Matt Pocock; aqui só o nome foi traduzido (veja [Créditos](#créditos)).
 
 </details>
 
@@ -189,3 +189,9 @@ pra decidir qual modelo serve pra quê.
 **Autoria:** Cassiano Diniz · **Co-autoria:** Tech Club, que forneceu insumos para as skills de
 revisão e de implementação (`build-review`, `implementar` e `gpt-implementar`). Histórico de
 versões em [CHANGELOG.md](CHANGELOG.md).
+
+## Créditos
+
+A **`otimizar-arquitetura`** é a skill `codebase-design` de **[Matt Pocock](https://github.com/mattpocock/skills)**.
+Aqui só o nome foi traduzido. O conteúdo é o original, sob a licença MIT dele
+([licença](skills/otimizar-arquitetura/LICENSE) · [créditos](skills/otimizar-arquitetura/CREDITOS.md)).
