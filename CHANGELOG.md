@@ -1,5 +1,10 @@
 # Changelog — cass (antigo Titan)
 
+## 4.6.0 — 2026-10-05
+
+- **Skill nova: `otimizar-arquitetura`.** Vocabulário e regras pra desenhar ou reorganizar código em módulos fundos: muito comportamento atrás de uma interface pequena, numa costura limpa, testável pela própria interface. Traz o teste da deleção, as 4 categorias de dependência e o "Design It Twice" (3+ subagentes desenham a interface de jeitos diferentes e ela recomenda um). Conteúdo da `codebase-design` de Matt Pocock (MIT), só com o nome trocado; a licença original vai junto na pasta da skill.
+- README com a seção e o desenho do passo a passo da skill nova (`docs/skill-otimizar-arquitetura.svg`).
+
 ## 4.5.0 — 2026-10-04
 
 - **`spec-plan`: ao dividir o plano em partes, confere se cada parte consegue ser testada sozinha.** Antes de editar o rascunho, monta um mapa critério por critério: o que cada um precisa, quem fornece e se isso já existe quando a parte termina. Se uma parte depende de algo que só chega depois, o pedaço muda de lugar ou a peça vem antes. Nenhuma ação, resultado ou prova se perde na reorganização; o que ficar em aberto continua escrito como obrigação, não vira nota solta.
