@@ -5,7 +5,7 @@ description: Use when the user invokes /spec-plan, $spec-plan or @spec-plan to t
 
 # Spec Plan
 
-Turn the idea into approved issues, each self-contained and ready for a separate `$implementar` session.
+Turn the idea into an approved plan of self-contained issues, ready for one `$implementar` session that builds the whole plan.
 
 Follow two phases, in this order. Read each reference only when its phase begins:
 
@@ -19,4 +19,4 @@ Invariants:
 - Never implement the feature.
 - Never publish externally without explicit authorization for the exact destination.
 - Never use a shared `PLAN.md`. Each plan has its own directory and each issue has a single implementation file.
-- The handoff to `$implementar` points to exactly one issue file, never to the index or to the whole directory.
+- The handoff to `$implementar` points to the plan (`#<plan-issue>` on GitHub, `<plan-name>` in files), never to a single part.

@@ -63,4 +63,5 @@ Depois as skills ficam disponíveis como `/cass:ask-me`, `/cass:gpt-implementar`
 
 | Ferramenta | Quem usa | Como instalar |
 |---|---|---|
+| **GitHub CLI** (`gh`, logado com `gh auth login`) | `spec-plan`, `implementar`, `gpt-implementar` e `build-review`, só em projeto que mora no GitHub (plano e partes como issues, PR do plano) | Instalar em https://cli.github.com e logar. Sem ele, use o plano em arquivos, como antes. |
 | **context7** (MCP) | `auto-think` e `gpt-optimizer` (documentação oficial atualizada da tecnologia em questão) | Adicionar o MCP context7 conforme seu provedor |

@@ -52,6 +52,8 @@ Abra código só quando precisar montar uma correção que o teste vermelho não
 
 Mande ao Codex (resume) a lista exata: problema, arquivo, prova esperada. Depois da 2ª rodada ainda vermelho: **pare**. Não conserte você, nem com pressa do usuário, nem sendo uma linha: o combinado é que o Codex digita, e um conserto seu esconde que ele não entregou. Faça commit do que existe e diga ao usuário o que falta, oferecendo: nova sessão do Codex, você consertar (só com o aval dele), ou seguir pro `/build-review`.
 
+Quando estiver construindo um plano inteiro do GitHub (`/gpt-implementar #<número do plano>`), se a vistoria da build-review mostrar FAIL, também volta ao Codex sem perguntar: o sim do plano cobre até 2 rodadas (consertar > revisar > consertar > revisar novamente).
+
 ## Fim
 
 Relatório de `../implementar/references/relatorio.md`, mais as rodadas usadas e os desvios da spec. Fluxo: `/spec-plan` → **`/gpt-implementar`** → `/build-review`.

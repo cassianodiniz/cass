@@ -103,6 +103,13 @@ Regras da junção:
 - **Os eixos ficam separados no arquivo.** Na mensagem, cada defeito que trava diz quem o achou, e "O que não trava" dá o maior conselho de cada eixo, sem eleger um vencedor entre eles.
 - **Spec e o passo 1 do Fiscal se encostam** (código×pedido vs checklist×fonte). Achado dobrado às vezes é cobertura, não erro — no arquivo, os dois falam; na mensagem, ele aparece uma vez com os dois nomes.
 
+## Ao subir, quando a issue de origem mora no GitHub
+
+Vale com o sim à PR e só quando a issue de origem é do GitHub. Sem GitHub (a issue é arquivo), nada disto: o `**Status:** done` que a construção grava é o bilhete, e a PR não leva `Closes`.
+
+- **Uma PR por plano.** Se ainda não existe, "open a draft PR …, marked as closing the spec and tickets" (Matt, `implement-spec`, passo 3): o texto leva `Closes #<plano>`, o plano que a parte cita como origem, e `Closes #<parte>`. Se já existe, acrescente `Closes #<parte>` ao texto dela, sem tirar as linhas que já estão lá e sem marcá-la como pronta.
+- **Bilhete na parte**, depois de subir o ramo: "**Comment on an issue**: `gh issue comment <number> --body "..."`" (Matt, `setup-matt-pocock-skills/issue-tracker-github.md`), com o texto "Construída e aprovada na vistoria: ramo `<ramo>`, commit `<sha>`". Não feche a issue nem mexa na do plano: quem fecha é o merge da PR.
+
 ## Depois do conserto
 
 Terminado o conserto autorizado, o maestro dispara um **novo Fiscal independente** antes de oferecer publicação ou outra rodada. Passe a checklist e suas fontes, `<base da feature>..<novo HEAD>`, o diff do conserto e os relatórios completos da vistoria anterior, incluindo todos os motivos de FAIL dos três eixos. O Fiscal segue verbatim **Re-verifying after a fix** em `references/verify.md`: provas inteiras no novo HEAD, escopo pelo diff e pelos vereditos não PASS, evidência reaproveitada com sua origem.

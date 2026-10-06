@@ -1,11 +1,11 @@
 # cass — pensar antes de fazer, construir com prova, conferir antes de confiar
 
-Dez skills pra trabalhar com IA no Claude Code sem cair nas armadilhas de sempre: a IA que
+Onze skills pra trabalhar com IA no Claude Code sem cair nas armadilhas de sempre: a IA que
 sai construindo antes de entender o pedido, que diz "pronto" sem ter testado, que inventa
 número de pesquisa. Cada skill resolve um desses momentos e pode ser chamada sozinha.
 
 <p align="center">
-  <img src="docs/qual-sua-situacao.svg" width="680" alt="Mapa de porta de entrada, com três jornadas. Sei onde ajustar: direto na spec-plan. Pesquisar ideias: ask-me e depois search. Feature nova: ask-me e depois auto-think. As três seguem pra spec-plan. Com o plano pronto, se ele for grande e complexo, a gpt-optimizer pode atacá-lo antes da obra; em mudança simples, pule direto. Depois, implementar ou gpt-implementar constroem e build-review confere, com volta ao construtor quando reprova. A qualquer momento, handoff.">
+  <img src="docs/qual-sua-situacao.svg" width="680" alt="Mapa de porta de entrada, com três jornadas. Sei onde ajustar: direto na spec-plan. Pesquisar ideias: ask-me e depois search. Feature nova: ask-me e depois auto-think. As três seguem pra spec-plan. Com o plano pronto, se ele for grande e complexo, a gpt-optimizer pode atacá-lo antes da obra; em mudança simples, pule direto. Depois, implementar ou gpt-implementar constroem e build-review confere, com volta ao construtor quando reprova. A qualquer momento, handoff. Depois de uma sessão, aprender-com-a-sessao.">
 </p>
 
 ## Como eu uso no dia a dia
@@ -18,7 +18,8 @@ Começo pela situação, não pelo nome da skill ([como instalar](#instalar)):
 
 Com o plano pronto: `/cass:gpt-optimizer` se o plano for grande (opcional), depois
 `/cass:implementar` ou `/cass:gpt-implementar` pra construir e `/cass:build-review` pra
-conferir antes de publicar. Conversa ficou longa? `/cass:handoff`.
+conferir antes de publicar. Conversa ficou longa? `/cass:handoff`. Sessão terminou e a IA
+tropeçou? `/cass:aprender-com-a-sessao`.
 
 ---
 
@@ -41,14 +42,16 @@ que não fazer e quando parar e perguntar. Serve pra qualquer tarefa, não só c
 
 ### `/cass:spec-plan` — quando você já sabe o que quer
 
-Transforma uma mudança ou ideia num plano fatiado em tarefas pequenas, sem dúvida em aberto.
+Transforma uma mudança ou ideia num plano fatiado em partes pequenas, sem dúvida em aberto.
+Com um sim, publica o plano: se o projeto está no GitHub, vira uma issue do plano e uma por
+parte, ligadas; senão, fica em arquivos. Depois oferece construir o plano inteiro numa sessão.
 Se você ainda não sabe a resposta, comece pela `auto-think`.
 
-<p align="center"><img src="docs/skill-spec-plan.svg" width="520" alt="A spec-plan entrevista em rodadas, passa pelos 9 requisitos que ninguém escreve e só segue com o seu sim. Escreve o plano fatiado em tarefas num rascunho, conta o plano em passos e pergunta se você aprova; se pedir ajuste, refaz o rascunho. Aprovado, salva em docs/plans e pergunta qual tarefa e quem constrói."></p>
+<p align="center"><img src="docs/skill-spec-plan.svg" width="520" alt="A spec-plan entrevista em rodadas, passa pelos 9 requisitos que ninguém escreve e só segue com o seu sim. Escreve o plano fatiado em partes num rascunho; a mensagem diz em quantas partes, traz as três perguntas de tamanho e onde o plano vai morar. Um sim publica: no GitHub, uma issue do plano e uma por parte, ligadas; sem GitHub, em docs/plans. Depois oferece construir o plano inteiro numa sessão."></p>
 
 <details><summary>Detalhe técnico</summary>
 
-Spec + issues autocontidas em `docs/plans/<plano>/issues/`; cenários de comportamento; varredura dos "9 esquecidos" (validação, falhas, idempotência...).
+Projeto no GitHub (ou com `docs/agents/issue-tracker.md`): issue do plano + uma por parte como sub-issue, com bloqueio nativo e etiquetas `ready-for-agent`/`ready-for-human`, via `gh`. Sem GitHub: spec + issues em `docs/plans/<plano>/issues/`. Cenários de comportamento; varredura dos "9 esquecidos" (validação, falhas, idempotência...).
 
 </details>
 
@@ -72,7 +75,11 @@ As duas entregam o mesmo: o trabalho testado, com a prova de cada item, salvo no
 computador. Muda quem digita o código. Na `implementar`, o agente da própria conversa
 (Claude, Codex ou outro). Na `gpt-implementar`, subagentes GPT no Codex, com o Claude
 orquestrando: sai mais barato, porque o trabalho pesado não gasta a sua cota do Claude.
-Nada vai pro GitHub sem o seu OK.
+
+Com uma tarefa só, nada vai pro GitHub sem o seu OK. Com o plano inteiro no GitHub
+(`/cass:implementar #<plano>`), um sim cobre tudo: cada parte passa na vistoria e sobe sozinha
+pra uma PR em rascunho, e no fim uma revisão do plano inteiro tira a PR do rascunho. O merge é
+sempre seu.
 
 <p align="center"><img src="docs/skill-construtoras.svg" width="720" alt="As duas construtoras começam iguais: seu sim pra tarefa, pasta limpa com marco de início e a lista de provas escrita pelo Claude antes do código. Na implementar, o agente da conversa constrói com teste antes do código, anota decisões novas, faz commits e não há fiscal no meio. Na gpt-implementar, o Claude escreve a ordem de serviço, subagentes GPT constroem no Codex, o Claude roda as provas e commita, e um fiscal confere cada asserção; se reprova, volta ao Codex até 2 vezes e depois para e pergunta. As duas terminam no relatório final e oferecem a vistoria com o seu sim."></p>
 
@@ -80,6 +87,14 @@ Nada vai pro GitHub sem o seu OK.
 
 - `implementar`: TDD vermelho→verde; checklist em `.checks/` com teste nomeado por item; commits na branch atual; push e PR só com OK.
 - `gpt-implementar`: `codex exec` com `gpt-6.1-sol` esforço `medium`; fiscal prova cada item no HEAD; até 2 rodadas de correção, depois o Claude para e pergunta a você, sem consertar sozinho.
+
+</details>
+
+<p align="center"><img src="docs/skill-plano-inteiro.svg" width="520" alt="Com o plano publicado no GitHub, um sim cobre todas as partes. A sessão cria o ramo do plano e, parte por parte, em ordem: marca dono, constrói como uma tarefa, passa na build-review (reprovou: conserta até 2 vezes) e sobe na PR rascunho com bilhete na issue, sem perguntar. Para e chama você numa parte só sua, depois de 2 consertos falhos ou numa decisão fora do plano. No fim, revisão final do plano inteiro; reprovou, volta a quem fez. Aprovada, a PR sai do rascunho e o merge é sempre seu."></p>
+
+<details><summary>Detalhe técnico do plano inteiro</summary>
+
+`/cass:implementar #<plano>` ou `/cass:gpt-implementar #<plano>` lê o plano e as partes com `gh`; ramo `plano/<n>-<nome>`; dono marcado com `gh issue edit --add-assignee @me`; uma PR em rascunho por plano, com `Closes #` do plano e de cada parte; bilhete "Construída e aprovada na vistoria" em cada parte; revisão final desde `git merge-base main HEAD`; `gh pr ready` quando passa. Retomar outro dia: os donos e bilhetes nas issues são pista, o git decide.
 
 </details>
 
@@ -92,7 +107,7 @@ Reprovado, com a prova de cada item.
 
 <details><summary>Detalhe técnico</summary>
 
-3 subagentes (Standards, Spec, Fiscal) sobre `<marco>..HEAD`; injeção de defeito em `git worktree`; o veredito parte do Fiscal.
+3 subagentes (Standards, Spec, Fiscal) sobre `<marco>..HEAD`; injeção de defeito em `git worktree`; o veredito parte do Fiscal. Quando a issue mora no GitHub: a PR leva `Closes #` do plano e da parte, e a parte aprovada ganha um comentário de bilhete; a issue só fecha no merge.
 
 </details>
 
@@ -133,6 +148,20 @@ pronto pra colar na sessão nova.
 <details><summary>Detalhe técnico</summary>
 
 Ancorado num commit: se o trabalho da conversa estiver sem commit, para e pede o commit antes; ao começar do zero algo que surgiu, ancora no ramo principal; cada afirmação marcada `[GIT]`/`[ARQUIVO]`/`[CHAT]`/`[SUPOSIÇÃO]`.
+
+</details>
+
+### `/cass:aprender-com-a-sessao` — depois de uma sessão de código
+
+Revê como a IA trabalhou numa sessão que terminou e sugere ajustes no projeto e nas instruções
+pra ela errar menos da próxima vez. Não mexe no código; você decide o que aplicar. Só roda quando
+você chama.
+
+<p align="center"><img src="docs/skill-aprender-com-a-sessao.svg" width="520" alt="A aprender-com-a-sessao entra quando uma sessão de código terminou. Lê o manual de escrita que vem dentro dela e o registro da sessão, o caminho inteiro e não só o resultado. Procura onde o ambiente falhou: achar arquivos, checagens automáticas, regras do revisor, CLAUDE.md inchado, ferramenta cara, frase inútil e falta de informação. Entrega a lista do mais grave ao menos grave e você decide o que aplicar."></p>
+
+<details><summary>Detalhe técnico</summary>
+
+Sete frentes: navegação, checagens automáticas (lint, tipos, testes, trava antes do commit ou no GitHub), regras do revisor (erro mecânico vira checagem; julgamento vira `CODING_STANDARDS.md`), `CLAUDE.md`/`AGENTS.md` inchado, ferramenta cara, instrução que não muda nada e falta de informação. Depois de compactar, rode numa conversa nova apontando a sessão: o registro completo continua salvo no computador. Criada por Matt Pocock (`retro`); aqui o nome foi traduzido e o guia `writing-for-agents` vai junto (veja [Créditos](#créditos)).
 
 </details>
 
@@ -179,6 +208,7 @@ conta no **Exa** (a `search`). Detalhe item a item no **[INSTALL.md](INSTALL.md)
 - **Codex CLI** (≥ 0.156, com `codex login`) — `gpt-implementar`, `gpt-optimizer` e `auto-think`. Sem ele, a `gpt-implementar` para e avisa; a `gpt-optimizer` e a `auto-think` avisam e seguem sem o olhar do GPT, com garantia menor.
 - **Exa** — a `search` (e a pesquisa de quem chama a `search`).
 - **git** — `implementar`, `gpt-implementar` e `build-review` trabalham num repositório git; o `handoff` se ancora nele quando existe.
+- **GitHub CLI (`gh`, logado)** — só quando o projeto mora no GitHub: a `spec-plan` publica o plano e as partes como issues, e a `implementar`, a `gpt-implementar` e a `build-review` leem as issues, marcam dono, deixam o bilhete e cuidam da PR do plano.
 
 ---
 
@@ -195,3 +225,8 @@ versões em [CHANGELOG.md](CHANGELOG.md).
 A **`otimizar-arquitetura`** é a skill `codebase-design` de **[Matt Pocock](https://github.com/mattpocock/skills)**.
 Aqui só o nome foi traduzido. O conteúdo é o original, sob a licença MIT dele
 ([licença](skills/otimizar-arquitetura/LICENSE) · [créditos](skills/otimizar-arquitetura/CREDITOS.md)).
+
+A **`aprender-com-a-sessao`** é a skill `retro` de **[Matt Pocock](https://github.com/mattpocock/skills)**,
+com o guia `writing-for-agents` dele nas referências. Aqui o nome foi traduzido e a skill lê o guia
+de dentro da própria pasta. O resto é o original, sob a licença MIT dele
+([licença](skills/aprender-com-a-sessao/LICENSE) · [créditos](skills/aprender-com-a-sessao/CREDITOS.md)).
