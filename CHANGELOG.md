@@ -7,7 +7,7 @@
 - **`gpt-implementar`: no plano inteiro, vistoria reprovada volta ao Codex sem perguntar**, até 2 rodadas.
 - **`build-review`: quando a issue mora no GitHub**, a PR leva `Closes #` do plano e de cada parte, e a parte aprovada ganha o comentário "Construída e aprovada na vistoria: ramo, commit". A issue só fecha no merge.
 - **Retomar outro dia:** os donos e bilhetes nas issues são pista; quem decide o que está feito é o git.
-- **Skill nova: `aprender-com-a-sessao`.** Revê como a IA trabalhou numa sessão de código e sugere, do mais grave ao menos grave, ajustes no projeto e nas instruções. É a `retro` de Matt Pocock (MIT), com o guia `writing-for-agents` dele nas referências; mudam só o nome e as duas frases que chamavam o guia como skill. Licença e `CREDITOS.md` na pasta.
+- **Skill nova: `aprender-com-a-sessao`.** Revê como a IA trabalhou numa sessão de código e sugere, do mais grave ao menos grave, ajustes no projeto e nas instruções. É a `retro` de Matt Pocock (MIT), com o guia `writing-for-agents` dele nas referências; mudam só o nome e as duas frases que chamavam o guia como skill. Cada revisão fica guardada em `docs/aprendizados/` do repositório da sessão, e `revisar` retoma as sugestões pendentes. Licença e `CREDITOS.md` na pasta.
 - `build-review/references/PR.md` (modelo de texto de PR, da skill `pr` de Matt Pocock) vai junto como está; nenhuma skill o lê ainda.
 - README: desenho novo do plano inteiro (`docs/skill-plano-inteiro.svg`) e da skill nova (`docs/skill-aprender-com-a-sessao.svg`); `spec-plan` e mapa do topo atualizados; GitHub CLI na lista de dependências.
 

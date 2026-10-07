@@ -6,6 +6,8 @@ disable-model-invocation: true
 
 The user has asked for a **retrospective**. You are suggesting improvements to the coding agent's **environment** to improve future runs.
 
+Every retrospective is saved, so the user can come back to the candidates later and judge whether they paid off. If the user asks to review saved learnings instead (`revisar`, "o que ficou pendente"), read [`references/revisar.md`](references/revisar.md) and follow it in place of the steps below.
+
 ## Steps
 
 1. Read [`references/writing-for-agents.md`](references/writing-for-agents.md) for the writing style guide.
@@ -23,6 +25,10 @@ The user has asked for a **retrospective**. You are suggesting improvements to t
 - **Information access**: look for opportunities to increase the agent's access to information. Teeing dev server logs, readonly access to third-party services. _Use when_ a crucial piece of information was not available to the agent.
 
 4. Present these candidates to the user, in order of severity.
+
+5. Save the retrospective as a **record** in `docs/aprendizados/` of the repo the session worked on and update the **index**, following [`references/registro.md`](references/registro.md): every candidate `pendente`, then commit by that repo's git rule. Done when the record file and its index row are saved there and committed, or the user's answer about committing is recorded.
+
+6. Ask the user which candidates to resolve now. Apply only the ones they pick, as in the "Aplicar" section of [`references/revisar.md`](references/revisar.md); the rest stay `pendente` for a later `revisar`.
 
 ## Reference
 

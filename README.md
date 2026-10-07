@@ -154,10 +154,11 @@ Ancorado num commit: se o trabalho da conversa estiver sem commit, para e pede o
 ### `/cass:aprender-com-a-sessao` — depois de uma sessão de código
 
 Revê como a IA trabalhou numa sessão que terminou e sugere ajustes no projeto e nas instruções
-pra ela errar menos da próxima vez. Não mexe no código; você decide o que aplicar. Só roda quando
-você chama.
+pra ela errar menos da próxima vez. Não mexe no código; você decide o que aplicar. Cada revisão fica
+guardada em `docs/aprendizados/` do repositório, e `/cass:aprender-com-a-sessao revisar` retoma o que
+ficou pendente. Só roda quando você chama.
 
-<p align="center"><img src="docs/skill-aprender-com-a-sessao.svg" width="520" alt="A aprender-com-a-sessao entra quando uma sessão de código terminou. Lê o manual de escrita que vem dentro dela e o registro da sessão, o caminho inteiro e não só o resultado. Procura onde o ambiente falhou: achar arquivos, checagens automáticas, regras do revisor, CLAUDE.md inchado, ferramenta cara, frase inútil e falta de informação. Entrega a lista do mais grave ao menos grave e você decide o que aplicar."></p>
+<p align="center"><img src="docs/skill-aprender-com-a-sessao.svg" width="520" alt="A aprender-com-a-sessao entra quando uma sessão de código terminou. Lê o manual de escrita que vem dentro dela e o registro da sessão, o caminho inteiro e não só o resultado. Procura onde o ambiente falhou: achar arquivos, checagens automáticas, regras do revisor, CLAUDE.md inchado, ferramenta cara, frase inútil e falta de informação. Guarda a lista, do mais grave ao menos grave, em docs/aprendizados/ do repositório, e você decide o que resolver agora; o resto fica pendente pra revisar depois."></p>
 
 <details><summary>Detalhe técnico</summary>
 
