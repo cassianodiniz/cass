@@ -1,7 +1,7 @@
 {
   "name": "cass",
-  "version": "4.6.0",
-  "description": "Skills do Cassiano Diniz pra trabalhar com IA do jeito certo: pensar antes de fazer, construir com prova e conferir antes de confiar. ask-me (te entrevista antes de uma tarefa e entrega o pedido pronto pro agente), spec-plan (transforma uma mudança ou ideia em plano com tarefas), auto-think (estuda um problema sem resposta e traz opções com veredito), implementar (o agente da conversa constrói um plano aprovado: Claude, Codex ou outro), gpt-implementar (o Claude orquestra, subagentes GPT no Codex constroem — mais barato), build-review (revisão final com 3 revisores independentes), search (pesquisa com a fonte de cada número), gpt-optimizer (o GPT tenta derrubar uma decisão que você já tomou), handoff (passa o trabalho pra uma sessão nova sem perder o fio) e otimizar-arquitetura (vocabulário e regras pra reorganizar código em módulos fundos, fáceis de testar).",
+  "version": "4.7.0",
+  "description": "Skills do Cassiano Diniz pra trabalhar com IA do jeito certo: pensar antes de fazer, construir com prova e conferir antes de confiar. ask-me (te entrevista antes de uma tarefa e entrega o pedido pronto pro agente), spec-plan (transforma uma mudança ou ideia em plano com tarefas), auto-think (estuda um problema sem resposta e traz opções com veredito), implementar (o agente da conversa constrói um plano aprovado: Claude, Codex ou outro), gpt-implementar (o Claude orquestra, subagentes GPT no Codex constroem — mais barato), build-review (revisão final com 3 revisores independentes), search (pesquisa com a fonte de cada número), gpt-optimizer (o GPT tenta derrubar uma decisão que você já tomou), handoff (passa o trabalho pra uma sessão nova sem perder o fio), otimizar-arquitetura (vocabulário e regras pra reorganizar código em módulos fundos, fáceis de testar) e aprender-com-a-sessao (revê como a IA trabalhou numa sessão e sugere ajustes pra ela errar menos).",
   "author": {
     "name": "Cassiano Diniz",
     "email": "cassi.diniz@gmail.com"
@@ -20,7 +20,8 @@
     "pesquisa",
     "codex",
     "handoff",
-    "arquitetura"
+    "arquitetura",
+    "retrospectiva"
   ],
   "homepage": "https://github.com/cassianodiniz/cass",
   "repository": "https://github.com/cassianodiniz/cass"

@@ -43,7 +43,7 @@ Um subagente por revisor, no mesmo turno, cada um com o briefing **verbatim** do
 
 1. **Standards** — siga `references/matt-code-review.md`, eixo Standards, com a base de maus cheiros colada por inteiro (o subagente não tem outro acesso a ela).
 2. **Spec** — siga `references/matt-code-review.md`, eixo Spec, com a issue/spec.
-3. **Fiscal** — siga `references/verify.md` do começo ao fim, **todos os passos, incluindo a injeção de defeito**, e inclua verbatim no briefing a resolução local abaixo. Ele recebe a checklist, o diff, a fonte, e roda só leitura (a injeção acontece num `git worktree` isolado, nunca na árvore real).
+3. **Fiscal** — siga `references/verify.md` do começo ao fim, **todos os passos, incluindo a injeção de defeito**, e inclua verbatim no briefing a resolução local abaixo. Ele recebe a checklist, o diff, a fonte, e roda só leitura (a injeção acontece num `git worktree` isolado, nunca na worktree real).
    - **Force o perfil `standard` no mínimo** (`ui` se a feature tem telas **e o usuário pedir revisão UI**). O `verify.md` assume `light` por padrão, e `light` pula exatamente a injeção de defeito, a enumeração de cobertura e as regras de teste — que são o motivo de existir a build-review. Diga o perfil no prompt do Fiscal; não deixe ele cair no padrão.
    - Ao julgar uma prova entre camadas, esta regra local prevalece sobre instruções ou exemplos contrários de `verify.md`: inspecione somente as dependências necessárias para confirmar o caminho real e o isolamento do comportamento; mutante só morre quando a asserção relevante falha, não quando setup ou outra causa encerra o comando; se falta executar uma falha dirigida em superfície que carrega check e ainda há margem no teto do `verify.md`, registre prova parcial e veredito não PASS; PASS escopado não encerra essa pendência; política explícita e aplicável do repositório continua obrigatória junto da checklist, mas o formato histórico da suíte sozinho não cria uma regra de nível. No relatório, registre `Claim | caminho real (file:line) | input isolado | asserção (file:line) | falha dirigida e saída | branches/entradas exigidas (origem, total e mapa n/n) | veredito`. Inclua todas as linhas de resultado de uma decisão adicionada ou tocada pelo diff, contratos alterados, fontes vinculantes e checklist; decisão preexistente fora desse conjunto não cria prova nova.
 
@@ -102,6 +102,13 @@ Regras da junção:
 - **O portão parte do Fiscal e incorpora defeitos demonstrados pelos outros eixos.** É FAIL se o Fiscal falha ou se Spec ou Standards demonstra, com evidência, requisito ausente ou contradito, bug, risco de segurança ou regressão concreta. Smell, preferência, nit, recomendação ou teste adicional sem comportamento distinto ficam não bloqueantes. Na dúvida de classificação, não promova opinião a bloqueio: registre a incerteza e peça decisão.
 - **Os eixos ficam separados no arquivo.** Na mensagem, cada defeito que trava diz quem o achou, e "O que não trava" dá o maior conselho de cada eixo, sem eleger um vencedor entre eles.
 - **Spec e o passo 1 do Fiscal se encostam** (código×pedido vs checklist×fonte). Achado dobrado às vezes é cobertura, não erro — no arquivo, os dois falam; na mensagem, ele aparece uma vez com os dois nomes.
+
+## Ao subir, quando a issue de origem mora no GitHub
+
+Vale com o sim à PR e só quando a issue de origem é do GitHub. Sem GitHub (a issue é arquivo), nada disto: o `**Status:** done` que a construção grava é o bilhete, e a PR não leva `Closes`.
+
+- **Uma PR por plano.** Se ainda não existe, "open a draft PR …, marked as closing the spec and tickets" (Matt, `implement-spec`, passo 3): o texto leva `Closes #<plano>`, o plano que a parte cita como origem, e `Closes #<parte>`. Se já existe, acrescente `Closes #<parte>` ao texto dela, sem tirar as linhas que já estão lá e sem marcá-la como pronta.
+- **Bilhete na parte**, depois de subir a branch: "**Comment on an issue**: `gh issue comment <number> --body "..."`" (Matt, `setup-matt-pocock-skills/issue-tracker-github.md`), com o texto "Construída e aprovada na vistoria: branch `<branch>`, commit `<sha>`". Não feche a issue nem mexa na do plano: quem fecha é o merge da PR.
 
 ## Depois do conserto
 

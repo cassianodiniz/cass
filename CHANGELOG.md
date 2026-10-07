@@ -1,5 +1,16 @@
 # Changelog — cass (antigo Titan)
 
+## 4.7.0 — 2026-10-05
+
+- **O plano mora no GitHub quando o projeto está lá.** A `spec-plan` decide o destino pela ficha `docs/agents/issue-tracker.md` ou, sem ficha, pelo remoto do git. No GitHub, um sim só publica uma issue do plano e uma issue por parte, como sub-issues, com o bloqueio nativo e as etiquetas `ready-for-agent`/`ready-for-human` (cria as que faltam). A mensagem de aprovação diz o destino e traz as três perguntas de tamanho das partes, com recomendação. Sem GitHub, tudo em arquivo como antes. Os comandos ficam em `spec-plan/references/github.md`.
+- **O plano inteiro numa sessão, uma PR por plano.** No fim, a `spec-plan` oferece `/cass:implementar #<plano>` (ou `/cass:gpt-implementar #<plano>`) em vez de pedir pra escolher uma parte. Com um sim, a sessão cria o ramo `plano/<n>-<nome>` e, parte por parte, em ordem: marca dono na issue, constrói, roda a `build-review` e sobe a parte aprovada pra PR do plano em rascunho, sem perguntar de novo. Para numa parte `ready-for-human`, depois de 2 consertos falhos ou numa decisão fora do plano. No fim, uma revisão do plano inteiro (desde onde o ramo saiu da main); se reprova, devolve a quem construiu a parte, até 2 rodadas; se aprova, tira a PR do rascunho. O merge continua seu.
+- **`gpt-implementar`: no plano inteiro, vistoria reprovada volta ao Codex sem perguntar**, até 2 rodadas.
+- **`build-review`: quando a issue mora no GitHub**, a PR leva `Closes #` do plano e de cada parte, e a parte aprovada ganha o comentário "Construída e aprovada na vistoria: ramo, commit". A issue só fecha no merge.
+- **Retomar outro dia:** os donos e bilhetes nas issues são pista; quem decide o que está feito é o git.
+- **Skill nova: `aprender-com-a-sessao`.** Revê como a IA trabalhou numa sessão de código e sugere, do mais grave ao menos grave, ajustes no projeto e nas instruções. É a `retro` de Matt Pocock (MIT), com o guia `writing-for-agents` dele nas referências; mudam só o nome e as duas frases que chamavam o guia como skill. Cada revisão fica guardada em `docs/aprendizados/` do repositório da sessão, e `revisar` retoma as sugestões pendentes. Licença e `CREDITOS.md` na pasta.
+- `build-review/references/PR.md` (modelo de texto de PR, da skill `pr` de Matt Pocock) vai junto como está; nenhuma skill o lê ainda.
+- README: desenho novo do plano inteiro (`docs/skill-plano-inteiro.svg`) e da skill nova (`docs/skill-aprender-com-a-sessao.svg`); `spec-plan` e mapa do topo atualizados; GitHub CLI na lista de dependências.
+
 ## 4.6.0 — 2026-10-05
 
 - **Skill nova: `otimizar-arquitetura`.** Vocabulário e regras pra desenhar ou reorganizar código em módulos fundos: muito comportamento atrás de uma interface pequena, numa costura limpa, testável pela própria interface. Traz o teste da deleção, as 4 categorias de dependência e o "Design It Twice" (3+ subagentes desenham a interface de jeitos diferentes e ela recomenda um). Conteúdo da `codebase-design` de Matt Pocock (MIT), só com o nome trocado; a licença original e um `CREDITOS.md` vão junto na pasta da skill, e o README ganhou uma seção de Créditos no fim.
