@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 945" width="760" height="945" role="img" aria-labelledby="t d">
 <title id="t">implementar e gpt-implementar, lado a lado</title>
-<desc id="d">As duas construtoras começam iguais: seu sim pra tarefa, pasta limpa com marco de início e a lista de provas escrita pelo Claude antes do código. Na implementar, o agente da conversa constrói com teste antes do código, anota decisões novas, faz commits e não há fiscal no meio. Na gpt-implementar, o Claude escreve a ordem de serviço, subagentes GPT constroem no Codex, o Claude roda as provas e commita, e um fiscal confere cada asserção; se reprova, volta ao Codex até 2 vezes e depois para e pergunta. As duas terminam no relatório final e oferecem a vistoria com o seu sim.</desc>
+<desc id="d">As duas construtoras começam iguais: seu sim pra tarefa, pasta limpa com marco de início e a lista de provas escrita pelo Claude antes do código. Na implementar, o agente da conversa constrói com teste antes do código, anota decisões novas, faz commits e não há fiscal no meio. Na gpt-implementar, o Claude escreve a ordem de serviço, subagentes GPT constroem no Codex, o Claude roda as provas e commita, sem fiscal no meio; se uma prova fica vermelha, volta ao Codex até 2 vezes e depois para e pergunta. As duas terminam no relatório final e oferecem a vistoria com o seu sim.</desc>
 <style>
 svg{--tx:#1f2328;--mu:#59636e;--ln:#59636e;--hf:#e1f5ee;--hs:#0f6e56;--ht:#085041;--hu:#0f6e56;--nf:#f6f8fa;--ns:#d1d9e0;--pf:#eaeef2}
 @media (prefers-color-scheme:dark){svg{--tx:#e6edf3;--mu:#9198a1;--ln:#9198a1;--hf:#0b3a30;--hs:#5dcaa5;--ht:#e1f5ee;--hu:#9fe1cb;--nf:#151b23;--ns:#3d444d;--pf:#262c36}}
@@ -48,9 +48,9 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <line class="ln" x1="570" y1="460" x2="570" y2="482" marker-end="url(#a)"/>
 <g class="nb"><rect x="410" y="484" width="320" height="47" rx="4"/><text class="h" x="570" y="505" text-anchor="middle">o Claude roda as provas e commita</text><text class="s" x="570" y="523" text-anchor="middle">o relato do Codex não conta como prova</text></g>
 <line class="ln" x1="570" y1="531" x2="570" y2="553" marker-end="url(#a)"/>
-<g class="ac"><rect x="410" y="555" width="320" height="47" rx="4"/><text class="h" x="570" y="576" text-anchor="middle">fiscal confere cada asserção</text><text class="s" x="570" y="594" text-anchor="middle">lê o código que o Claude não leu</text></g>
-<path class="bk" d="M730 578 H746 V436 H732" marker-end="url(#b)"/>
-<text class="lb" x="570" y="622" text-anchor="middle"><tspan x="570" dy="0">reprovou: volta ao Codex, até 2 vezes;</tspan><tspan x="570" dy="15">depois para e pergunta a você</tspan></text>
+<g class="gh"><rect x="410" y="555" width="320" height="47" rx="4"/><text class="h" x="570" y="576" text-anchor="middle">sem fiscal no meio</text><text class="s" x="570" y="594" text-anchor="middle">a conferência fica pra vistoria</text></g>
+<path class="bk" d="M730 507 H746 V436 H732" marker-end="url(#b)"/>
+<text class="lb" x="570" y="622" text-anchor="middle"><tspan x="570" dy="0">prova vermelha: volta ao Codex, até 2 vezes;</tspan><tspan x="570" dy="15">depois para e pergunta a você</tspan></text>
 <path class="ln" d="M190 673 V691 M570 646 V691 M190 691 H570"/>
 <line class="ln" x1="380" y1="691" x2="380" y2="711" marker-end="url(#a)"/>
 <g class="nb"><rect x="170" y="713" width="420" height="47" rx="4"/><text class="h" x="380" y="734" text-anchor="middle">relatório final</text><text class="s" x="380" y="752" text-anchor="middle">o que foi feito, as provas e o que falta</text></g>
