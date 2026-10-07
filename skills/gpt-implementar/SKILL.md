@@ -7,7 +7,7 @@ description: "Use when the user invokes /gpt-implementar (old name /gpt-builder)
 
 Siga a skill `/implementar` inteira (`../implementar/SKILL.md`): árvore limpa, commit-marco, checklist antes do código, "sim" por issue, relatório final. Esta skill muda uma coisa só: **quem digita o código é o Codex**, numa sessão separada. A sessão delega a construção e continua dona das provas e dos commits.
 
-Seu papel é coordenar, não reconstruir. O contexto desta sessão é o recurso caro; o que o Codex e o fiscal leem não pesa aqui. Por isso você confere pelo resultado dos testes, não lendo o código que o Codex escreveu.
+Seu papel é coordenar, não reconstruir. O contexto desta sessão é o recurso caro; o que o Codex lê não pesa aqui. Por isso você confere pelo resultado dos testes, não lendo o código que o Codex escreveu.
 
 ## Largada
 
@@ -44,7 +44,7 @@ codex exec resume "<thread_id>" --model gpt-6.1-sol -c model_reasoning_effort="m
 1. `git status --porcelain` e `git diff --stat <marco>`: arquivo fora dos limites, commit feito pelo Codex ou arquivo solto → entra na lista de correção.
 2. Rode você as provas nomeadas do checklist e a suíte, em modo quieto (`-q`). O relato do Codex não conta como prova.
 3. Commit do que chegou, arquivo por arquivo pelo nome.
-4. Algo vermelho → correção. Tudo verde → fiscal: um subagente (`model: sonnet`) com o briefing de `../implementar/references/fiscal.md`. É ele quem abre o código e confere cada asserção; você lê só o veredito. FAIL do fiscal → correção.
+4. Algo vermelho → correção. Tudo verde → entrega pronta. Quem abre o código e confere se cada teste prova o que promete é o Fiscal da `/build-review`, que vem em seguida.
 
 Abra código só quando precisar montar uma correção que o teste vermelho não explica, e só o trecho.
 

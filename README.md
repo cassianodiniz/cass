@@ -81,12 +81,12 @@ Com uma tarefa só, nada vai pro GitHub sem o seu OK. Com o plano inteiro no Git
 pra uma PR em rascunho, e no fim uma revisão do plano inteiro tira a PR do rascunho. O merge é
 sempre seu.
 
-<p align="center"><img src="docs/skill-construtoras.svg" width="720" alt="As duas construtoras começam iguais: seu sim pra tarefa, pasta limpa com marco de início e a lista de provas escrita pelo Claude antes do código. Na implementar, o agente da conversa constrói com teste antes do código, anota decisões novas, faz commits e não há fiscal no meio. Na gpt-implementar, o Claude escreve a ordem de serviço, subagentes GPT constroem no Codex, o Claude roda as provas e commita, e um fiscal confere cada asserção; se reprova, volta ao Codex até 2 vezes e depois para e pergunta. As duas terminam no relatório final e oferecem a vistoria com o seu sim."></p>
+<p align="center"><img src="docs/skill-construtoras.svg" width="720" alt="As duas construtoras começam iguais: seu sim pra tarefa, pasta limpa com marco de início e a lista de provas escrita pelo Claude antes do código. Na implementar, o agente da conversa constrói com teste antes do código, anota decisões novas, faz commits e não há fiscal no meio. Na gpt-implementar, o Claude escreve a ordem de serviço, subagentes GPT constroem no Codex, o Claude roda as provas e commita; se algo falha, volta ao Codex até 2 vezes e depois para e pergunta. Quem confere o código é a vistoria da build-review. As duas terminam no relatório final e oferecem a vistoria com o seu sim."></p>
 
 <details><summary>Detalhe técnico</summary>
 
 - `implementar`: TDD vermelho→verde; checklist em `.checks/` com teste nomeado por item; commits na branch atual; push e PR só com OK.
-- `gpt-implementar`: `codex exec` com `gpt-6.1-sol` esforço `medium`; fiscal prova cada item no HEAD; até 2 rodadas de correção, depois o Claude para e pergunta a você, sem consertar sozinho.
+- `gpt-implementar`: `codex exec` com `gpt-6.1-sol` esforço `medium`; o Fiscal da `build-review` prova cada item no HEAD; até 2 rodadas de correção, depois o Claude para e pergunta a você, sem consertar sozinho.
 
 </details>
 

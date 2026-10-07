@@ -1,5 +1,9 @@
 # Changelog — cass (antigo Titan)
 
+## 4.7.1 — 2026-10-07
+
+- **`gpt-implementar` sai do fiscal próprio.** Depois dos testes verdes, a skill entrega pronto; quem abre o código e confere cada asserção é o Fiscal da `build-review`. `implementar/references/fiscal.md` removido e `contrato.md` alinhado. Modelo segue `gpt-6.1-sol` · `medium`.
+
 ## 4.7.0 — 2026-10-05
 
 - **O plano mora no GitHub quando o projeto está lá.** A `spec-plan` decide o destino pela ficha `docs/agents/issue-tracker.md` ou, sem ficha, pelo remoto do git. No GitHub, um sim só publica uma issue do plano e uma issue por parte, como sub-issues, com o bloqueio nativo e as etiquetas `ready-for-agent`/`ready-for-human` (cria as que faltam). A mensagem de aprovação diz o destino e traz as três perguntas de tamanho das partes, com recomendação. Sem GitHub, tudo em arquivo como antes. Os comandos ficam em `spec-plan/references/github.md`.
