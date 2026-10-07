@@ -1,6 +1,6 @@
 # Contrato de entrega (prompt para um executor delegado)
 
-Um contrato por **entrega inteira** — nunca por arquivo, teste ou etapa. Serve para um processo Codex (o `/gpt-implementar` usa este mesmo formato) e para um subagente do runtime. O executor começa com zero contexto: tudo que ele precisa está aqui ou em disco, por ponteiro (caminhos, números de issue, SHA), não por cópia longa. Seção vazia é sinal vermelho.
+Um contrato por **entrega inteira** — nunca por arquivo, teste ou etapa. Serve para um subagente do runtime. O executor começa com zero contexto: tudo que ele precisa está aqui ou em disco, por ponteiro (caminhos, números de issue, SHA), não por cópia longa. Seção vazia é sinal vermelho.
 
 ```
 Você implementa UMA entrega do repo <caminho>. Trabalhe só nela. Não faça commit nem push; não crie branch; não abra outros agentes.
@@ -39,11 +39,11 @@ Responda exatamente com:
 
 ## Rodada de correção
 
-**Mesmo executor** (Codex: `resume` do `thread_id`; subagente: `SendMessage` ao `agentId`). Repita `GOAL` sem mudanças e acrescente:
+**Mesmo executor** (subagente: `SendMessage` ao `agentId`). Repita `GOAL` sem mudanças e acrescente:
 
 ```
 REVIEW
-O que está errado: <fato observado pela sessão ou pelo fiscal, com arquivo:linha e o comando/saída que provou>.
+O que está errado: <fato observado, com arquivo:linha e o comando/saída que provou>.
 Plano de correção:
 1. <passo>
 2. <passo>
@@ -51,4 +51,4 @@ Mantém: <o que já está certo e não deve ser refeito>.
 Devolva no formato de OUTPUT, incluindo a saída nova dos comandos.
 ```
 
-Até duas rodadas; na terceira, a sessão assume ou para e pergunta. Trabalho que o executor fez fora da própria entrega sai do diff dela.
+Até duas rodadas; na terceira, a sessão para e pergunta. Trabalho que o executor fez fora da própria entrega sai do diff dela.
