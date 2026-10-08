@@ -81,6 +81,8 @@ Doors get discovered while building, and deciding them is yours - stopping to as
 
 A red proof blocks completion and must be fixed, not merely noted. An expected RED phase in TDD does not interrupt the red → green cycle or require renegotiation. If a check turns out to be wrong or impossible, stop and renegotiate with the user rather than quietly adjusting it. The same goes for a `Landing` row the user approved that the build proves unbuildable - they approved that shape specifically. A new door that contradicts nothing already approved never stops: it gets its row and you keep going.
 
+What the user settles in the chat while you build is recorded the same way, because a compaction or another session will not have the conversation. When the user forbids, allows, chooses between options or changes scope, add a line to the checklist's `Sources` right then - `"conversation" - "<the user's words>" (scope: this issue | the whole plan)` - and say in one line of that reply what you recorded. It goes into the next commit of the slice. Questions, thinking aloud and one-off requests ("run the tests") are not recorded; when unsure, do not record. A go-ahead to push, publish, deploy or merge is never recorded as standing permission: it covers that one action and never skips a `/build-review`.
+
 ## Critical rules
 
 1. Every check names its **proof**: the test or command whose exit code settles it. No proof, no check.
