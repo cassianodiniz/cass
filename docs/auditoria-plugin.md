@@ -24,7 +24,7 @@ Risco baixo: cópia de instruções existentes, metadados e artefatos; sem execu
 | `implementar` sem a regra local mais recente | Cópia idêntica dos 8 arquivos; decisões do usuário no chat são registradas em `Sources`. |
 | `writin-skills` ausente | Inclusão dos 10 arquivos da versão local, sem reescrever suas regras ou reorganizar suas referências. Arquivos `.DS_Store` excluídos. |
 | README com 11 skills e catálogo com 10 | Ambos passam a refletir as 12 skills. A skill nova tem seção textual, sem entrar no primeiro infográfico. |
-| Handoff e retrospectiva em notas de rodapé; arquitetura ausente do mapa | Três cartões laterais, com os momentos de uso, mantendo os elementos centrais, cores e tipografia. |
+| Handoff e retrospectiva em notas de rodapé; arquitetura ausente do mapa | Handoff e arquitetura em cartões laterais; retrospectiva abaixo de “pode publicar”, ligada por seta. Momentos de uso, cores e tipografia preservados. |
 | Desenho das construtoras atribuía sempre a checklist ao Claude | Texto passa a dizer agente coordenador, conforme a `implementar` permite. |
 | Borda do cartão final de `auto-think` começava fora do SVG | Ajuste de três unidades na posição e seis na largura; fluxo e textos preservados. |
 | Instalação dizia que o Claude assumiria o trabalho sem Codex | Documentação e aviso do instalador alinhados ao contrato atual: a `gpt-implementar` para e informa o erro. |

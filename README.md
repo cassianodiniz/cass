@@ -5,7 +5,7 @@ sai construindo antes de entender o pedido, que diz "pronto" sem ter testado, qu
 número de pesquisa. Cada skill resolve um desses momentos e pode ser chamada sozinha.
 
 <p align="center">
-  <img src="docs/qual-sua-situacao.svg" width="1000" alt="Mapa de porta de entrada, com três jornadas. Sei onde ajustar: direto na spec-plan. Pesquisar ideias: ask-me e depois search. Feature nova: ask-me e depois auto-think. As três seguem pra spec-plan. Com o plano pronto, se ele for grande e complexo, a gpt-optimizer pode atacá-lo antes da obra; em mudança simples, pule direto. Depois, implementar ou gpt-implementar constroem e build-review confere, com volta ao construtor quando reprova. Cartões laterais: handoff para continuar em outra conversa, otimizar-arquitetura para melhorar a estrutura do código e aprender-com-a-sessao para aprender com uma sessão concluída.">
+  <img src="docs/qual-sua-situacao.svg" width="1000" alt="Mapa de porta de entrada, com três jornadas. Sei onde ajustar: direto na spec-plan. Pesquisar ideias: ask-me e depois search. Feature nova: ask-me e depois auto-think. As três seguem pra spec-plan. Com o plano pronto, se ele for grande e complexo, a gpt-optimizer pode atacá-lo antes da obra; em mudança simples, pule direto. Depois, implementar ou gpt-implementar constroem e build-review confere, com volta ao construtor quando reprova. Cartões laterais: handoff para continuar em outra conversa e otimizar-arquitetura para melhorar a estrutura do código. Depois de revisar e publicar, uma seta leva a aprender-com-a-sessao abaixo do fluxo central.">
 </p>
 
 ## Como eu uso no dia a dia

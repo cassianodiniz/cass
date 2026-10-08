@@ -4,7 +4,7 @@
 
 - `writin-skills` incluída com todas as referências e ferramentas da versão local.
 - `implementar` sincronizada: decisões e restrições aprovadas no chat passam a ser registradas em `Sources`.
-- Primeiro infográfico: cartões laterais de `handoff`, `otimizar-arquitetura` e `aprender-com-a-sessao`, mantendo o fluxo central.
+- Primeiro infográfico: cartões laterais de `handoff` e `otimizar-arquitetura`; `aprender-com-a-sessao` abaixo de “pode publicar”, ligada por seta, mantendo o restante do fluxo.
 - Catálogo, README e instalação alinhados às 12 skills e ao comportamento atual das dependências.
 - Guia auxiliar de redução de consumo removido, junto de suas menções.
 - Auditoria documentada em `docs/auditoria-plugin.md`; sugestões de funcionamento ficam pendentes.
