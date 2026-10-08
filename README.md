@@ -1,11 +1,11 @@
 # cass — pensar antes de fazer, construir com prova, conferir antes de confiar
 
-Onze skills pra trabalhar com IA no Claude Code sem cair nas armadilhas de sempre: a IA que
+Doze skills pra trabalhar com IA no Claude Code sem cair nas armadilhas de sempre: a IA que
 sai construindo antes de entender o pedido, que diz "pronto" sem ter testado, que inventa
 número de pesquisa. Cada skill resolve um desses momentos e pode ser chamada sozinha.
 
 <p align="center">
-  <img src="docs/qual-sua-situacao.svg" width="680" alt="Mapa de porta de entrada, com três jornadas. Sei onde ajustar: direto na spec-plan. Pesquisar ideias: ask-me e depois search. Feature nova: ask-me e depois auto-think. As três seguem pra spec-plan. Com o plano pronto, se ele for grande e complexo, a gpt-optimizer pode atacá-lo antes da obra; em mudança simples, pule direto. Depois, implementar ou gpt-implementar constroem e build-review confere, com volta ao construtor quando reprova. A qualquer momento, handoff. Depois de uma sessão, aprender-com-a-sessao.">
+  <img src="docs/qual-sua-situacao.svg" width="1000" alt="Mapa de porta de entrada, com três jornadas. Sei onde ajustar: direto na spec-plan. Pesquisar ideias: ask-me e depois search. Feature nova: ask-me e depois auto-think. As três seguem pra spec-plan. Com o plano pronto, se ele for grande e complexo, a gpt-optimizer pode atacá-lo antes da obra; em mudança simples, pule direto. Depois, implementar ou gpt-implementar constroem e build-review confere, com volta ao construtor quando reprova. Cartões laterais: handoff para continuar em outra conversa, otimizar-arquitetura para melhorar a estrutura do código e aprender-com-a-sessao para aprender com uma sessão concluída.">
 </p>
 
 ## Como eu uso no dia a dia
@@ -81,7 +81,7 @@ Com uma tarefa só, nada vai pro GitHub sem o seu OK. Com o plano inteiro no Git
 pra uma PR em rascunho, e no fim uma revisão do plano inteiro tira a PR do rascunho. O merge é
 sempre seu.
 
-<p align="center"><img src="docs/skill-construtoras.svg" width="720" alt="As duas construtoras começam iguais: seu sim pra tarefa, pasta limpa com marco de início e a lista de provas escrita pelo Claude antes do código. Na implementar, o agente da conversa constrói com teste antes do código, anota decisões novas, faz commits e não há fiscal no meio. Na gpt-implementar, o Claude escreve a ordem de serviço, subagentes GPT constroem no Codex, o Claude roda as provas e commita; se algo falha, volta ao Codex até 2 vezes e depois para e pergunta. Quem confere o código é a vistoria da build-review. As duas terminam no relatório final e oferecem a vistoria com o seu sim."></p>
+<p align="center"><img src="docs/skill-construtoras.svg" width="720" alt="As duas construtoras começam iguais: seu sim pra tarefa, pasta limpa com marco de início e a lista de provas escrita pelo agente coordenador antes do código. Na implementar, o agente da conversa constrói com teste antes do código, anota decisões novas, faz commits e não há fiscal no meio. Na gpt-implementar, o Claude escreve a ordem de serviço, subagentes GPT constroem no Codex, o Claude roda as provas e commita; se algo falha, volta ao Codex até 2 vezes e depois para e pergunta. Quem confere o código é a vistoria da build-review. As duas terminam no relatório final e oferecem a vistoria com o seu sim."></p>
 
 <details><summary>Detalhe técnico</summary>
 
@@ -180,6 +180,20 @@ Módulos fundos (Ousterhout) e costuras (Feathers); 4 categorias de dependência
 
 </details>
 
+### `/cass:writin-skills` — criar, ajustar e testar skills
+
+Ajuda a transformar um processo em skill, acertar quando ela deve ser chamada e testar
+se o agente segue suas instruções. Traz as referências e ferramentas da versão local.
+É uma ferramenta para cuidar das próprias skills; fica fora do mapa principal de trabalho.
+
+<details><summary>Detalhe técnico</summary>
+
+RED–GREEN–REFACTOR aplicado a instruções: cenários sem a skill e com ela, versões congeladas
+e testes de pressão. Referências de entrevista, formato, descrição e testes acompanham a
+skill. O renderizador opcional de fluxogramas usa Node.js e Graphviz (`dot`).
+
+</details>
+
 ---
 
 ## Instalar
@@ -231,3 +245,5 @@ A **`aprender-com-a-sessao`** é a skill `retro` de **[Matt Pocock](https://gith
 com o guia `writing-for-agents` dele nas referências. Aqui o nome foi traduzido e a skill lê o guia
 de dentro da própria pasta. O resto é o original, sob a licença MIT dele
 ([licença](skills/aprender-com-a-sessao/LICENSE) · [créditos](skills/aprender-com-a-sessao/CREDITOS.md)).
+
+Auditoria desta atualização: [achados, verificações e sugestões](docs/auditoria-plugin.md).

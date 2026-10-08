@@ -1,5 +1,14 @@
 # Changelog — cass (antigo Titan)
 
+## Não lançado
+
+- `writin-skills` incluída com todas as referências e ferramentas da versão local.
+- `implementar` sincronizada: decisões e restrições aprovadas no chat passam a ser registradas em `Sources`.
+- Primeiro infográfico: cartões laterais de `handoff`, `otimizar-arquitetura` e `aprender-com-a-sessao`, mantendo o fluxo central.
+- Catálogo, README e instalação alinhados às 12 skills e ao comportamento atual das dependências.
+- Guia auxiliar de redução de consumo removido, junto de suas menções.
+- Auditoria documentada em `docs/auditoria-plugin.md`; sugestões de funcionamento ficam pendentes.
+
 ## 4.7.1 — 2026-10-07
 
 - **`gpt-implementar` sai do fiscal próprio.** Depois dos testes verdes, a skill entrega pronto; quem abre o código e confere cada asserção é o Fiscal da `build-review`. `implementar/references/fiscal.md` removido e `contrato.md` alinhado. Modelo segue `gpt-6.1-sol` · `medium`.
@@ -114,7 +123,7 @@ O plugin passa a se chamar **`cass`** (antes `Titan`) e o repositório passa a s
 - **Um modelo só pra falar com o GPT: `gpt-6-sol`.** `gpt-optimizer` (esforço `high`), `auto-think` e o motor `_shared/confronto-codex.md` (antes `gpt-5.6-sol`/`gpt-5.6-terra`) e o leitor cego do `handoff` (antes `gpt-5.6-terra`). O `gpt-6-sol` recusa `service_tier="flex"` (HTTP 400), então o `gpt-optimizer` e o `handoff` deixaram de pedir essa via. Testado com chamada real, rodada 1 e rodada 2.
 - **Sincronizadas com as versões locais:** `spec-plan` (oferece os dois construtores no fim), `implementar` (relatório abre pelo que precisa do usuário), `build-review` (relatório abre pelo veredito), `gpt-builder` (passa a usar as referências do `implementar`; a pasta `references/` própria saiu), `gpt-optimizer` e `handoff` (ganha `references/leitor-cego.md` e o aviso de árvore suja).
 - **Auditoria de funcionamento:** removidas as citações a skills que não vêm no plugin (`/revisar`, `/gpt-review`, `/codex-build`, `/setup-matt-pocock-skills`); corrigidos dois links quebrados em `build-review/references/checklist-format.md`; tirados trechos que se dirigiam ao autor como se fosse o usuário; `auto-think` passa a citar `spec-plan` na fronteira.
-- **README reescrito** pra quem está começando: guia "Qual eu uso?", seção sobre as skills parecidas, detalhe técnico de cada uma, link pros estudos de IA do autor e o prompt de instalação do guia de economia de tokens.
+- **README reescrito** pra quem está começando: guia "Qual eu uso?", seção sobre as skills parecidas, detalhe técnico de cada uma, link pros estudos de IA do autor.
 
 ## 2.4.0 — 2026-09-20
 

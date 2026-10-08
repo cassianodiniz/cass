@@ -36,7 +36,7 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <line class="ln" x1="190" y1="531" x2="190" y2="553" marker-end="url(#a)"/>
 <g class="nb"><rect x="40" y="555" width="300" height="34" rx="4"/><text class="h" x="190" y="577" text-anchor="middle">rodada 2: o GPT confronta os finalistas</text></g>
 <line class="ln" x1="190" y1="589" x2="190" y2="611" marker-end="url(#a)"/>
-<rect class="pill" x="-1" y="613" width="382" height="34" rx="17"/><text class="h" x="190" y="635" text-anchor="middle">a recomendada e as alternativas, com o porquê</text>
+<rect class="pill" x="2" y="613" width="376" height="34" rx="17"/><text class="h" x="190" y="635" text-anchor="middle">a recomendada e as alternativas, com o porquê</text>
 <path class="bk" d="M340 507 H362 V428 H342" marker-end="url(#b)"/>
 <text class="lb" x="370" y="453" text-anchor="start"><tspan x="370" dy="0">ainda há dúvida</tspan><tspan x="370" dy="15">que muda a</tspan><tspan x="370" dy="15">decisão</tspan></text>
 <line x1="16" y1="669" x2="504" y2="669" stroke="var(--ns)" stroke-width="1" stroke-dasharray="2 3"/>

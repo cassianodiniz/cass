@@ -37,6 +37,8 @@ Reúna uma vez, e reparta pra cada revisor a fatia que o texto dele pede:
 
 **Sem checklist, o Fiscal não tem o que provar.** Não invente uma nem deixe o Fiscal virar revisão genérica: pare e diga ao usuário que falta a checklist. Sem issue/spec, o eixo Spec e o passo 1 do Fiscal ficam sem âncora — siga com os outros e registre a ausência no relatório.
 
+**Referência de configuração do rastreador.** `references/matt-code-review.md` é a cópia original e cita `/setup-matt-pocock-skills`, que não vem neste plugin. Ao preparar as entradas, use `docs/agents/issue-tracker.md` do projeto; se faltar, informe essa ausência e peça a configuração ou a fonte da issue/spec, sem mandar executar o comando ausente. Esta resolução local acompanha o briefing dos revisores.
+
 ## Dispara os três em paralelo
 
 Um subagente por revisor, no mesmo turno, cada um com o briefing **verbatim** do seu texto de referência. Não resuma o texto no prompt — aponte o arquivo e passe as entradas.
