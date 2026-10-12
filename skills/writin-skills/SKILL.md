@@ -72,20 +72,24 @@ Before writing or changing a skill's `name` or `description`, choosing its keywo
 NO SKILL WITHOUT A FAILING TEST FIRST
 ```
 
-This applies to NEW skills AND EDITS to existing skills.
+This applies to NEW skills AND behavior-changing EDITS to existing skills.
+
+For purely mechanical edits to an existing skill (spelling, formatting, or a corrected link with unchanged instructions and destination meaning), verify the affected content objectively. No new agent baseline or campaign is required. If the edit changes triggers, instructions, workflow, permissions or expected output, use the behavioral testing cycle.
 
 Write skill before testing? Delete it. Start over.
 Edit skill without testing? Same violation.
 
-**No exceptions:**
+**For new skills and behavior-changing edits:**
 - Not for "simple additions"
 - Not for "just adding a section"
-- Not for "documentation updates"
+- Not for "documentation updates" that change behavior
 - Don't keep untested changes as "reference"
 - Don't "adapt" while running tests
 - Delete means delete
 
 ## House Rules for Testing Skills (Cassiano)
+
+These repository rules apply when running agent-based scenarios; they do not require a fake repository for an objective mechanical check.
 
 - **The fake test repo is born from scratch** (clean `git init`), one per scenario, never copied from another scenario. Before launching the agents, check `git log --all --oneline` and `git ls-files`: only what the scenario needs may exist. The absence scenario (no spec, no issue, no file) always goes into the battery. It was the only one that ever exposed a real failure.
 - **Similar form doesn't prove the result.** When comparing with another skill, "already covered" or "this is better" only counts with a test that compares the RESULT of both: the same input in both scripts, or the same scenario on the same model. Whatever went untested is "not verified", never "covered".
@@ -164,7 +168,7 @@ Different skill types need different test approaches:
 | "Academic review is enough" | Reading ≠ using. Test application scenarios. |
 | "No time to test" | Deploying untested skill wastes more time fixing it later. |
 
-**All of these mean: Test before deploying. No exceptions.**
+**For new skills and behavioral edits: test before deploying. Mechanical edits use the objective checks defined above.**
 
 ## Match the Form to the Failure
 
@@ -224,7 +228,7 @@ Run same scenarios WITH skill. Agent should now comply.
 
 ### REFACTOR: Close Loopholes
 
-Agent found new rationalization? Add explicit counter, freeze the new version and test it (see Versions below). Repeat until bulletproof.
+Agent found new rationalization? Add explicit counter, freeze the new version and test it (see Versions below). Repeat within the campaign scope and stopping rule below.
 
 ### Versions: Freeze, Test Once, Reuse
 
@@ -232,7 +236,7 @@ Every version you test is frozen before its first run: copy the skill folder (or
 
 Log each result with the name of the frozen copy it ran on. A result without that link cannot be reused.
 
-Each version is tested once. When a fix turns B into C, run only C and compare it with the logged results of A and B. Re-run an earlier version only if:
+Each version receives one planned campaign, including its scenarios and required repetitions; "once" does not mean one sample. When a fix turns B into C, run only C and compare it with the logged results of A and B. Re-run an earlier version only if:
 - the test itself changed (scenario, grading criteria, fixtures) — then re-run every earlier version you compare against, starting with A;
 - the model or the environment changed;
 - its logged result was inconsistent across repetitions.
@@ -250,6 +254,8 @@ Full pressure-scenario runs are the final gate, but they are slow and expensive 
 5. **Variance is a metric.** When guidance lands, reps converge on the same shape. Three different interpretations across three reps means the wording isn't binding — tighten the form before adding words.
 
 Micro-tests verify wording; they do not replace pressure scenarios for discipline skills.
+
+**Campaign scope and stopping rule:** Before running, record the affected scenarios, observable pass criteria and maximum correction rounds within the authorized scope. Finish the planned repetitions before grading. Stop when all planned criteria pass, or when the round limit is reached. At the limit, report unresolved failures and offer a next round instead of continuing automatically. Report cases and repetitions passed, with their limits; passing does not establish universal reliability.
 
 **Testing methodology:** See [testing-skills-with-subagents.md](testing-skills-with-subagents.md) for the complete testing methodology:
 - How to write pressure scenarios
@@ -272,7 +278,7 @@ Deploying untested skills = deploying untested code. It's a violation of quality
 
 ## Skill Creation Checklist (TDD Adapted)
 
-**IMPORTANT: Create a todo for EACH checklist item below.**
+**IMPORTANT: Create a todo for EACH checklist item below.** For purely mechanical edits, mark agent-baseline, micro-test and scenario/refactor items N/A and record the objective checks performed. Skill creation and behavioral edits keep the testing cycle.
 
 **RED Phase - Write Failing Test:**
 - [ ] Use cases, trigger phrases and success criteria gathered (see [references/interview.md](references/interview.md))
@@ -283,7 +289,7 @@ Deploying untested skills = deploying untested code. It's a violation of quality
 
 **GREEN Phase - Write Minimal Skill:**
 - [ ] Name uses only letters, numbers, hyphens (no parentheses/special chars)
-- [ ] YAML frontmatter with required `name` and `description` fields (max 1024 chars; see [spec](https://agentskills.io/specification))
+- [ ] YAML frontmatter with required `name` (max 64 chars) and `description` (max 1024 chars) fields (see [spec](https://agentskills.io/specification))
 - [ ] Description starts with "Use when..." and includes specific triggers/symptoms
 - [ ] Description says only when to use and when NOT to use — no summary of the process; describes near-miss requests without naming other skills
 - [ ] Description written in third person
@@ -303,7 +309,7 @@ Deploying untested skills = deploying untested code. It's a violation of quality
 - [ ] Add explicit counters (if discipline skill)
 - [ ] Build rationalization table from all test iterations
 - [ ] Create red flags list
-- [ ] Re-test until bulletproof — each new version once, earlier versions reused from the log
+- [ ] Run the planned campaign for each corrected version within its round limit; reuse eligible earlier results and report unresolved failures
 
 **Quality Checks:**
 - [ ] Small flowchart only if decision non-obvious
@@ -311,6 +317,7 @@ Deploying untested skills = deploying untested code. It's a violation of quality
 - [ ] Common mistakes section
 - [ ] No narrative storytelling
 - [ ] Supporting files only for tools or heavy reference
+- [ ] For a new skill or a behavior change, run an independent review before Deployment (read [references/independent-review.md](references/independent-review.md)). Return supported findings to the author for minimal fixes; offer affected tests after correction, respecting prior authorization. N/A for mechanical edits.
 
 **Deployment:**
 - [ ] Commit skill to git and push to your fork (if configured)
@@ -322,6 +329,7 @@ Deploying untested skills = deploying untested code. It's a violation of quality
 
 Same Iron Law: No skill without failing test first.
 Same cycle: RED (baseline) → GREEN (write skill) → REFACTOR (close loopholes).
-Same benefits: Better quality, fewer surprises, bulletproof results.
+Report observed results and remaining limits; passing tested cases is not a universal guarantee.
 
 If you follow TDD for code, follow it for skills. It's the same discipline applied to documentation.
+

@@ -16,16 +16,18 @@ You run scenarios without the skill (RED - watch agent fail), write skill addres
 
 ## When to Use
 
-Test skills that:
+Use pressure tests for skills that:
 - Enforce discipline (TDD, testing requirements)
 - Have compliance costs (time, effort, rework)
 - Could be rationalized away ("just this once")
 - Contradict immediate goals (speed over quality)
 
-Don't test:
+Don't use pressure tests for:
 - Pure reference skills (API docs, syntax guides)
 - Skills without rules to violate
 - Skills agents have no incentive to bypass
+
+Reference skills still need retrieval, application and gap checks as described in SKILL.md. Use the test approach that matches the skill type.
 
 ## TDD Mapping for Skill Testing
 
@@ -233,9 +235,9 @@ Agent should now:
 - Cite new sections
 - Acknowledge their previous rationalization was addressed
 
-**If agent finds NEW rationalization:** Continue REFACTOR cycle.
+**If agent finds NEW rationalization:** Continue REFACTOR only within the planned campaign round limit; at the limit, report the failure and offer a next round.
 
-**If agent follows rule:** Success - skill is bulletproof for this scenario.
+**If the planned repetitions meet the pass criteria:** This scenario passed for the tested version, model and conditions; report those limits.
 
 ## Meta-Testing (When GREEN Isn't Working)
 
@@ -264,16 +266,16 @@ it crystal clear that Option A was the only acceptable answer?
    - Make key points more prominent
    - Add foundational principle early
 
-## When Skill is Bulletproof
+## When the Tested Scenarios Pass
 
-**Signs of bulletproof skill:**
+**Evidence to record for the tested scenarios:**
 
 1. **Agent chooses correct option** under maximum pressure
 2. **Agent cites skill sections** as justification
 3. **Agent acknowledges temptation** but follows rule anyway
 4. **Meta-testing reveals** "skill was clear, I should follow it"
 
-**Not bulletproof if:**
+**Signals to examine against the planned pass criteria:**
 - Agent finds new rationalizations
 - Agent argues skill is wrong
 - Agent creates "hybrid approaches"
@@ -353,7 +355,7 @@ Agents resist single pressure, break under multiple.
 
 **❌ Stopping after first pass**
 Tests pass once ≠ bulletproof.
-✅ Fix: Continue REFACTOR cycle until no new rationalizations.
+✅ Fix: Complete the planned repetitions and use the campaign pass criteria and round limit; at the limit, report unresolved failures instead of continuing automatically.
 
 ## Quick Reference (TDD Cycle)
 

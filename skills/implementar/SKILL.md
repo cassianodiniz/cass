@@ -37,7 +37,7 @@ This skill runs the Execute half of the Spec-Driven Development flow below, for 
    3. **Decision**: Your recommendation, the consequence of each choice, and the exact scope of the requested approval.
       Use plain language for someone who does not program. When using a question panel, include this context in the question itself. Ask about the current correction and any authorization for future changes separately.
 
-# Tech Lead's Club - Spec-Driven Development
+# Spec-Driven Development
 
 Plan and implement features with precision. Granular tasks. Clear dependencies. Right tools. Zero ceremony.
 

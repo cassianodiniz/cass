@@ -42,7 +42,7 @@ Any gray area the user **declines** to discuss, or that goes undiscussed, is wri
 
 ### 4. Deep-Dive Each Area
 
-Ask in rounds, as in [grilling.md](grilling.md). Shared rules:
+Ask in rounds, as in [investigate.md](investigate.md). Shared rules:
 
 1. Options must be concrete ("Card layout" or "Table layout" - not "Option A" or "how should it look?").
 2. Lead with your recommended answer and one line of reasoning. You have read the codebase; the user should be able to accept or override in a word.

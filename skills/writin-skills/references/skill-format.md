@@ -41,8 +41,8 @@ skills/
 
 **Frontmatter (YAML):**
 - Two required fields: `name` and `description` (see [agentskills.io/specification](https://agentskills.io/specification) for all supported fields)
-- Max 1024 characters total
-- `name`: Use letters, numbers, and hyphens only (no parentheses, special chars)
+- `description`: Max 1024 characters
+- `name`: Max 64 characters; use lowercase letters, numbers, and hyphens only (no parentheses, special chars)
 - `description`: Third-person, describes ONLY when to use and when NOT to use (NOT what it does)
   - Start with "Use when..." to focus on triggering conditions
   - Include specific symptoms, situations, and contexts
@@ -51,7 +51,7 @@ skills/
 
 ```markdown
 ---
-name: Skill-Name-With-Hyphens
+name: skill-name-with-hyphens
 description: Use when [specific triggering conditions and symptoms]. Do NOT use for [near-miss requests].
 ---
 
@@ -111,6 +111,13 @@ digraph when_flowchart {
 - Labels without semantic meaning (step1, helper2)
 
 See [graphviz-conventions.dot](../graphviz-conventions.dot) for graphviz style rules.
+
+**Before/after comparisons for a human decision:**
+- Show corresponding stages side by side on the same grid, with equal legibility; highlight the actual change and keep unchanged stages visually quiet.
+- Give each card a prominent title and one short supporting line. DOT HTML-like labels can separate a bold title from smaller support using native SVG text.
+- Put short transition conditions beside the relevant arrows, with consistent alignment and clear association. Preserve explanations, loop limits and exceptions in nearby captions; keep branches visible when they determine the decision.
+- Keep the figure self-contained and light, with legible contrast and a caption stating what changed. Share the SVG with descriptive alternative text; do not rely on color alone.
+- Inspect the rendered result at its intended display width: text remains readable, paired stages align, arrow labels do not collide, and no information or behavior was lost.
 
 **Visualizing for your human partner:** Use `render-graphs.js` in the skill's root directory to render a skill's flowcharts to SVG:
 ```bash

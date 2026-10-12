@@ -2,6 +2,12 @@
 
 ## Não lançado
 
+- `spec-plan`, `implementar` e `build-review` sincronizadas integralmente com a fonte local: uma feature em `.specs/`, uma branch, uma issue e uma PR; tarefas em sequência e revisão final automática.
+- Entrevista da `spec-plan` em `investigate.md`, com preferência pela solução mais simples que atende aos requisitos e verificação dos nove requisitos esquecidos.
+- Validadores Python, aprendizados, licenças e referências acompanham as skills; `writin-skills` também recebe a versão local atual.
+- README, cinco desenhos, descrição do plugin e dependências refletem aprovações por documento, push e PR pronta; correções passam por aprovação item a item e até três rodadas de revisão.
+- `gpt-implementar` permanece no contrato anterior e é identificada como pendente de adaptação, fora do novo caminho principal.
+
 - `writin-skills` incluída com todas as referências e ferramentas da versão local.
 - `implementar` sincronizada: decisões e restrições aprovadas no chat passam a ser registradas em `Sources`.
 - Primeiro infográfico: cartões laterais de `handoff` e `otimizar-arquitetura`; `aprender-com-a-sessao` abaixo de “pode publicar”, ligada por seta, mantendo o restante do fluxo.

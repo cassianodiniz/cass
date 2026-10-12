@@ -32,7 +32,7 @@ The canonical rubric for requirements that are easy to miss. Referenced by [disc
 
 Start open - let the user dump their mental model. Follow the energy: whatever they emphasize, dig into that.
 
-Ask in rounds, as in [grilling.md](grilling.md):
+Ask in rounds, as in [investigate.md](investigate.md):
 
 - "What problem are you solving?"
 - "Who is the user and what's their pain?"
