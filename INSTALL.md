@@ -68,4 +68,4 @@ Depois as skills ficam disponíveis como `/cass:ask-me`, `/cass:gpt-implementar`
 
 O renderizador opcional `node skills/writin-skills/render-graphs.js <pasta-da-skill>` usa Node.js e Graphviz (`dot`). Eles só são necessários para gerar SVGs a partir de blocos DOT. Os testes de pressão da skill usam subagentes disponíveis no agente anfitrião.
 
-No fluxo atual de `spec-plan` → `implementar` → `build-review`, os scripts de validação e de aprendizados também precisam de **Python 3**. A `gpt-implementar` ainda mantém o contrato anterior e precisa de adaptação antes de entrar nesse fluxo.
+No fluxo atual de `spec-plan` → `implementar` → `build-review`, os scripts de validação e de aprendizados também precisam de **Python 3**. A `gpt-implementar` segue o mesmo fluxo, com o Codex construindo.

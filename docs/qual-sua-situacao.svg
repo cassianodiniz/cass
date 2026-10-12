@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 740" width="1000" height="740" role="img" aria-labelledby="t d">
 <title id="t">Qual skill do cass usar</title>
-<desc id="d">Três entradas para planejar uma feature. Fluxo atual: spec-plan publica uma branch, issue e PR rascunho; implementar constrói tarefas em sequência; build-review revisa ao final; correções aprovadas voltam a implementar por até três rodadas. A entrega precisa de autorização para commit, push e PR pronta. gpt-implementar é identificada como contrato anterior que precisa de adaptação. Ferramentas de apoio aparecem ao lado.</desc>
+<desc id="d">Três entradas para planejar uma feature. Fluxo atual: spec-plan publica uma branch, issue e PR rascunho; implementar constrói tarefas em sequência; build-review revisa ao final; correções aprovadas voltam a implementar por até três rodadas. A entrega precisa de autorização para commit, push e PR pronta. gpt-implementar segue o mesmo fluxo da implementar, com o Codex construindo. Ferramentas de apoio aparecem ao lado.</desc>
 <style>svg{--tx:#1f2328;--mu:#59636e;--ln:#59636e;--ns:#d1d9e0}
 @media(prefers-color-scheme:dark){svg{--tx:#e6edf3;--mu:#a6b0bb;--ln:#9198a1;--ns:#3d444d}}
 text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;fill:var(--mu);font-size:13px}
@@ -67,8 +67,8 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 </g>
 <g class="nb"><rect x="710" y="394" width="265" height="80" rx="6"/>
 <text class="h" x="842.5" y="419" text-anchor="middle">gpt-implementar</text>
-<text class="" x="842.5" y="441" text-anchor="middle">Contrato anterior.</text>
-<text class="" x="842.5" y="460" text-anchor="middle">Precisa de adaptação a .specs/.</text>
+<text class="" x="842.5" y="441" text-anchor="middle">O fluxo da implementar,</text>
+<text class="" x="842.5" y="460" text-anchor="middle">com o Codex construindo.</text>
 </g>
 <path class="ln" d="M340 610 V636" marker-end="url(#a)"/>
 <g class="nb"><rect x="125" y="638" width="430" height="80" rx="6"/>

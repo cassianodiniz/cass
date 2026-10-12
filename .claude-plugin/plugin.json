@@ -1,7 +1,7 @@
 {
   "name": "cass",
   "version": "4.7.0",
-  "description": "Skills do Cassiano Diniz pra trabalhar com IA: pensar antes de fazer, construir com prova e conferir antes de confiar. ask-me entrevista; spec-plan aprova uma feature em .specs/ e publica uma branch, issue e PR em rascunho; implementar constrói tarefas em sequência; build-review revisa a feature inteira com validação, telas e correções aprovadas. auto-think estuda problemas; search pesquisa com fontes; gpt-optimizer confronta decisões; handoff passa contexto; otimizar-arquitetura organiza módulos; aprender-com-a-sessao sugere melhorias; writin-skills cria e testa skills. gpt-implementar mantém o contrato anterior e precisa de adaptação ao novo fluxo.",
+  "description": "Skills do Cassiano Diniz pra trabalhar com IA: pensar antes de fazer, construir com prova e conferir antes de confiar. ask-me entrevista; spec-plan aprova uma feature em .specs/ e publica uma branch, issue e PR em rascunho; implementar constrói tarefas em sequência; build-review revisa a feature inteira com validação, telas e correções aprovadas. auto-think estuda problemas; search pesquisa com fontes; gpt-optimizer confronta decisões; handoff passa contexto; otimizar-arquitetura organiza módulos; aprender-com-a-sessao sugere melhorias; writin-skills cria e testa skills. gpt-implementar faz o mesmo que a implementar, com o Codex construindo.",
   "author": {
     "name": "Cassiano Diniz",
     "email": "cassi.diniz@gmail.com"

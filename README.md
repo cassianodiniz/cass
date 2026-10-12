@@ -106,19 +106,19 @@ contra o git antes de continuar. Pausar: commit local, sem stash; push só com s
 
 <p align="center"><img src="docs/skill-plano-inteiro.svg" width="600" alt="Uma feature inteira: planejamento aprovado, uma branch, uma issue e uma PR em rascunho; tarefas construídas em sequência com commits locais; revisão final automática; eventuais correções aprovadas e nova revisão, até três rodadas; aprovação para commitar a validação, fazer push e marcar a PR pronta. Merge continua com você."></p>
 
-### `/cass:gpt-implementar` — delegação ao Codex do fluxo anterior
+### `/cass:gpt-implementar` — o mesmo fluxo da `implementar`, com o Codex construindo
 
-O Claude coordena uma sessão do Codex que escreve o código e confere as provas antes de
-commitar. Esta skill ainda usa o contrato anterior, com checklist em `.checks/`, e aponta
-para referências que estas atualizações substituem. **Precisa de adaptação antes de ser
-usada com o novo fluxo de `.specs/`.** Para este fluxo, use `implementar`.
+Segue a `implementar` inteira e troca só quem constrói: cada lote de até ~7 tarefas vai a uma
+sessão do Codex, que escreve o código e faz o commit de cada tarefa. O Claude coordena, roda
+os testes ele mesmo, confere pelo git e, depois da última tarefa, inicia a `build-review`.
+No sim final da `spec-plan`, responda **"sim, codex"** para cair aqui.
 
 <details><summary>Detalhe técnico</summary>
 
-A skill permanece no plugin, sem alterações nesta atualização. Usa `codex exec` com
-`gpt-6.1-sol`, esforço `medium`, e limita correções a duas rodadas. Os caminhos antigos
-`implementar/references/tdd/tdd.md` e `implementar/references/relatorio.md` precisam ser
-adaptados junto do contrato de tarefas e revisão.
+Usa `codex exec` com `gpt-6.1-sol`, esforço `medium` e `service_tier="default"` (sem modo
+rápido), sempre explícitos. Antes do primeiro lote confere `codex --version` e
+`codex login status`; sem Codex, para e avisa. Conserto: até 2 rodadas na mesma sessão do
+Codex; depois, para e pergunta. Os consertos aprovados na `build-review` também vão ao Codex.
 
 </details>
 

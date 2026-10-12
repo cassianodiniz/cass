@@ -6,7 +6,8 @@
 - Entrevista da `spec-plan` em `investigate.md`, com preferência pela solução mais simples que atende aos requisitos e verificação dos nove requisitos esquecidos.
 - Validadores Python, aprendizados, licenças e referências acompanham as skills; `writin-skills` também recebe a versão local atual.
 - README, cinco desenhos, descrição do plugin e dependências refletem aprovações por documento, push e PR pronta; correções passam por aprovação item a item e até três rodadas de revisão.
-- `gpt-implementar` permanece no contrato anterior e é identificada como pendente de adaptação, fora do novo caminho principal.
+- **`gpt-implementar` adaptada ao fluxo por feature:** segue a `implementar` e troca só quem constrói; cada lote (~7 tarefas) vai ao Codex `gpt-6.1-sol` · `medium` · `service_tier="default"` (sem modo rápido), que faz o commit de cada tarefa; o Claude confere pelo git e pelos testes e inicia a `build-review`. Testada antes e depois (46 ensaios).
+- `spec-plan`: o sim final diz quem constrói — "sim" chama a `implementar`, "sim, codex" chama a `gpt-implementar`.
 
 - `writin-skills` incluída com todas as referências e ferramentas da versão local.
 - `implementar` sincronizada: decisões e restrições aprovadas no chat passam a ser registradas em `Sources`.
