@@ -2,6 +2,8 @@
 
 ## Não lançado
 
+- `handoff` enxuta: commit opcional das mudanças deste trabalho, respeito à recusa, branch/HEAD conferidos e pendências locais explícitas. Preserva trabalho alheio staged; falha de commit é registrada sem impedir a entrega. A frase de retomada contém o caminho completo do documento. README e desenho acompanham o fluxo.
+
 - `spec-plan`, `implementar` e `build-review` sincronizadas integralmente com a fonte local: uma feature em `.specs/`, uma branch, uma issue e uma PR; tarefas em sequência e revisão final automática.
 - Entrevista da `spec-plan` em `investigate.md`, com preferência pela solução mais simples que atende aos requisitos e verificação dos nove requisitos esquecidos.
 - Validadores Python, aprendizados, licenças e referências acompanham as skills; `writin-skills` também recebe a versão local atual.

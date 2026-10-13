@@ -182,13 +182,18 @@ Orquestrador Exa com subagentes; registro de procedência por número; arquivo e
 ### `/cass:handoff` — continuar numa conversa nova
 
 Escreve um documento de passagem, com o que foi decidido e o que falta, e te dá um texto
-pronto pra colar na sessão nova.
+pronto pra colar na sessão nova. Se houver mudanças deste trabalho, oferece commit: com
+seu sim, commita antes; com seu não, entrega o handoff sem commit.
 
-<p align="center"><img src="docs/skill-handoff.svg" width="520" alt="A handoff confere o git: se algum arquivo desta conversa está sem commit, pede o seu OK pra commitar antes de seguir. Escolhe a âncora, varre a conversa inteira, marca a origem de cada afirmação, salva o documento em .claude/handoffs e entrega um texto pronto pra colar na sessão nova."></p>
+<p align="center"><img src="docs/skill-handoff.svg" width="520" alt="A handoff oferece commit das mudanças deste trabalho e respeita a resposta. Registra branch, HEAD e mudanças locais pendentes, preserva decisões e motivos da conversa, referencia arquivos existentes, salva em .claude/handoffs e entrega uma frase com o caminho completo para retomar."></p>
 
 <details><summary>Detalhe técnico</summary>
 
-Ancorado num commit: se o trabalho da conversa estiver sem commit, para e pede o commit antes; ao começar do zero algo que surgiu, ancora no ramo principal; cada afirmação marcada `[GIT]`/`[ARQUIVO]`/`[CHAT]`/`[SUPOSIÇÃO]`.
+Registra branch e HEAD conferidos, distinguindo as mudanças locais fora desse commit. Se
+o commit falhar, registra a falha e entrega o handoff com as pendências. Preserva trabalho
+de outra frente, inclusive o que já estava staged. Usa apenas as seções necessárias e
+uma frase colável com o caminho absoluto do documento. Sem Git ou sem primeiro commit,
+informa a ausência de âncora.
 
 </details>
 
