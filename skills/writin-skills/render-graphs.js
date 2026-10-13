@@ -19,7 +19,7 @@ const { execFileSync } = require('child_process');
 
 function extractDotBlocks(markdown) {
   const blocks = [];
-  const regex = /```dot\n([\s\S]*?)```/g;
+  const regex = /```dot\r?\n([\s\S]*?)```/g;
   let match;
 
   while ((match = regex.exec(markdown)) !== null) {
@@ -77,6 +77,7 @@ function renderToSvg(dotContent) {
   } catch (err) {
     console.error('Error running dot:', err.message);
     if (err.stderr) console.error(err.stderr.toString());
+    process.exitCode = 1;
     return null;
   }
 }
@@ -151,12 +152,17 @@ function main() {
     }
   } else {
     // Render each separately
+    const usedNames = new Set();
     for (const block of blocks) {
       const svg = renderToSvg(block.content);
       if (svg) {
-        const outputPath = path.join(outputDir, `${block.name}.svg`);
+        let outputName = block.name;
+        let suffix = 2;
+        while (usedNames.has(outputName)) outputName = `${block.name}_${suffix++}`;
+        usedNames.add(outputName);
+        const outputPath = path.join(outputDir, `${outputName}.svg`);
         fs.writeFileSync(outputPath, svg);
-        console.log(`  Rendered: ${block.name}.svg`);
+        console.log(`  Rendered: ${outputName}.svg`);
       } else {
         console.error(`  Failed: ${block.name}`);
       }

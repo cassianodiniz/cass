@@ -1,137 +1,58 @@
 ---
 name: build-review
-description: "Use quando uma feature já construída vai ser revisada antes do merge e já existem a checklist do que foi prometido (`.checks/<feature>.md`), o diff `<base>..HEAD` e a issue/spec original; também com /build-review ou com o sim ao convite do /implementar ou do /gpt-implementar. Não use pra planejar nem construir, nem quando ainda não há checklist."
-license: matt-code-review.md e verify.md são cópias verbatim — Matt Pocock (CC-BY-4.0, github.com/mattpocock) e Tech Leads Club (CC-BY-4.0); as demais referências são adaptações locais do TLC Implement (CC-BY-4.0)
+description: Use when /implementar starts it after the last task of a feature, or when the user invokes /build-review, $build-review or @build-review, to review a finished feature of `.specs/features/<feature>/` before it goes live. Not for building nor for planning.
+license: TLC-derived material under CC-BY-4.0; Matt Pocock-derived material under MIT. See LICENSE and Credits and licenses.
 ---
 
-# Build Review — três revisores sobre o mesmo diff
+# Build Review
 
-**Onde entra no fluxo:** roda depois de `/implementar` ou `/gpt-implementar` — que já deixam a checklist `.checks/<feature>.md` e o diff prontos. É o pente-fino final; não planeja nem constrói.
+This skill runs the feature-level validation of the Spec-Driven Development flow, once, at the end of the feature, for a feature built with the `/implementar` skill. Specify, Design and Tasks run in the `/spec-plan` skill; Execute runs in the `/implementar` skill. Never fix code here.
 
-## O que é
+## How this skill runs the review
 
-Um maestro. Ele **não revisa com texto próprio**: dispara três subagentes independentes sobre o mesmo diff e junta os relatórios sem misturá-los. Os textos que cada subagente segue são cópias verbatim, em `references/` — este arquivo só conduz.
+1. **When.** It starts on its own after the last task of the feature, and again after each fix round. It reviews the whole feature from where the feature branch left main.Follow “Project vocabulary” in the /spec-plan skill to locate the relevant glossary. Require the Verifier and Spec reviewer to read it and report behavior that conflicts with its approved definitions.
+2. **Language.** Write every message to the user in the user's language, in plain words; put each technical question in lay terms. Keep `.specs/` files in English.
+3. **Tests and reviewers.** The Verifier, a fresh sub-agent (author ≠ verifier), runs [validate.md](references/validate.md) steps 1 to 6, then 6b, 9 and 10: it writes `validation.md` (`validate_state.py` waits for item 6), distills the lessons and returns its report. Once all tasks are complete, run [code-review.md](references/code-review.md) on the feature branch. The verdict is the Verifier's; the Standards and Spec reports stay separate and only report.
+4. **Screen photos.** For a feature with a screen, the Verifier runs step 6b of `validate.md` only after the tests pass, never at the same time. If the tests fail, say the photos come in the next round. The photos come back with the Verifier's report, and the orchestrator shows them to the user with the review result, every time, even when the guided test does not run.
+   - Log in with the project's own test account, from its example or seed files. If there is none, ask the user once and record it in the project.
+   - If the app does not open, the result is "Não deu para revisar as telas", with the reason, and the PR is not marked ready until the user decides.
+5. **Guided test with the user.** Then run step 7 of `validate.md` (Interactive UAT) when it applies, with the photos.
+6. **Final verdict.** Add the photo and guided-test results to `validation.md`. If either found an issue, change the verdict to FAIL. Only then run `python3 <skill-dir>/scripts/validate_state.py <feature>` (`validate.md`, step 9).
+7. **One fix plan.** Every issue from the Verifier, the photos, the guided test and the Standards and Spec reports goes into one fix plan, in the "Fix Plans" section of `validation.md` with the round number (`validate.md`, step 8). Each item names where it came from (Verifier, photos, guided test, Standards or Spec), and items are not reranked across those sources. The user approves it item by item, even when the Verifier's verdict is PASS. An item the user refuses is recorded there with the user's words and no longer counts toward FAIL. With the yes, hand the approved fix tasks to the `/implementar` skill; it builds them from that section, marks each one done there, and starts this skill again. After 3 rounds with gaps left, stop and ask the user.
+8. **Could not review.** When the review stops before the reviewers run, the verdict is neither PASS nor FAIL: it is "Não deu para revisar", with what was missing and how to get it.
+9. **On PASS, with no approved fix task left.** The draft PR already exists: mark it ready for review only with the user's yes. Ask one question: commit `validation.md` and the lessons files, push, and mark the PR ready. That yes covers the three actions.
 
-Os três revisores respondem perguntas diferentes, e por isso não se substituem:
+## Critical Rules (read before acting)
 
-- **Standards** (`references/matt-code-review.md`, eixo Standards) — o código segue os padrões documentados da casa + a base fixa de "maus cheiros"? Smell ou preferência é conselho; defeito demonstrado entra no portão.
-- **Spec** (`references/matt-code-review.md`, eixo Spec) — o código faz o que a issue pediu? Falta algo, sobrou algo, ou implementou errado?
-- **Fiscal** (`references/verify.md`) — cada item da checklist está *provado*? Roda a prova, confere a asserção, e **injeta defeito** pra provar que os testes pegam uma regressão. Devolve PASS/FAIL.
+**Loading this skill's files.** Reference files live under `references/` in this skill's own directory (where this `SKILL.md` resides). Resolve them relative to the skill directory - never the workspace root - and load them through the active skill by name; never assume a fixed install path. When a step tells you to read a reference, **read it completely (to EOF)** before acting - never act on a partial/truncated read.
 
-Por que os três juntos: um modelo esperto acha bugs sozinho, mas de forma não-determinística e sem os dentes. Standards e Spec pegam o que o Fiscal não olha (qualidade e escopo); o Fiscal pega o que eles não tocam (prova executável, item a item, à prova de teste decorativo).
+**Running this skill's scripts.** Every `scripts/*.py` shipped with this skill lives under that same skill directory. Resolve the skill directory first, then invoke `python3 <skill-dir>/scripts/<name>.py ...`. Never run `python3 scripts/...` from the consuming project root - that looks for a project-local `scripts/` tree that is not this skill. Project data under `.specs/` is still read/written relative to the project root (pass `--root` when the cwd is elsewhere). Below, `<skill-dir>` means the directory that contains this `SKILL.md`.
 
-## Roda na sessão principal
+**Execution contract - every task, non-negotiable (holds even if you do not open the reference files):**
 
-Os três SÃO subagentes, e subagente não abre subagente. Quem dispara e junta é a **sessão principal**. Se você está dentro de um subagente, pare e devolva pra sessão.
+1. Tests derive from the spec's acceptance criteria and assert spec-defined outcomes - they never mirror the implementation.
+2. The gate must pass (tests pass) before a task is done - the test runner decides, not self-assessment.
+3. One atomic commit per task. Mark the task complete in `tasks.md` (and update spec traceability when used) **before** that commit, and include those updates in the same commit. Never batch tasks; never weaken, skip, or delete tests to make them pass.
+4. After the LAST task, a fresh **Verifier always runs automatically** (author ≠ verifier) - spec-anchored outcome check + discrimination sensor. It is never optional and never prompted. See the Verifier Sub-Agent in [sub-agents.md](references/sub-agents.md).
+5. **Blast radius:** approving a spec or tasks authorizes local implementation and local commits only. `git push`, force-push, deploy, production DB changes, and other remote / externally visible / destructive operations require an explicit go-ahead for that action.
 
-## Antes de tudo: as entradas (portão)
+**Deterministic gates run before human review - not from memory.** The structural gates for the spec and tasks are enforced by scripts in this skill's `scripts/` directory, so they cannot silently drift when the model forgets a step:
 
-Reúna uma vez, e reparta pra cada revisor a fatia que o texto dele pede:
+- Before confirming a spec, in the `/spec-plan` skill: `python3 <skill-dir>/scripts/validate_spec.py <spec-path-or-feature>` (closure gate: EARS-shaped ACs, filled assumptions, well-formed requirement IDs, required sections).
+- Before presenting tasks for approval, in the `/spec-plan` skill: `python3 <skill-dir>/scripts/validate_tasks.py <tasks-path-or-feature>` (granularity smell, diagram-vs-`Depends on` parity within a phase, no forward-phase dependency, every task carries `Tests` + `Gate`).
+- On each commit: `python3 <skill-dir>/scripts/check_commit.py --message "<msg>"` (Conventional Commits). Optionally wire it as a git `commit-msg` guard (git only, no agent dependency) - see `references/implement.md` in the `/implementar` skill, which ships `check_commit.py`.
+- Before declaring a feature done: `python3 <skill-dir>/scripts/validate_state.py <feature>` (completion gate: the Verifier's `validation.md` exists, its verdict is filled to PASS, and it cites `file:line` evidence - a missing, FAIL, placeholder, or evidence-free report fails). The closing step of Execute runs this automatically, the same way the lessons layer runs at distillation; it is not a manual step.
 
-| Entrada | Quem usa | Como obter |
-|---|---|---|
-| Ponto fixo `<base>..HEAD` | os três | o commit-marco que a construção deixou: `git log --format=%H --grep="^chore(checks): start <nome do checklist, sem .md>"`. A base é esse commit; confirme com `git rev-parse`. Nenhum marco, ou mais de um → pare e pergunte a base ao usuário. Não deduza pelo histórico: três leituras do mesmo `git log` dão três bases |
-| Issue / spec original | Spec, Fiscal | o caminho que o usuário deu, ou a referência no commit |
-| Docs de padrão da casa | Standards | `CODING_STANDARDS.md`, `CONTRIBUTING.md`, `CLAUDE.md`/`AGENTS.md` |
-| Checklist `.checks/<feature>.md` | Fiscal | a checklist que a construção deixou |
+A non-zero exit means STOP and fix before proceeding. Skip a script only when no code-execution tool is available; then perform the same checks by reading the artifact.
 
-**Sem checklist, o Fiscal não tem o que provar.** Não invente uma nem deixe o Fiscal virar revisão genérica: pare e diga ao usuário que falta a checklist. Sem issue/spec, o eixo Spec e o passo 1 do Fiscal ficam sem âncora — siga com os outros e registre a ausência no relatório.
+**Before Execute** (the `/implementar` skill does this step, not this skill): read `references/implement.md` of the `/implementar` skill completely and run `<skill-dir>/scripts/validate_tasks.py`; if a formal `tasks.md` packs into more than one task-budgeted batch (> ~8 tasks), present the sub-agent offer first (see Sub-Agent Delegation in the `/implementar` skill).
 
-**Referência de configuração do rastreador.** `references/matt-code-review.md` é a cópia original e cita `/setup-matt-pocock-skills`, que não vem neste plugin. Ao preparar as entradas, use `docs/agents/issue-tracker.md` do projeto; se faltar, informe essa ausência e peça a configuração ou a fonte da issue/spec, sem mandar executar o comando ausente. Esta resolução local acompanha o briefing dos revisores.
+## Credits and licenses
 
-## Dispara os três em paralelo
+This skill adapts **tlc-spec-driven v3.3.0**, authored by **Felipe Rodrigues ([felipfr](https://github.com/felipfr))**, from **Tech Leads Club**, under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/). [Original source](https://github.com/tech-leads-club/agent-skills/tree/main/packages/skills-catalog/skills/%28development%29/tlc-spec-driven).
 
-Um subagente por revisor, no mesmo turno, cada um com o briefing **verbatim** do seu texto de referência. Não resuma o texto no prompt — aponte o arquivo e passe as entradas.
+It also incorporates material from **Matt Pocock's** skills (code-review and implement-spec) in [mattpocock/skills](https://github.com/mattpocock/skills), under the **MIT License**, Copyright (c) 2026 Matt Pocock.
 
-1. **Standards** — siga `references/matt-code-review.md`, eixo Standards, com a base de maus cheiros colada por inteiro (o subagente não tem outro acesso a ela).
-2. **Spec** — siga `references/matt-code-review.md`, eixo Spec, com a issue/spec.
-3. **Fiscal** — siga `references/verify.md` do começo ao fim, **todos os passos, incluindo a injeção de defeito**, e inclua verbatim no briefing a resolução local abaixo. Ele recebe a checklist, o diff, a fonte, e roda só leitura (a injeção acontece num `git worktree` isolado, nunca na worktree real).
-   - **Force o perfil `standard` no mínimo** (`ui` se a feature tem telas **e o usuário pedir revisão UI**). O `verify.md` assume `light` por padrão, e `light` pula exatamente a injeção de defeito, a enumeração de cobertura e as regras de teste — que são o motivo de existir a build-review. Diga o perfil no prompt do Fiscal; não deixe ele cair no padrão.
-   - Ao julgar uma prova entre camadas, esta regra local prevalece sobre instruções ou exemplos contrários de `verify.md`: inspecione somente as dependências necessárias para confirmar o caminho real e o isolamento do comportamento; mutante só morre quando a asserção relevante falha, não quando setup ou outra causa encerra o comando; se falta executar uma falha dirigida em superfície que carrega check e ainda há margem no teto do `verify.md`, registre prova parcial e veredito não PASS; PASS escopado não encerra essa pendência; política explícita e aplicável do repositório continua obrigatória junto da checklist, mas o formato histórico da suíte sozinho não cria uma regra de nível. No relatório, registre `Claim | caminho real (file:line) | input isolado | asserção (file:line) | falha dirigida e saída | branches/entradas exigidas (origem, total e mapa n/n) | veredito`. Inclua todas as linhas de resultado de uma decisão adicionada ou tocada pelo diff, contratos alterados, fontes vinculantes e checklist; decisão preexistente fora desse conjunto não cria prova nova.
+Changes from the sources: the TLC workflow was split into `spec-plan`, `implementar` and `build-review`; instructions and cross-references were adapted to connect the three skills; Matt Pocock's material was integrated into the corresponding stages. This adapted skill is not an unchanged upstream copy.
 
-O Fiscal faz julgamento pesado (mutação, cobertura) — não rode ele no modelo econômico. Standards e Spec também são julgamento.
-
-Enquanto os revisores trabalham, fale só em marcos, uma linha cada: disparei os três; terminou X; problema de ambiente (o que travou e o que foi feito). Não explique o que cada revisor faz nem antecipe achados: o resultado vem uma vez, na mensagem final.
-
-## Junta sem misturar
-
-Os três relatórios vão **inteiros**, cada um sob seu título (`## Standards`, `## Spec`, `## Fiscal`), para `.checks/<feature>.review.md`. É lá que os eixos ficam separados e completos. Para o Fiscal, abra e copie `.checks/<feature>.verified.md`; o retorno compacto no chat aponta para esse relatório, não o substitui. Se o arquivo estiver ausente, registre a ausência e peça o relatório ao Fiscal, sem inventar o conteúdo.
-
-A mensagem final ao usuário É estas quatro partes, nesta ordem, na língua e no nível de quem vai ler:
-
-```
-## Veredito
-<PASS ou FAIL> — <uma frase: por quê>
-
-## O que não trava
-<uma linha por eixo: quantos conselhos e o maior deles>
-
-## O que trava
-- <cada defeito que a pessoa veria no uso, UM por linha, em palavras; entre parênteses, quem achou>
-- Sem teste que avise se parar de funcionar: <todas as partes que ficam sem proteção, numa linha só, separadas por ponto e vírgula> (<quem achou>)
-- Prova impedida por ambiente ou acesso: <o que não foi verificado e qual recurso falta> (<quem achou>)
-
-Relatórios completos: .checks/<feature>.review.md
-
-## O que preciso de você
-1. <cada decisão que os relatórios deixaram para o usuário: o que é, em uma frase; (a) … → o que acontece; (b) … → o que acontece; Recomendo (x), porque …> — sem decisão, este item não existe: não escreva "não há decisão"
-2. <por último, a próxima ação — ver abaixo>
-```
-
-"O que trava" leva todo motivo de FAIL que os relatórios trazem: cada defeito demonstrado por Spec ou Standards e cada lacuna do Fiscal (item sem prova ou com prova parcial, mutante sobrevivente, linha de test-policy não atendida, contradição com o desenho). Um motivo achado por mais de um revisor aparece uma vez, com os nomes de todos. As lacunas de proteção entram todas na linha "Sem teste que avise se parar de funcionar", cada uma nomeada: juntar é só para caber, nenhuma some. O conserto recebe a lista completa do arquivo.
-
-Códigos de item (C21, C33…) e caminhos de arquivo ficam no arquivo e no pedido de conserto, não na mensagem: quem lê a mensagem decide pelo que acontece no app, não pelo número do item.
-
-"O que preciso de você" leva toda decisão que um relatório deixou para o usuário. A única exceção é correção com um só jeito certo e que não muda o app (texto da checklist, nome, comentário): essa vai no conserto sem pergunta; cite em uma linha em "O que não trava" ("vai junto no conserto: …").
-
-A linha "Sem teste que avise…" leva toda lacuna da lista de lacunas do Fiscal (item não provado, prova parcial, mutante sobrevivente, caso sem teste, ponto do desenho que nada confere), esteja ou não ligada a um item da checklist. Sugestão de teste de Spec ou Standards, sem falha apontada ("provavelmente passa"), é conselho e fica em "O que não trava". O que já está listado como defeito de uso não se repete nessa linha.
-
-Quando uma prova existente não executou por ambiente ou acesso, ela entra em "Prova impedida por ambiente ou acesso". Se essa for a única pendência, a próxima ação pede o recurso que falta e encaminha a prova ao Fiscal quando ele estiver disponível. Se houver também defeito demonstrado ou lacuna corrigível na entrega, peça o recurso e mantenha a rota de conserto abaixo para esses achados.
-
-Quando só falta executar a falha dirigida de uma prova nominal já executada e há margem no teto do `verify.md`, a próxima ação é encaminhá-la ao Fiscal; ofereça conserto somente se essa execução demonstrar defeito ou proteção insuficiente. Esta rota precede as ofertas de conserto abaixo.
-
-O último item de "O que preciso de você" é a próxima ação, dizendo quem vai fazer:
-- PASS → "Posso subir e abrir a PR?"
-- FAIL, construído nesta sessão (`/implementar`; a vistoria roda na mesma sessão por decisão do usuário) → "Posso consertar aqui mesmo, nesta sessão que construiu, numa rodada de conserto?"
-- FAIL, construído pelo Codex (`/gpt-implementar`) → "Posso devolver ao Codex, num pedido novo com a lista, para uma rodada de conserto?" — mesmo que as rodadas de conserto dele já tenham acabado.
-- FAIL e nada diz quem construiu → pergunte quem construiu, no lugar da pergunta de sim/não.
-- FAIL numa vistoria que vem depois de uma rodada de conserto pós-vistoria → não repita a oferta. Pare e dê as saídas como decisão: (a) mais uma rodada com quem construiu → …; (b) consertar nesta sessão → …; (c) aceitar e registrar o que falta → …; Recomendo (x), porque … Esta regra prevalece sobre o limite de três rodadas do `verify.md`.
-
-Só age com o sim. Se não há decisão a tomar, "O que preciso de você" tem só a próxima ação. Nada vem antes do "## Veredito" nem depois da última pergunta: aviso, nota ou resumo extra entram numa das quatro partes ou saem.
-
-Regras da junção:
-
-- **O portão parte do Fiscal e incorpora defeitos demonstrados pelos outros eixos.** É FAIL se o Fiscal falha ou se Spec ou Standards demonstra, com evidência, requisito ausente ou contradito, bug, risco de segurança ou regressão concreta. Smell, preferência, nit, recomendação ou teste adicional sem comportamento distinto ficam não bloqueantes. Na dúvida de classificação, não promova opinião a bloqueio: registre a incerteza e peça decisão.
-- **Os eixos ficam separados no arquivo.** Na mensagem, cada defeito que trava diz quem o achou, e "O que não trava" dá o maior conselho de cada eixo, sem eleger um vencedor entre eles.
-- **Spec e o passo 1 do Fiscal se encostam** (código×pedido vs checklist×fonte). Achado dobrado às vezes é cobertura, não erro — no arquivo, os dois falam; na mensagem, ele aparece uma vez com os dois nomes.
-
-## Ao subir, quando a issue de origem mora no GitHub
-
-Vale com o sim à PR e só quando a issue de origem é do GitHub. Sem GitHub (a issue é arquivo), nada disto: o `**Status:** done` que a construção grava é o bilhete, e a PR não leva `Closes`.
-
-- **Uma PR por plano.** Se ainda não existe, "open a draft PR …, marked as closing the spec and tickets" (Matt, `implement-spec`, passo 3): o texto leva `Closes #<plano>`, o plano que a parte cita como origem, e `Closes #<parte>`. Se já existe, acrescente `Closes #<parte>` ao texto dela, sem tirar as linhas que já estão lá e sem marcá-la como pronta.
-- **Bilhete na parte**, depois de subir a branch: "**Comment on an issue**: `gh issue comment <number> --body "..."`" (Matt, `setup-matt-pocock-skills/issue-tracker-github.md`), com o texto "Construída e aprovada na vistoria: branch `<branch>`, commit `<sha>`". Não feche a issue nem mexa na do plano: quem fecha é o merge da PR.
-
-## Depois do conserto
-
-Terminado o conserto autorizado, o maestro dispara um **novo Fiscal independente** antes de oferecer publicação ou outra rodada. Passe a checklist e suas fontes, `<base da feature>..<novo HEAD>`, o diff do conserto e os relatórios completos da vistoria anterior, incluindo todos os motivos de FAIL dos três eixos. O Fiscal segue verbatim **Re-verifying after a fix** em `references/verify.md`: provas inteiras no novo HEAD, escopo pelo diff e pelos vereditos não PASS, evidência reaproveitada com sua origem.
-
-Se um achado anterior de Spec ou Standards não puder ser conferido por essa prova, reabra o eixo responsável para esse achado. Junte os relatórios atualizados com os anteriores explicitamente identificados, usando o mesmo formato de quatro partes. Com PASS, vale a oferta de PR; com FAIL, valem as saídas pós-conserto acima, sem iniciar outro conserto automaticamente.
-
-## Erros comuns
-
-| Erro | Por que quebra |
-|---|---|
-| Reescrever os três relatórios num só, sem dizer quem achou o quê | apaga a separação de eixos do Matt; é o que um agente sozinho faz por padrão |
-| Deixar o Fiscal pular a injeção de defeito | vira uma revisão que aceita teste decorativo (verde que não prova nada) |
-| Um smell do Standards reprovar o merge | só defeito demonstrado entra no portão; preferência continua conselho |
-| Rodar dentro de um subagente | subagente não abre subagente; os três nascem mortos |
-| Resumir os textos de `references/` no prompt | o valor está no texto verbatim; resumir é reintroduzir o buraco |
-
-## Red flags — pare
-
-- "Vou reescrever os três relatórios num texto meu e não guardar os originais"
-- "Os testes já passam, não preciso injetar defeito"
-- "Não tem commit-marco, mas dá pra deduzir a base pelo git log"
-- "Não tem checklist, mas dá pra o Fiscal revisar mesmo assim"
-- "Rodo os três em sequência, um de cada vez" (são paralelos, e na sessão principal)
+See [LICENSE](LICENSE) for attribution and license notices for both sources.

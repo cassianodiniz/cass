@@ -3,86 +3,20 @@ name: handoff
 description: "Use quando o usuário disser /handoff, \"gera um handoff\", \"vou limpar o contexto\", \"passa isso pra uma sessão nova\", \"documento de continuação\", \"resume pra eu continuar depois\", \"tô chegando no limite de contexto\", ou quando uma conversa longa vai terminar e ele quer retomar o trabalho — ou começar do zero algo que surgiu nela — numa sessão nova, sem o histórico da conversa."
 ---
 
-# Handoff — passagem de bastão entre sessões
+# Handoff
 
-Você escreve um documento para um você do futuro que abre uma sessão limpa, sem nada desta conversa. Quando a sessão fecha, a conversa some; sobrevive o que está em disco e no git. Por isso o handoff se ancora num commit e aponta arquivos, e só copia do chat o que não existe em disco. Não é resumo: é o estado de agora, com fato separado de suposição.
+Escreva um documento para um agente sem o histórico desta conversa conseguir continuar o trabalho. Adapte o conteúdo ao foco pedido pelo usuário.
 
-Se a sessão já foi compactada, diga isso no documento ("parte da conversa pode ter se perdido na compactação").
+Se houver Git, confira o estado do repositório e separe as mudanças deste trabalho das demais. Havendo mudanças deste trabalho sem commit, mostre quais entrariam e proponha uma mensagem; pergunte se o usuário quer commitar antes do handoff e aguarde a resposta. Se ele já respondeu, siga essa decisão. Sem mudanças deste trabalho, siga direto para o handoff.
 
-## Passo 0 — Trava do git
+Se aceitar, faça commit somente das mudanças deste trabalho, preservando as demais, inclusive o que já estava staged. Depois faça o handoff. Se recusar, faça o handoff sem commit. Se o commit falhar, registre a falha e faça o handoff com as mudanças ainda pendentes; não contorne a falha nem entre em um ciclo de tentativas.
 
-Rode `git status --short` (e `git log -1 --oneline`, `git branch --show-current`).
+No documento, registre a branch e o hash do HEAD conferidos após essa decisão. Identifique as mudanças relevantes que continuam fora desse commit e o trabalho de outra frente que deve ser preservado. O hash é o ponto de referência; mudanças sem commit precisam dos arquivos locais. Se não houver Git ou ainda não existir commit, informe isso sem inventar uma âncora.
 
-**Algum arquivo que esta conversa criou ou alterou aparece sem commit?** Pare aqui, sem escrever o handoff. Diga ao usuário quais são esses arquivos, proponha a mensagem de commit e pergunte se pode commitar. Gere o handoff só depois do commit. Motivo: o handoff aponta um commit; trabalho fora dele pode se perder ou se misturar com outra frente, e a sessão nova não teria como conferir o ponto de partida.
+Preserve o contexto que só existe na conversa: objetivo, decisões vigentes e seus motivos relevantes, limites do usuário, ponto de parada e pendências. Referencie por caminho ou URL o que já está em planos, arquivos, issues e outros artefatos; não reproduza esse conteúdo.
 
-Arquivos na lista que esta conversa nunca tocou são de outra frente: não travam, não entram no commit e aparecem no handoff numa linha "fora deste trabalho".
+Distinga fatos confirmados, decisões do usuário, sugestões do agente e lacunas. Preserve valores, nomes e comandos sem mudar seu sentido. Decisões revogadas não valem como instruções atuais. Se parte do contexto não estiver disponível, registre o que falta sem reconstruir por suposição. Não inclua segredos ou dados pessoais sensíveis.
 
-Pasta sem git: não há trava; registre o `pwd` e diga que a validade depende dos arquivos de hoje.
+Use somente as seções que ajudam a continuar. Antes de salvar, confira se não perdeu uma decisão relevante nem acrescentou algo sem base.
 
-## Qual âncora
-
-- **Continuar o mesmo trabalho** (o padrão): âncora = ramo atual + hash do HEAD.
-- **Começar do zero algo que surgiu** (o usuário diz que o trabalho atual acabou — PR mergeada, "do zero", "outra coisa"): âncora = ramo principal. Registre o hash dele (`git rev-parse --short main`, ou `origin/main` depois de `git fetch` se houver remoto). O handoff manda a sessão nova atualizar o principal e abrir ramo novo a partir dele. O trabalho encerrado entra em uma linha de contexto, não como pendência.
-
-## Regras de escrita
-
-1. Varra a conversa inteira. Decisão do começo que nunca foi revogada ainda vale; decisão revista vale na forma final.
-2. Copie literal valor, caminho, comando, número, regra de negócio. Parafrasear é como se inventa o que não foi dito.
-3. Marque a origem: `[GIT]` / `[ARQUIVO]` / `[CHAT]` / `[SUPOSIÇÃO]`. `[GIT]` e `[ARQUIVO]` exigem ponteiro que a sessão nova reabre e confirma (`arquivo:linha` no HEAD, ou comando + saída). Palpite seu — inclusive um que já virou código — é `[SUPOSIÇÃO]`, nunca restrição.
-4. Decisão que só viveu no chat vai copiada com o porquê; ponteiro para arquivo que não existe é informação perdida.
-5. Segredo (token, senha, chave) nunca entra no handoff: aponte onde ele mora (ex.: `.env`).
-6. Corte o que já foi resolvido, a menos que vire restrição para o que vem.
-7. Buraco real vira pergunta em "O QUE NÃO SEI". Gap nomeado vale mais que gap preenchido com chute.
-
-## Estrutura
-
-Estes títulos, nesta ordem. Seção vazia: "Nada relevante".
-
-```
-Leia [arquivos essenciais]. Depois continue o trabalho descrito abaixo.
-
-## OBJETIVO
-[1-2 frases.]
-
-## ÂNCORA
-- Gerado em: [data hora] · Pasta: [raiz do repo]
-- Modo: continuar | trabalho novo a partir do principal
-- Ramo: [ramo] · Commit: [hash + mensagem]
-- Fora deste trabalho (sem commit, não mexer): [arquivos, ou "nada"]
-
-## ESTADO AGORA
-[O que existe e funciona, com origem marcada.]
-
-## DECISÕES (e por quê)
-Já em arquivo/commit: 1 linha — `decisão — porque X [ponteiro]`.
-Só no chat: **Decisão** · **Por quê** (o problema e o que venceu) · **Descartado** (o que não fazer).
-
-## JÁ TENTADO E NÃO DEU
-## RESTRIÇÕES FIRMES
-[Só as que o usuário disse (fala literal) ou que estão no código (arquivo:linha).]
-## ARQUIVOS-CHAVE
-- `caminho` — pra que serve
-## O QUE NÃO SEI / CONFIRMAR
-## PRÓXIMOS PASSOS
-1. [Verbo + ação verificável]
-## COMO SABER QUE DEU CERTO
-
-## COMO RETOMAR
-1. Continuar: `git log -1 --oneline` e `git status --short` devem bater com a ÂNCORA. Trabalho novo: atualize o principal, confira que ele contém o commit da ÂNCORA e abra ramo novo. Não bateu → diga ao usuário o que mudou antes de seguir.
-2. Leia os ARQUIVOS-CHAVE e confirme cada ponteiro das RESTRIÇÕES. Arquivo de hoje vence o documento.
-3. Rode [comando de estado: testes / build].
-4. Siga os PRÓXIMOS PASSOS.
-```
-
-Antes de salvar, releia e tire a linha que repete o resolvido, afirma como regra o que foi dedução, ou aponta arquivo que não existe.
-
-## Entrega
-
-1. Salve em `<raiz-do-repo>/.claude/handoffs/handoff-<ramo>-AAAA-MM-DD-HHMMSS.md` (troque `/` do ramo por `-`); sem git, `~/handoffs/handoff-AAAA-MM-DD-HHMMSS.md`. O arquivo não entra em commit.
-2. No chat, um bloco de código colável, sem nada para preencher:
-   ```
-   Leia o handoff em <caminho ABSOLUTO> e continue o trabalho descrito nele: <objetivo em 1 linha>.
-
-   Antes de tocar em qualquer coisa, faça o COMO RETOMAR do handoff. Só depois siga os PRÓXIMOS PASSOS.
-   ```
-3. Uma linha abaixo com o caminho salvo. Não cole o documento no chat. Se nenhum local for gravável, aí sim mostre o documento inteiro num bloco e avise.
+Salve na pasta do trabalho em `.claude/handoffs/handoff-AAAA-MM-DD-HHMMSS.md`. Entregue uma frase curta colável com o caminho absoluto real do arquivo e a instrução para o próximo agente lê-lo e continuar. Se não conseguir salvar, entregue o texto no chat e informe a falha.

@@ -2,6 +2,15 @@
 
 ## Não lançado
 
+- `handoff` enxuta: commit opcional das mudanças deste trabalho, respeito à recusa, branch/HEAD conferidos e pendências locais explícitas. Preserva trabalho alheio staged; falha de commit é registrada sem impedir a entrega. A frase de retomada contém o caminho completo do documento. README e desenho acompanham o fluxo.
+
+- `spec-plan`, `implementar` e `build-review` sincronizadas integralmente com a fonte local: uma feature em `.specs/`, uma branch, uma issue e uma PR; tarefas em sequência e revisão final automática.
+- Entrevista da `spec-plan` em `investigate.md`, com preferência pela solução mais simples que atende aos requisitos e verificação dos nove requisitos esquecidos.
+- Validadores Python, aprendizados, licenças e referências acompanham as skills; `writin-skills` também recebe a versão local atual.
+- README, cinco desenhos, descrição do plugin e dependências refletem aprovações por documento, push e PR pronta; correções passam por aprovação item a item e até três rodadas de revisão.
+- **`gpt-implementar` adaptada ao fluxo por feature:** segue a `implementar` e troca só quem constrói; cada lote (~7 tarefas) vai ao Codex `gpt-6.1-sol` · `medium` · `service_tier="default"` (sem modo rápido), que faz o commit de cada tarefa; o Claude confere pelo git e pelos testes e inicia a `build-review`. Testada antes e depois (46 ensaios).
+- `spec-plan`: o sim final diz quem constrói — "sim" chama a `implementar`, "sim, codex" chama a `gpt-implementar`.
+
 - `writin-skills` incluída com todas as referências e ferramentas da versão local.
 - `implementar` sincronizada: decisões e restrições aprovadas no chat passam a ser registradas em `Sources`.
 - Primeiro infográfico: cartões laterais de `handoff` e `otimizar-arquitetura`; `aprender-com-a-sessao` abaixo de “pode publicar”, ligada por seta, mantendo o restante do fluxo.

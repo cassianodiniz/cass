@@ -1,118 +1,138 @@
 ---
 name: implementar
-description: Use when the user invokes /implementar, $implementar or @implementar, or says yes to the hand-off offered by /spec-plan, to build work already decided in a spec, plan, tickets or issue of the current repository. Not for deciding what to build.
+description: Use when the user invokes /implementar, $implementar or @implementar, or when /spec-plan starts it after the final yes, or when /build-review hands back approved fix tasks, to build a feature already approved in `.specs/features/<feature>/`. Not for deciding what to build.
+license: TLC-derived material under CC-BY-4.0; Matt Pocock-derived material under MIT. See LICENSE and Credits and licenses.
 ---
 
 # Implementar
 
-Implement the work described by the user in the spec or tickets.
+This skill runs the Execute half of the Spec-Driven Development flow below, for one feature already approved with the `/spec-plan` skill. Specify, Design and Tasks run in the `/spec-plan` skill; the Verifier and the final review run in the `/build-review` skill.
 
-## Clean tree first
 
-Before anything else, run `git status --porcelain`. Every path it lists must be inside the plan directory of `SPEC_FILE` or inside `.checks/`. Any other path is someone's unfinished work sitting in the tree: stop and ask the user to commit it or set it aside. Work started on top of loose changes cannot be told apart from them later - the start marker only fences what is committed, and `$build-review` would review those changes as if they belonged to this task.
 
-With the tree clean and nothing staged, make the start marker right away, before writing the checklist: `git commit --allow-empty -m "chore(checks): start <checklist file name, without .md>"`. It carries no code; it is the stake that says where the work began - `$build-review` finds it by that message and reviews everything after it. Right after the marker, run the full test suite once and record the result in the checklist's `Suite before start` line. A test already failing there goes to the final report as pre-existing; the recorded line is what proves it, so nothing has to be stashed or checked out later to find out.
+## How this skill runs the flow
 
-## Source contract for spec-plan
+1. **The feature.** Work on the feature branch that `/spec-plan` created, from the feature folder `.specs/features/<feature>/` on it. Read [implement.md](references/implement.md) completely before the first task, and [tdd.md](references/tdd.md) before writing the first test. Before the first task, follow “Project vocabulary” in the /spec-plan skill to read the relevant glossary. Use its definitions in task and test descriptions, and include its path in any batch-worker brief.
 
-When `SPEC_FILE` comes from `$spec-plan`, it must identify exactly one approved issue file under the plan's `issues/` directory.
+2. **Language.** Write every message to the user in the user's language, in plain words; put each technical question in lay terms. Keep `.specs/` files in English.
 
-- Implement only the target issue. Sibling issues and the parent `index.md` are context, not authorization.
-- Read the parent index when linked, but do not absorb its other issues into scope.
-- If `SPEC_FILE` is an index, a directory, or a document containing multiple implementation issues without one explicit target, stop and ask which issue to implement.
-- Use an issue-specific checklist path such as `.checks/<plan-id>-<issue-key>-<slug>.md` so concurrent plans do not share a checklist.
-- Preserve the approved issue as the original source for `$build-review`; do not rewrite it during implementation.
+3. **One task at a time.** Never in parallel. After each task's commit, go on to the next task without asking. While building, stop and ask the user only in these four cases:
+   1. a test looks wrong (`references/implement.md`, step 4);
+   2. a task is blocked (step 2);
+   3. a bug outside the task's scope (step 8);
+   4. an action outside this machine, such as a push (step 8, Blast radius).
 
-When the argument is a plan name, find the plan whose `index.md` declares `Plan name: <that name>`. Zero matches or more than one: stop and ask. In that plan, take the first issue in dependency order that is `approved`, has every blocker finished (`Status: done`), and has no start marker in `git log`. Say which issue you will implement, in one line, and wait for the user's yes before anything else.
+   The stops before the first task still apply: the sub-agent offer, the tools question and the safety valve (`references/implement.md`, before step 1), and, when resuming, the reconciled next step (Workflow below).
 
-With no argument and no hand-off in this conversation, never choose a plan yourself — not the most recent, not the one in the conversation. List the plans that have pending issues, by name, and ask.
+4. **Each push gets its own yes.** Ask before every push, even after earlier yeses.
 
-## Plan on GitHub (`/implementar #<number>`)
+5. **Pausing.** Follow the Pause procedure in [memory.md](references/memory.md); at its step 4, commit (do not stash). Then ask the user before pushing. On another machine, the Resume procedure checks the Handoff against git.
 
-`#<number>` names a GitHub issue. A plan name or a file path keeps everything in files, exactly as above.
+6. **Then review.** After the last task, start the `/build-review` skill for this feature, without asking (`references/implement.md`, step 9). When `/build-review` hands back fix tasks the user approved, read them from the "Fix Plans" section of `.specs/features/<feature>/validation.md`, build them with the same cycle, mark each one done there in its own commit, then start `/build-review` again; after 3 rounds it escalates to the user.
 
-Read it with `gh` (Matt Pocock, `setup-matt-pocock-skills/issue-tracker-github.md`):
+7. **Context before asking for a decision.** Before asking the user, present:
 
-> - **Read an issue**: `gh issue view <number> --comments`, filtering comments by `jq` and also fetching labels.
->
-> Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
+   1. **Context**: What behavior the feature must provide, what failed, and the evidence supporting the diagnosis.
+   2. **Proposed change**: What you recommend changing, why it follows the approved requirement, and the practical impact on the user.
+   3. **Decision**: Your recommendation, the consequence of each choice, and the exact scope of the requested approval.
+      Use plain language for someone who does not program. When using a question panel, include this context in the question itself. Ask about the current correction and any authorization for future changes separately.
 
-An issue with sub-issues is a plan: the sub-issues are its parts, and blocking gives their order (same file, "Wayfinding operations"):
+# Spec-Driven Development
 
-> - **Child ticket**: an issue linked to the map as a GitHub sub-issue (`gh api` on the sub-issues endpoint). Where sub-issues aren't enabled, add the child to a task list in the map body and put `Part of #<map>` at the top of the child body.
-> - **Blocking**: GitHub's **native issue dependencies**, the canonical, UI-visible representation. […] GitHub reports `issue_dependencies_summary.blocked_by` (open blockers only, the live gate). Where dependencies aren't available, fall back to a `Blocked by: #<n>, #<n>` line at the top of the child body.
+Plan and implement features with precision. Granular tasks. Clear dependencies. Right tools. Zero ceremony.
 
-Inside the plan, a blocker counts as done once its part passed its `/build-review` on the plan branch: the issues only close when the plan's PR merges.
+```
+┌──────────┐   ┌──────────┐   ┌─────────┐   ┌─────────┐
+│ SPECIFY  │ → │  DESIGN  │ → │  TASKS  │ → │ EXECUTE │
+└──────────┘   └──────────┘   └─────────┘   └─────────┘
+   required      optional*      optional*     required
 
-**Plan mode** — `#<number>` is a plan. From Matt Pocock, `implement-spec`:
+* Agent auto-skips when scope doesn't need it
+```
 
-> The goal is the entire spec implemented on a single **integration branch**, with every ticket resolved the way the issue tracker closes work.
->
-> The tickets are not a list of steps. They are a **task graph** with blocking relationships between them. This means there is always a **frontier** of tickets which are ready to be grabbed.
+## Critical Rules (read before acting)
 
-1. Before any write, list the parts in dependency order, say which are `ready-for-human` (needs human implementation: you stop there), and ask one yes for the whole plan. That yes covers the plan branch, every agent part in sequence, each part's /build-review, pushing each approved part to the plan's draft PR, and the final review.
-2. Create the plan branch, `plano/<number>-<slug>`, from the main branch.
-3. For each part, in dependency order: claim it — "`gh issue edit <n> --add-assignee @me`, the session's first write" (Matt, `issue-tracker-github.md`) — then build it exactly as one issue above (clean tree, start marker, checklist `.checks/gh-<plan>-<part>-<slug>.md`, proofs), then run `/build-review` on it before the next part starts. When a part passes its /build-review, before the next part starts, push the plan branch and do what /build-review's section "Ao subir" says, without asking: the first part opens the plan's draft PR, later parts are added to it, and each part gets its note. The claim is the only write this skill makes on the issue: no `Status: done`, no close; the note of a passed part is `/build-review`'s.
-4. Stop and call the user at a `ready-for-human` part (no claim, no marker; first build the parts that do not depend on it), at a part still failing after 2 fix rounds, or at a decision the plan does not settle.
-5. "Once all tickets are complete, call the Skill tool with `code-review` on the integration branch" (Matt, `implement-spec` step 7) — here, /build-review on the whole plan branch, from where it left the main branch (git merge-base main HEAD), so the review covers every part. If the final review fails, hand the findings back to whoever built the part where each one is (this session, a subagent or Codex) to fix without asking, up to 2 fix rounds, then push the fixes to the plan's draft PR. When the final review passes, mark the plan's draft PR ready for review (gh pr ready); the merge stays with the user. Then the final report; its first question is the stop that ended the run, since every part's review already ran.
+**Loading this skill's files.** Reference files live under `references/` in this skill's own directory (where this `SKILL.md` resides). Resolve them relative to the skill directory - never the workspace root - and load them through the active skill by name; never assume a fixed install path. When a step tells you to read a reference, **read it completely (to EOF)** before acting - never act on a partial/truncated read.
 
-**Resuming** — a part already has an assignee or a note "Construída e aprovada na vistoria": another session built there. From tech-leads-club, `tlc-spec-driven/references/memory.md`, "Resume", with the parts' assignees and notes in place of their Handoff and the plan's parts in place of their `tasks.md`:
+**Running this skill's scripts.** Every `scripts/*.py` shipped with this skill lives under that same skill directory. Resolve the skill directory first, then invoke `python3 <skill-dir>/scripts/<name>.py ...`. Never run `python3 scripts/...` from the consuming project root - that looks for a project-local `scripts/` tree that is not this skill. Project data under `.specs/` is still read/written relative to the project root (pass `--root` when the cwd is elsewhere). Below, `<skill-dir>` means the directory that contains this `SKILL.md`.
 
-> - treat it as a **hypothesis** for feature, phase/task, next step, blockers, uncommitted files, branch - not as ground truth by itself.
-> - **Reconcile with git before editing anything:**
->   - Current branch vs the plan branch
->   - `git status --porcelain` (uncommitted / unexpected paths)
->   - Recent commits on the branch (messages and touched files)
->   - the commit references in the notes
-> - **Resolve conflicts with evidence, not narrative:**
->   - A task with a green gate and an atomic commit already on the branch → do **not** redo it; continue from the next incomplete task
->   - Partial unverified work in the working tree → preserve it, re-run the relevant gate, then finish the status+commit cycle
->   - Stale or missing Handoff → rebuild next-step from git + the plan's parts, then propose that to the user
->   - Unexplained local changes you cannot map to the current task → STOP and ask; do not discard them
-> - Propose the reconciled next step to the user before writing any code.
+**Execution contract - every task, non-negotiable (holds even if you do not open the reference files):**
 
-Before writing the first test, read [TDD](references/tdd/tdd.md). It is the reference for the red → green loop: what a good test is, where tests go, and the rules of the loop. Use TDD where possible, at pre-agreed seams.
+1. Tests derive from the spec's acceptance criteria and assert spec-defined outcomes - they never mirror the implementation.
+2. The gate must pass (tests pass) before a task is done - the test runner decides, not self-assessment.
+3. One atomic commit per task. Mark the task complete in `tasks.md` (and update spec traceability when used) **before** that commit, and include those updates in the same commit. Never batch tasks; never weaken, skip, or delete tests to make them pass.
+4. After the LAST task, a fresh **Verifier always runs automatically** (author ≠ verifier) - spec-anchored outcome check + discrimination sensor. It is never optional and never prompted. See Sub-Agent Delegation.
+5. **Blast radius:** approving a spec or tasks authorizes local implementation and local commits only. `git push`, force-push, deploy, production DB changes, and other remote / externally visible / destructive operations require an explicit go-ahead for that action.
 
-Run typechecking regularly, single test files regularly, and the full test suite once at the end. You decide how. Work the checklist one check at a time: write its test, watch it fail, implement just enough to pass it, run its proof - then the next check. Commit in coherent pieces with Conventional Commits to the current branch, staging each file by name (`git add <path>`) so every commit holds only what that piece changed. The start marker above is the first commit of the work.
+**Deterministic gates run before human review - not from memory.** The structural gates for the spec and tasks are enforced by scripts in this skill's `scripts/` directory, so they cannot silently drift when the model forgets a step:
 
-Two boundaries, and they are about scope rather than care. New capability nobody asked for and unrelated refactors are not yours to add - surface them and move on. Everything else inside the work at hand is the work: a guard clause, a log line, a clear error message, a test beyond the proofs when you can say what *should* happen at an edge the checklist did not name. Extra tests are welcome and there is no quota.
+- Before confirming a spec, in the `/spec-plan` skill: `python3 <skill-dir>/scripts/validate_spec.py <spec-path-or-feature>` (closure gate: EARS-shaped ACs, filled assumptions, well-formed requirement IDs, required sections).
+- Before presenting tasks for approval, in the `/spec-plan` skill: `python3 <skill-dir>/scripts/validate_tasks.py <tasks-path-or-feature>` (granularity smell, diagram-vs-`Depends on` parity within a phase, no forward-phase dependency, every task carries `Tests` + `Gate`).
+- On each commit: `python3 <skill-dir>/scripts/check_commit.py --message "<msg>"` (Conventional Commits). Optionally wire it as a git `commit-msg` guard (git only, no agent dependency) - see [implement.md](references/implement.md).
+- Before declaring a feature done, in the `/build-review` skill: `python3 <skill-dir>/scripts/validate_state.py <feature>` (completion gate: the Verifier's `validation.md` exists, its verdict is filled to PASS, and it cites `file:line` evidence - a missing, FAIL, placeholder, or evidence-free report fails). The closing step of Execute runs this automatically, the same way the lessons layer runs at distillation; it is not a manual step.
 
-Doors get discovered while building, and deciding them is yours - stopping to ask on every one defeats the point of getting out of your way. Decide, then record: append the row to `Landing` with its literal shape and the alternative you rejected, **before the code that closes it is written**, and in that code's commit where the project tracks the artifact. The timing is the mechanism, not the commit. An alternative is only knowable while you are still choosing between them; written at the end of the build it becomes a justification of what you already wrote, which is the stale design document `Landing` exists to avoid. Stating what the other option would have done is also the one thing that can expose a bad decision with nobody else in the loop.
+A non-zero exit means STOP and fix before proceeding. Skip a script only when no code-execution tool is available; then perform the same checks by reading the artifact.
 
-A red proof blocks completion and must be fixed, not merely noted. An expected RED phase in TDD does not interrupt the red → green cycle or require renegotiation. If a check turns out to be wrong or impossible, stop and renegotiate with the user rather than quietly adjusting it. The same goes for a `Landing` row the user approved that the build proves unbuildable - they approved that shape specifically. A new door that contradicts nothing already approved never stops: it gets its row and you keep going.
+**Before Execute:** read [implement.md](references/implement.md) completely and run `<skill-dir>/scripts/validate_tasks.py`; if a formal `tasks.md` packs into more than one task-budgeted batch (> ~8 tasks), present the sub-agent offer first (see Sub-Agent Delegation).
 
-What the user settles in the chat while you build is recorded the same way, because a compaction or another session will not have the conversation. When the user forbids, allows, chooses between options or changes scope, add a line to the checklist's `Sources` right then - `"conversation" - "<the user's words>" (scope: this issue | the whole plan)` - and say in one line of that reply what you recorded. It goes into the next commit of the slice. Questions, thinking aloud and one-off requests ("run the tests") are not recorded; when unsure, do not record. A go-ahead to push, publish, deploy or merge is never recorded as standing permission: it covers that one action and never skips a `/build-review`.
+## Workflow
 
-## Critical rules
+**New feature:**
 
-1. Every check names its **proof**: the test or command whose exit code settles it. No proof, no check.
-2. Tests assert the intended behavior within the approved scope and pre-agreed seams, including edge cases not named in the checklist, never what the code happens to do. Never write a test by reading the implementation.
-3. Never weaken an assertion, delete a test, or skip one to make a suite pass. If a test is genuinely wrong, stop and ask.
-4. The checks and the test-policy rows do not change while you build: once written they are the bar you build under, not a position to argue against, and lowering either is renegotiation with the user, visible in the diff. `Landing` is the exception, and it is additive - a door you discover while building gets a row, never a deletion.
-5. Record the actual command, result, and exit code for every required proof. Do not report the work complete while any required proof is failing or unverified. Independent verification is a separate step, run after this skill by `build-review` on the checklist and diff left here; what this skill owes that step is an honest checklist in the format below and the final commit range accessible. Completion reported here is the session's own account, not independent review.
-6. **Blast radius:** an approved checklist authorises local edits and local commits. `git push`, deploy and production data changes need an explicit go-ahead.
-7. **Each issue starts on its own yes.** Before the start marker of any issue - the first one of the session or the next one after a merge - say which issue, in one line, and wait for the user's yes to that issue. "Merge feito", "ok", or an answer to your own "next I'll start X" closes the current issue; it is not that yes. A plan you announced in an earlier message authorises nothing. The one exception is plan mode on GitHub: the user's yes to the whole plan, asked as in "Plan on GitHub", covers each of its parts.
+1. Specify → (Design) → (Tasks) → Execute (depth auto-sized)
 
-## When NOT to be lazy
+**Resume work:**
 
-Never simplify away: input validation at trust boundaries, error handling that prevents data loss, security measures, accessibility basics, anything explicitly requested. User insists on the full version → build it, no re-arguing.
+1. Read `.specs/STATE.md` (Handoff + Decisions).
+2. Reconcile Handoff against git (`branch`, `status --porcelain`, recent commits) and `tasks.md` - evidence wins over a stale snapshot. Full procedure: [memory.md](references/memory.md).
+3. Propose the reconciled next step before writing code.
 
-Never lazy about understanding the problem. Trace the whole thing first — every file the change touches, the actual flow — before writing the fix. Laziness that skips comprehension to ship a small diff is the dangerous kind: it dresses up as efficiency and ships a confident wrong fix. Read fully, then be lazy.
+## Context Loading Strategy
 
-Lazy code without its check is unfinished. Non-trivial logic (a branch, a loop, a parser, a money/security path) leaves at least one runnable check behind, the smallest thing that fails if the logic breaks: an `assert`-based `demo()`/`__main__` self-check or one small `test_*.py`. Reuse the repo's existing test setup and the commands that already run in CI; do not add a new framework or extra fixtures beyond what that setup needs, unless asked. Trivial one-liners need no test, YAGNI applies to tests too.
+**On-demand load (only what the current task needs):**
 
-## Required references
+- `.specs/STATE.md` - Decisions section (read at Design, re-read on resume); Handoff section (read on resume only)
+- confirmed lessons - load at Specify and Design via `python3 <skill-dir>/scripts/lessons.py list --status confirmed` (in the `/spec-plan` skill: `references/lessons.md`); confirmed only, never candidates
+- spec.md (when working on a specific feature)
+- context.md (when designing or implementing from user decisions)
+- design.md (when implementing from design)
+- tasks.md (when executing tasks)
 
-Before implementing, read [Checklist](references/checklist.md). Reuse the existing issue-specific checklist when there is one; otherwise write it from the approved source before any code. When the source comes from `$spec-plan`, use `.checks/<plan-id>-<issue-key>-<slug>.md`; for other sources, keep the checklist naming appropriate to that source. Confirm any test seam not already approved before writing tests at it.
+**Never load simultaneously:**
 
-**Prévia.** Mudou tela → servidor local + autologin já na tela alterada (`preview_start` quando houver), usando a configuração existente do projeto. Abra a rota alterada em uma aba visível ao usuário com os recursos da sessão. Dado de teste, quando necessário, vai no banco **local**, nome começando por `TESTE`, valores no relatório. Nunca em produção. Confirme o critério visual e o funcionamento na própria tela antes de entregar; a prévia é para o usuário conferir, não para descobrir se funciona.
+- Multiple feature specs
+- Multiple architecture docs
 
-Na execução delegada, a sessão coordenadora abre, inspeciona e mostra a prévia; a aba do executor pode ser privada e não substitui essa entrega. Use testes de navegador já previstos no projeto, sem instalar infraestrutura nova. Recurso indisponível ou abertura/inspeção que falhou → informe o impedimento e o que não foi verificado no relatório.
+**Target:** <40k tokens total context
+**Reserve:** 160k+ tokens for work, reasoning, outputs
+**Monitoring:** Display status when >40k (see [context-limits.md](references/context-limits.md))
 
-Before the final response, read [Final report](references/relatorio.md). Report only the observed implementation state and the actual results this session obtained. State implementation status and independent-review status separately: local proofs run and passed here, `build-review` still pending.
+## Sub-Agent Delegation
 
-## Next step (flow)
+**Trigger:** count total tasks. If the feature packs into more than one task-budgeted batch (> ~8 tasks) → offer sub-agents; if it fits a single batch (≤ ~8 tasks) → execute inline.
 
-Flow: `/spec-plan` → **`/implementar`** (you are here) → `/build-review`.
+**Offer-then-confirm** - never auto-spawn. The user must accept before any sub-agent is dispatched.
 
-Once the build is complete, `/build-review` is presented (optional, requires user approval): 3 independent reviewers for the diff + a `.checks/<feature>.md` checklist.
+**One worker per task-budgeted batch (~7 tasks, whole phases):** Phases stay the semantic/dependency unit; a **batch** is the execution unit - one or more *consecutive whole phases* packed to ~7 tasks. Walk phases in order, accumulate whole phases into the current batch until it reaches the budget, then start the next - **never split a phase** across workers. ~20 tasks → ~3 workers; scales linearly (40 → ~6). Each worker executes all its tasks in order (implement → gate → atomic commit), then reports a compact summary (tasks done, commit hashes, test counts, deviations). Batches run sequentially - a batch never starts until the previous one reports all tasks complete. Workers never spawn further sub-agents.
+
+**Verifier (always-on, never prompted, in the `/build-review` skill):** After the final task is committed, the orchestrator starts the `/build-review` skill, which dispatches a fresh Verifier sub-agent automatically - regardless of phase count. Validation never requires a user prompt; it is the closing step of Execute. **Author ≠ verifier**: the Verifier re-derives coverage independently using evidence-or-zero; it does not inherit the author's mental model. The Verifier: (1) performs a **spec-anchored outcome check** - confirms each test's asserted value matches the spec-defined expected outcome, flags spec-precision gaps; (2) runs a **discrimination sensor** - injects behavior-level faults in an isolated scratch (temp worktree or file copies - never `git stash`), confirms tests kill them, discards the scratch and verifies real-tree porcelain matches the pre-sensor baseline; surviving mutants become fix tasks; (3) writes `.specs/features/[feature]/validation.md` (PASS/FAIL, per-AC evidence, sensor result, diff range); (4) returns a compact verdict + ranked gap list to the orchestrator in chat. Gaps become fix tasks in a fix plan for the user's yes (in the `/build-review` skill); the fix→re-verify loop is bounded to 3 iterations before escalating. (5) **distills lessons** - turns each grounded failure (surviving mutant, spec-precision gap, failed AC, SPEC_DEVIATION) into a reusable project-local lesson via `<skill-dir>/scripts/lessons.py`; a clean PASS records nothing (see `references/lessons.md` in the `/build-review` skill).
+
+**Model tier per role (only if the harness supports choosing a model per sub-agent).** Match the reasoning cost to the work instead of paying top-tier reasoning for boilerplate. A batch worker on a mechanical, low-ambiguity phase (entities, config, wiring, straightforward CRUD) runs on a faster/cheaper tier; a worker on a core-domain or high-ambiguity phase, and the Design phase itself, runs on a high-reasoning tier; the Verifier runs on a mid-to-high tier because it does adversarial reasoning and designs mutations. This is a portable recommendation: if the harness cannot set a per-sub-agent model, ignore it. Full rubric in [sub-agents.md](references/sub-agents.md).
+
+**Standalone fallback:** Without sub-agents, start the `/build-review` skill, which runs `validate.md` as an independent fresh-eyes pass after the final commit - including the spec-anchored check and discrimination sensor.
+
+Full mechanics (worker payload, compact summary format, failure handling, context sizing, model tier): [sub-agents.md](references/sub-agents.md); Verifier report format: `references/sub-agents.md` in the `/build-review` skill.
+
+## Code Analysis
+
+Use available tools with graceful degradation. See [code-analysis.md](references/code-analysis.md).
+
+## Credits and licenses
+
+This skill adapts **tlc-spec-driven v3.3.0**, authored by **Felipe Rodrigues ([felipfr](https://github.com/felipfr))**, from **Tech Leads Club**, under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/). [Original source](https://github.com/tech-leads-club/agent-skills/tree/main/packages/skills-catalog/skills/%28development%29/tlc-spec-driven).
+
+It also incorporates material from **Matt Pocock's** skills (tdd) in [mattpocock/skills](https://github.com/mattpocock/skills), under the **MIT License**, Copyright (c) 2026 Matt Pocock.
+
+Changes from the sources: the TLC workflow was split into `spec-plan`, `implementar` and `build-review`; instructions and cross-references were adapted to connect the three skills; Matt Pocock's material was integrated into the corresponding stages. This adapted skill is not an unchanged upstream copy.
+
+See [LICENSE](LICENSE) for attribution and license notices for both sources.

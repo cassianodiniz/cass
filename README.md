@@ -5,20 +5,21 @@ sai construindo antes de entender o pedido, que diz "pronto" sem ter testado, qu
 número de pesquisa. Cada skill resolve um desses momentos e pode ser chamada sozinha.
 
 <p align="center">
-  <img src="docs/qual-sua-situacao.svg" width="1000" alt="Mapa de porta de entrada, com três jornadas. Sei onde ajustar: direto na spec-plan. Pesquisar ideias: ask-me e depois search. Feature nova: ask-me e depois auto-think. As três seguem pra spec-plan. Com o plano pronto, se ele for grande e complexo, a gpt-optimizer pode atacá-lo antes da obra; em mudança simples, pule direto. Depois, implementar ou gpt-implementar constroem e build-review confere, com volta ao construtor quando reprova. Cartões laterais: handoff para continuar em outra conversa e otimizar-arquitetura para melhorar a estrutura do código. Depois de revisar e publicar, uma seta leva a aprender-com-a-sessao abaixo do fluxo central.">
+  <img src="docs/qual-sua-situacao.svg" width="1000" alt="Mapa do fluxo atual: uma mudança a esclarecer segue para spec-plan; pesquisar ideias passa por ask-me e search; um problema sem resposta passa por ask-me e auto-think. Spec-plan publica uma feature aprovada em uma branch, issue e PR em rascunho; implementar constrói tarefas em sequência; build-review revisa ao final. Correções precisam de aprovação e voltam a implementar. Cada push e a PR pronta pedem autorização. Handoff, otimizar-arquitetura e aprender-com-a-sessao apoiam o trabalho.">
 </p>
 
 ## Como eu uso no dia a dia
 
 Começo pela situação, não pelo nome da skill ([como instalar](#instalar)):
 
-- 🔧 **Sei onde ajustar:** direto na `/cass:spec-plan`.
+- 🔧 **Mudança a esclarecer:** direto na `/cass:spec-plan`.
 - 🔎 **Pesquisar ideias:** `/cass:ask-me` → `/cass:search` → `/cass:spec-plan`.
 - 🌱 **Feature nova:** `/cass:ask-me` → `/cass:auto-think` → `/cass:spec-plan`.
 
-Com o plano pronto: `/cass:gpt-optimizer` se o plano for grande (opcional), depois
-`/cass:implementar` ou `/cass:gpt-implementar` pra construir e `/cass:build-review` pra
-conferir antes de publicar. Conversa ficou longa? `/cass:handoff`. Sessão terminou e a IA
+O fluxo atual é `/cass:spec-plan` → `/cass:implementar` → `/cass:build-review`:
+uma feature inteira numa PR. A construção e a revisão começam automaticamente nas passagens
+entre essas skills. Se quiser um ataque extra a uma decisão grande antes de aprová-la,
+chame a `gpt-optimizer`. Conversa ficou longa? `/cass:handoff`. Sessão terminou e a IA
 tropeçou? `/cass:aprender-com-a-sessao`.
 
 ---
@@ -40,18 +41,27 @@ que não fazer e quando parar e perguntar. Serve pra qualquer tarefa, não só c
 
 </details>
 
-### `/cass:spec-plan` — quando você já sabe o que quer
+### `/cass:spec-plan` — transformar uma ideia em feature aprovada
 
-Transforma uma mudança ou ideia num plano fatiado em partes pequenas, sem dúvida em aberto.
-Com um sim, publica o plano: se o projeto está no GitHub, vira uma issue do plano e uma por
-parte, ligadas; senão, fica em arquivos. Depois oferece construir o plano inteiro numa sessão.
-Se você ainda não sabe a resposta, comece pela `auto-think`.
+Conversa em rodadas até fechar o que a feature deve fazer, incluindo os nove requisitos
+que costumam ficar esquecidos. Prefere a solução mais simples que atende ao combinado.
+A profundidade acompanha o tamanho: toda feature ganha uma spec; contexto entra quando há
+pontos a esclarecer, e design e tarefas formais entram nas features grandes ou complexas.
 
-<p align="center"><img src="docs/skill-spec-plan.svg" width="520" alt="A spec-plan entrevista em rodadas, passa pelos 9 requisitos que ninguém escreve e só segue com o seu sim. Escreve o plano fatiado em partes num rascunho; a mensagem diz em quantas partes, traz as três perguntas de tamanho e onde o plano vai morar. Um sim publica: no GitHub, uma issue do plano e uma por parte, ligadas; sem GitHub, em docs/plans. Depois oferece construir o plano inteiro numa sessão."></p>
+Você aprova cada documento apresentado. O último sim autoriza salvar e publicar a pasta da
+feature, criar uma issue com o link para ela e abrir uma PR em rascunho. A construção começa
+em seguida, sem uma nova pergunta. **Uma feature, uma branch, uma issue e uma PR.**
+
+<p align="center"><img src="docs/skill-spec-plan.svg" width="600" alt="A spec-plan investiga em rodadas e verifica os nove requisitos esquecidos. Escreve a spec e, quando necessário, contexto, design e tarefas. Cada documento precisa do seu sim. O último sim publica a pasta da feature na branch, cria uma issue com seu link, abre a PR em rascunho e inicia implementar."></p>
 
 <details><summary>Detalhe técnico</summary>
 
-Projeto no GitHub (ou com `docs/agents/issue-tracker.md`): issue do plano + uma por parte como sub-issue, com bloqueio nativo e etiquetas `ready-for-agent`/`ready-for-human`, via `gh`. Sem GitHub: spec + issues em `docs/plans/<plano>/issues/`. Cenários de comportamento; varredura dos "9 esquecidos" (validação, falhas, idempotência...).
+Arquivos em `.specs/features/<feature>/`: `spec.md`, `context.md` quando Discuss roda,
+`design.md` e `tasks.md` para Large/Complex. As fases e tarefas ficam em `tasks.md`;
+a issue não copia o plano nem o progresso. Os scripts validam a spec (exceto Small), as
+tarefas e as mensagens de commit. O vocabulário vem do glossário do projeto.
+Uma pausa antes da aprovação final pode publicar a branch e abrir a PR com autorização;
+a issue espera a aprovação final.
 
 </details>
 
@@ -69,45 +79,76 @@ Codex `gpt-6.1-sol` esforço `high`, só leitura; a 2ª rodada audita o filtro q
 
 </details>
 
-### `/cass:implementar` e `/cass:gpt-implementar` — construir o plano
+### `/cass:implementar` — construir a feature aprovada
 
-As duas entregam o mesmo: o trabalho testado, com a prova de cada item, salvo no seu
-computador. Muda quem digita o código. Na `implementar`, o agente da própria conversa
-(Claude, Codex ou outro). Na `gpt-implementar`, subagentes GPT no Codex, com o Claude
-orquestrando: sai mais barato, porque o trabalho pesado não gasta a sua cota do Claude.
+Trabalha na branch que a `spec-plan` criou. Constrói uma tarefa por vez: escreve o teste do
+comportamento esperado, vê falhar, implementa, confere e faz um commit com a tarefa marcada
+como concluída. Depois segue para a próxima sem pedir um novo sim.
 
-Com uma tarefa só, nada vai pro GitHub sem o seu OK. Com o plano inteiro no GitHub
-(`/cass:implementar #<plano>`), um sim cobre tudo: cada parte passa na vistoria e sobe sozinha
-pra uma PR em rascunho, e no fim uma revisão do plano inteiro tira a PR do rascunho. O merge é
-sempre seu.
+Cada push precisa da sua autorização. Também para quando uma tarefa está bloqueada, um
+teste parece errado ou aparece um problema fora do pedido. Após a última tarefa, inicia a
+`build-review` automaticamente; a revisão completa acontece no final da feature.
 
-<p align="center"><img src="docs/skill-construtoras.svg" width="720" alt="As duas construtoras começam iguais: seu sim pra tarefa, pasta limpa com marco de início e a lista de provas escrita pelo agente coordenador antes do código. Na implementar, o agente da conversa constrói com teste antes do código, anota decisões novas, faz commits e não há fiscal no meio. Na gpt-implementar, o Claude escreve a ordem de serviço, subagentes GPT constroem no Codex, o Claude roda as provas e commita; se algo falha, volta ao Codex até 2 vezes e depois para e pergunta. Quem confere o código é a vistoria da build-review. As duas terminam no relatório final e oferecem a vistoria com o seu sim."></p>
+<p align="center"><img src="docs/skill-construtoras.svg" width="600" alt="A implementar lê a feature aprovada, as regras e o glossário. Se não há tarefas formais, lista passos; mais de cinco passos ou dependências complexas voltam ao planejamento. Define ferramentas e oferece subagentes para mais de um lote. Constrói uma tarefa por vez com teste, código, verificação e commit. Cada push pede autorização. A última tarefa inicia build-review automaticamente."></p>
 
 <details><summary>Detalhe técnico</summary>
 
-- `implementar`: TDD vermelho→verde; checklist em `.checks/` com teste nomeado por item; commits na branch atual; push e PR só com OK.
-- `gpt-implementar`: `codex exec` com `gpt-6.1-sol` esforço `medium`; o Fiscal da `build-review` prova cada item no HEAD; até 2 rodadas de correção, depois o Claude para e pergunta a você, sem consertar sozinho.
+Testes derivados dos critérios de aceitação da spec, nunca do código que acabou de escrever.
+A checagem da tarefa deve passar antes do commit, que inclui a atualização de `tasks.md`.
+Sem `tasks.md`, lista passos; mais de cinco passos ou dependências complexas pedem tarefas
+formais à `spec-plan`. Mais de um lote de tarefas (> cerca de oito) exige oferecer subagentes
+e esperar a escolha. Lotes seguem em sequência, sem tarefas em paralelo.
+
+Retomar: `.specs/STATE.md` guarda decisões e passagem de contexto; o estado é conferido
+contra o git antes de continuar. Pausar: commit local, sem stash; push só com seu sim.
 
 </details>
 
-<p align="center"><img src="docs/skill-plano-inteiro.svg" width="520" alt="Com o plano publicado no GitHub, um sim cobre todas as partes. A sessão cria o ramo do plano e, parte por parte, em ordem: marca dono, constrói como uma tarefa, passa na build-review (reprovou: conserta até 2 vezes) e sobe na PR rascunho com bilhete na issue, sem perguntar. Para e chama você numa parte só sua, depois de 2 consertos falhos ou numa decisão fora do plano. No fim, revisão final do plano inteiro; reprovou, volta a quem fez. Aprovada, a PR sai do rascunho e o merge é sempre seu."></p>
+<p align="center"><img src="docs/skill-plano-inteiro.svg" width="600" alt="Uma feature inteira: planejamento aprovado, uma branch, uma issue e uma PR em rascunho; tarefas construídas em sequência com commits locais; revisão final automática; eventuais correções aprovadas e nova revisão, até três rodadas; aprovação para commitar a validação, fazer push e marcar a PR pronta. Merge continua com você."></p>
 
-<details><summary>Detalhe técnico do plano inteiro</summary>
+### `/cass:gpt-implementar` — o mesmo fluxo da `implementar`, com o Codex construindo
 
-`/cass:implementar #<plano>` ou `/cass:gpt-implementar #<plano>` lê o plano e as partes com `gh`; ramo `plano/<n>-<nome>`; dono marcado com `gh issue edit --add-assignee @me`; uma PR em rascunho por plano, com `Closes #` do plano e de cada parte; bilhete "Construída e aprovada na vistoria" em cada parte; revisão final desde `git merge-base main HEAD`; `gh pr ready` quando passa. Retomar outro dia: os donos e bilhetes nas issues são pista, o git decide.
-
-</details>
-
-### `/cass:build-review` — vistoria antes de publicar
-
-Três revisores independentes conferem a obra pronta, não a ideia. Volta Aprovado ou
-Reprovado, com a prova de cada item.
-
-<p align="center"><img src="docs/skill-build-review.svg" width="600" alt="A build-review reúne o marco de início, o pedido original, a lista de provas e as regras do projeto; sem lista de provas, para. Três revisores trabalham em paralelo sem conversar: Standards confere as regras do projeto, Spec confere se fez o que foi pedido e o Fiscal prova cada item, inclusive estragando o código de propósito. Os relatórios vão inteiros pra um arquivo e sai o veredito. Aprovado: pergunta se pode subir e abrir a PR. Reprovado: pergunta se devolve a quem construiu pra uma rodada de conserto."></p>
+Segue a `implementar` inteira e troca só quem constrói: cada lote de até ~7 tarefas vai a uma
+sessão do Codex, que escreve o código e faz o commit de cada tarefa. O Claude coordena, roda
+os testes ele mesmo, confere pelo git e, depois da última tarefa, inicia a `build-review`.
+No sim final da `spec-plan`, responda **"sim, codex"** para cair aqui.
 
 <details><summary>Detalhe técnico</summary>
 
-3 subagentes (Standards, Spec, Fiscal) sobre `<marco>..HEAD`; injeção de defeito em `git worktree`; o veredito parte do Fiscal. Quando a issue mora no GitHub: a PR leva `Closes #` do plano e da parte, e a parte aprovada ganha um comentário de bilhete; a issue só fecha no merge.
+Usa `codex exec` com `gpt-6.1-sol`, esforço `medium` e `service_tier="default"` (sem modo
+rápido), sempre explícitos. Antes do primeiro lote confere `codex --version` e
+`codex login status`; sem Codex, para e avisa. Conserto: até 2 rodadas na mesma sessão do
+Codex; depois, para e pergunta. Os consertos aprovados na `build-review` também vão ao Codex.
+
+</details>
+
+### `/cass:build-review` — revisar a feature inteira
+
+Começa automaticamente depois da última tarefa. Um Verifier independente confere os
+resultados contra a spec e verifica se os testes pegam defeitos introduzidos de propósito
+numa cópia isolada. Standards e Spec revisam as regras do projeto e o pedido; seus relatos
+ficam separados. O Verifier dá o veredito.
+
+Se há tela, depois dos testes verdes vêm as capturas e, quando cabe, um teste guiado com
+você. Os problemas dessas verificações e dos revisores entram num único plano de correção,
+que você aprova item por item. A `implementar` faz as correções aprovadas e a revisão roda
+novamente; depois de três rodadas com problemas, para e chama você.
+
+Com tudo aprovado e nenhuma correção aprovada pendente, pergunta uma vez se pode commitar
+a validação e os aprendizados, fazer push e marcar a PR existente como pronta. O merge é seu.
+Se faltou acesso ou ambiente para revisar, diz **“Não deu para revisar”** e explica o que falta.
+
+<p align="center"><img src="docs/skill-build-review.svg" width="600" alt="A build-review começa ao final da feature. Verifier confere critérios e testa se defeitos são detectados; Standards e Spec entregam relatos separados. Depois de testes verdes, captura telas e faz teste guiado quando aplicável. Registra validação e reúne correções para aprovação item a item; implementar corrige e uma nova revisão começa, até três rodadas. Sem pendências, pede autorização para commit, push e PR pronta."></p>
+
+<details><summary>Detalhe técnico</summary>
+
+Revisão desde `git merge-base main HEAD`. `validation.md` guarda PASS/FAIL, evidências por
+critério, resultado das falhas injetadas e “Fix Plans”. `validate_state.py` confere o relatório
+final após incorporar telas e teste guiado. Falhas fundamentadas geram candidatos a
+aprendizados em `.specs/lessons.json` e `.specs/LESSONS.md`; só os confirmados são usados
+em planejamentos futuros. Uma revisão limpa não inventa aprendizados.
+
+A PR leva `Closes #<issue>`; a issue só fecha no merge. Não se cria uma nova PR nesta etapa.
 
 </details>
 
@@ -141,13 +182,18 @@ Orquestrador Exa com subagentes; registro de procedência por número; arquivo e
 ### `/cass:handoff` — continuar numa conversa nova
 
 Escreve um documento de passagem, com o que foi decidido e o que falta, e te dá um texto
-pronto pra colar na sessão nova.
+pronto pra colar na sessão nova. Se houver mudanças deste trabalho, oferece commit: com
+seu sim, commita antes; com seu não, entrega o handoff sem commit.
 
-<p align="center"><img src="docs/skill-handoff.svg" width="520" alt="A handoff confere o git: se algum arquivo desta conversa está sem commit, pede o seu OK pra commitar antes de seguir. Escolhe a âncora, varre a conversa inteira, marca a origem de cada afirmação, salva o documento em .claude/handoffs e entrega um texto pronto pra colar na sessão nova."></p>
+<p align="center"><img src="docs/skill-handoff.svg" width="520" alt="A handoff oferece commit das mudanças deste trabalho e respeita a resposta. Registra branch, HEAD e mudanças locais pendentes, preserva decisões e motivos da conversa, referencia arquivos existentes, salva em .claude/handoffs e entrega uma frase com o caminho completo para retomar."></p>
 
 <details><summary>Detalhe técnico</summary>
 
-Ancorado num commit: se o trabalho da conversa estiver sem commit, para e pede o commit antes; ao começar do zero algo que surgiu, ancora no ramo principal; cada afirmação marcada `[GIT]`/`[ARQUIVO]`/`[CHAT]`/`[SUPOSIÇÃO]`.
+Registra branch e HEAD conferidos, distinguindo as mudanças locais fora desse commit. Se
+o commit falhar, registra a falha e entrega o handoff com as pendências. Preserva trabalho
+de outra frente, inclusive o que já estava staged. Usa apenas as seções necessárias e
+uma frase colável com o caminho absoluto do documento. Sem Git ou sem primeiro commit,
+informa a ausência de âncora.
 
 </details>
 
@@ -190,7 +236,9 @@ se o agente segue suas instruções. Traz as referências e ferramentas da vers�
 
 RED–GREEN–REFACTOR aplicado a instruções: cenários sem a skill e com ela, versões congeladas
 e testes de pressão. Referências de entrevista, formato, descrição e testes acompanham a
-skill. O renderizador opcional de fluxogramas usa Node.js e Graphviz (`dot`).
+skill. Mudanças mecânicas usam verificações objetivas; mudanças de comportamento passam
+por testes com critérios e limite de rodadas definidos, mais uma revisão independente.
+O renderizador opcional de fluxogramas usa Node.js e Graphviz (`dot`).
 
 </details>
 
@@ -223,7 +271,8 @@ conta no **Exa** (a `search`). Detalhe item a item no **[INSTALL.md](INSTALL.md)
 - **Codex CLI** (≥ 0.156, com `codex login`) — `gpt-implementar`, `gpt-optimizer` e `auto-think`. Sem ele, a `gpt-implementar` para e avisa; a `gpt-optimizer` e a `auto-think` avisam e seguem sem o olhar do GPT, com garantia menor.
 - **Exa** — a `search` (e a pesquisa de quem chama a `search`).
 - **git** — `implementar`, `gpt-implementar` e `build-review` trabalham num repositório git; o `handoff` se ancora nele quando existe.
-- **GitHub CLI (`gh`, logado)** — só quando o projeto mora no GitHub: a `spec-plan` publica o plano e as partes como issues, e a `implementar`, a `gpt-implementar` e a `build-review` leem as issues, marcam dono, deixam o bilhete e cuidam da PR do plano.
+- **Python 3** — executa os validadores e o registro de aprendizados de `spec-plan`, `implementar` e `build-review`.
+- **GitHub CLI (`gh`, logado)** — a `spec-plan` publica a pasta da feature na branch, cria sua issue e abre a PR em rascunho; a `build-review` marca essa PR pronta com sua autorização.
 
 ---
 
@@ -246,4 +295,10 @@ com o guia `writing-for-agents` dele nas referências. Aqui o nome foi traduzido
 de dentro da própria pasta. O resto é o original, sob a licença MIT dele
 ([licença](skills/aprender-com-a-sessao/LICENSE) · [créditos](skills/aprender-com-a-sessao/CREDITOS.md)).
 
-Auditoria desta atualização: [achados, verificações e sugestões](docs/auditoria-plugin.md).
+Auditoria anterior do plugin: [achados, verificações e sugestões](docs/auditoria-plugin.md).
+
+A **`spec-plan`**, a **`implementar`** e a **`build-review`** adaptam o fluxo
+`tlc-spec-driven v3.3.0` de **Felipe Rodrigues (Tech Leads Club)**, sob CC BY 4.0,
+e incorporam material de **Matt Pocock**, sob MIT. Créditos e licenças acompanham cada
+pasta: [spec-plan](skills/spec-plan/LICENSE), [implementar](skills/implementar/LICENSE)
+e [build-review](skills/build-review/LICENSE).
