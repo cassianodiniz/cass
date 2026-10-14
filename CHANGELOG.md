@@ -2,6 +2,8 @@
 
 ## Não lançado
 
+- `ask-me`: fechamento em uma única mensagem com o combinado, o prompt em caixa de código e uma só confirmação para executar, ajustar ou acionar outra skill. Removida a autorização separada para gerar o prompt; entrevista e modelo do pedido preservados.
+
 - `handoff` enxuta: commit opcional das mudanças deste trabalho, respeito à recusa, branch/HEAD conferidos e pendências locais explícitas. Preserva trabalho alheio staged; falha de commit é registrada sem impedir a entrega. A frase de retomada contém o caminho completo do documento. README e desenho acompanham o fluxo.
 
 - `spec-plan`, `implementar` e `build-review` sincronizadas integralmente com a fonte local: uma feature em `.specs/`, uma branch, uma issue e uma PR; tarefas em sequência e revisão final automática.
