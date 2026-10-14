@@ -74,6 +74,10 @@ NO SKILL WITHOUT A FAILING TEST FIRST
 
 This applies to NEW skills AND behavior-changing EDITS to existing skills.
 
+For an existing skill, a proven contradiction with an accepted user requirement or source counts as RED.
+Cite both sides, correct only the conflicting instruction, and keep the existing testing and review workflow.
+If agents avoided the error, do not report an agent failure.
+
 For purely mechanical edits to an existing skill (spelling, formatting, or a corrected link with unchanged instructions and destination meaning), verify the affected content objectively. No new agent baseline or campaign is required. If the edit changes triggers, instructions, workflow, permissions or expected output, use the behavioral testing cycle.
 
 Write skill before testing? Delete it. Start over.
@@ -248,7 +252,7 @@ In your report, say which results were reused and which were run fresh.
 Full pressure-scenario runs are the final gate, but they are slow and expensive per iteration. Verify the wording itself first with micro-tests:
 
 1. **One fresh-context sample per call** — a raw API call, or a single-shot subagent if you don't have API access. System prompt = the realistic context the guidance will live in (the full skill or prompt template, not the guidance in isolation); user message = a task that tempts the failure.
-2. **Always include a no-guidance control**, measured once per scenario and reused while the scenario doesn't change. If the control doesn't exhibit the failure, there is nothing to fix — stop, don't author the guidance.
+2. **Always include a no-guidance control**, measured once per scenario and reused while the scenario doesn't change. If the control doesn't exhibit the failure and no existing instruction contradicts an accepted user requirement or source, stop, don't author the guidance.
 3. **3 reps per variant.** Single samples lie.
 4. **Manually read every flagged match.** Score programmatically if you like, but template echoes and quoted counter-examples masquerade as hits; automated counts alone overstate both failure and success.
 5. **Variance is a metric.** When guidance lands, reps converge on the same shape. Three different interpretations across three reps means the wording isn't binding — tighten the form before adding words.
