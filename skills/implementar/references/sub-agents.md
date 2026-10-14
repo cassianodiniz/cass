@@ -46,7 +46,7 @@ Phase 5    (7 tasks)  ------→ Batch Worker 3 ------→ compact summary ------�
 ...
 ```
 
-Batches run strictly sequentially: a batch never starts until the previous batch's summary shows all its tasks complete.
+Batches run strictly sequentially: the next batch starts only after the orchestrator has checked the summary against the existing task evidence below.
 
 **What a batch worker receives:**
 
@@ -63,6 +63,7 @@ Executes ALL tasks in its assigned batch **in order** - finishing every task in 
 ```
 Batch (phases [N]-[M]) complete:
 - Tasks done: [list with commit hashes]
+- Evidence: [per-task links to existing verification records and gate results]
 - Tests: [N passed, 0 failed]
 - Deviations/blockers: [none | description]
 ```
@@ -75,10 +76,12 @@ No raw logs, no full test output - only the above fields keep the main context c
 
 1. Count total tasks and pack phases into task-budgeted batches (~7 tasks each) - if that yields more than one batch, offer batch sub-agents and wait for the user to accept
 2. Dispatch the next batch to a worker (or execute inline if not using sub-agents)
-3. Receive the compact summary
-4. Update `tasks.md` with results
-5. If all tasks in the summary show complete: dispatch the next batch
-6. If a task failed: the worker has already stopped; decide fix/escalate before dispatching the next batch
+3. Receive the compact summary and open its task-evidence links.
+4. For each task, check its commit and actual prescribed gate result; confirm the result applies to the code in that commit. If `Tests` requires tests, open the cited assertions at their `file:line` in that commit and compare them with the mapped required outcomes. If `Tests: none`, confirm the approved coverage matrix permits that path and the prescribed gate passed.
+5. Reconcile `tasks.md` with those records; dispatch the next batch only when all tasks are supported.
+6. If evidence is missing, inconsistent or insufficient, return the affected task to the worker. Follow the existing approval rules when a correction requires a user decision.
+
+Use the records already required by `implement.md`, locally. This handoff creates no additional report or whole-suite rerun; the independent feature-level Verifier still runs at completion.
 
 **Failure handling:** If a task in a batch fails (gate does not pass, blocker hit), the worker stops and includes the failure in its summary. The next batch does not start until the current batch's summary shows all tasks complete. The orchestrator decides: fix and re-run, or escalate to the user.
 
