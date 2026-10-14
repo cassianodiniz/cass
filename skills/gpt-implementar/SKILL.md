@@ -5,18 +5,13 @@ description: "Use when the user invokes /gpt-implementar (old name /gpt-builder)
 
 # gpt-implementar — a /implementar com o Codex construindo
 
-Siga a skill `/implementar` inteira (`../implementar/SKILL.md` e os arquivos que ela manda ler), com uma troca só: **quem constrói cada lote é o Codex**, sempre. Esta sessão coordena: monta o pedido de cada lote, confere o resultado rodando os testes ela mesma, faz as perguntas ao usuário e, no fim, inicia a `/build-review` como a `/implementar` manda.
-
-O contexto desta sessão é o recurso caro; o que o Codex lê não pesa aqui. Por isso você confere pelo resultado dos testes e pelo git, não lendo o código que o Codex escreveu.
+Siga a skill `/implementar` inteira (`../implementar/SKILL.md` e os arquivos que ela manda ler), com uma troca só: **quem constrói cada lote é o Codex**, sempre, no papel do ajudante de lote de `../implementar/references/sub-agents.md`. Esta sessão é o orquestrador desse mesmo arquivo. Abaixo está só o que muda por ser o Codex; o resto vale como está na `/implementar`.
 
 ## O que muda na /implementar (vale por cima dela)
 
-1. **Sempre delega, sem oferecer.** Não valem aqui a construção na própria sessão até ~8 tarefas nem a oferta de ajudantes acima disso (`Sub-Agent Delegation` no SKILL.md da `/implementar`; "Before implementing: assess sub-agent delegation" em `references/implement.md`): o usuário escolheu o Codex ao chamar esta skill. Monte os lotes como em `references/sub-agents.md` da `/implementar` (fases inteiras, ~7 tarefas; obra de até ~8 tarefas é um lote só) e entregue cada lote ao Codex, um depois do outro. Não peça sim antes do primeiro lote.
-2. **O ajudante de lote é o Codex.** Ele recebe o que `references/sub-agents.md` lista em "What a batch worker receives" e faz o que está em "What a batch worker does": cada tarefa no ciclo de `references/implement.md` (teste antes, gate, `tasks.md` marcado e um commit por tarefa) e, no fim, o resumo curto.
-3. **Parada vira relato.** O Codex não fala com o usuário. Nos casos em que a `/implementar` manda parar e perguntar (teste que parece errado, tarefa bloqueada, bug fora do escopo, ação fora da máquina), o Codex para e relata; você leva a pergunta ao usuário no formato do item 7 do SKILL.md da `/implementar` e, com a resposta, retoma a mesma sessão do Codex.
-4. **Conserto da /build-review.** As tarefas de conserto que o usuário aprovou na `/build-review` também vão para o Codex, do mesmo jeito.
-
-O resto da `/implementar` vale como está: a branch da feature, a retomada, o sim antes de cada push e a `/build-review` depois da última tarefa.
+1. **Sempre delega, sem oferecer.** Não valem aqui a construção na própria sessão até ~8 tarefas nem a oferta de ajudantes: o usuário escolheu o Codex ao chamar esta skill. Monte os lotes como em `sub-agents.md` (fases inteiras, ~7 tarefas; obra de até ~8 tarefas é um lote só) e mande cada lote ao Codex, um depois do outro, sem pedir sim antes do primeiro.
+2. **Parada vira relato.** O Codex não fala com o usuário. Quando a `/implementar` manda parar e perguntar, o Codex para e relata no resumo; você leva a pergunta ao usuário no formato do item 7 do SKILL.md da `/implementar` e, com a resposta, retoma a mesma sessão do Codex.
+3. **Conserto é do Codex.** Os consertos de cada lote e as tarefas de conserto aprovadas na `/build-review` vão para o Codex (ver Conserto, abaixo).
 
 ## Antes do primeiro lote
 
@@ -24,13 +19,7 @@ Rode `codex --version` (precisa ser ≥ 0.156) e `codex login status`. Se o Code
 
 ## Pedido de cada lote
 
-Escreva num arquivo temporário (`P=$(mktemp)`), nesta ordem:
-
-- **PAPEL:** você é o ajudante de lote da skill implementar. Leia e siga, para cada tarefa, `<caminho absoluto de ../implementar/references/implement.md>`, `tdd.md`, `tests.md`, `mocking.md` e `coding-principles.md` da mesma pasta. Mensagem de commit conferida com `python3 <caminho absoluto de ../implementar/scripts/check_commit.py> --message "<msg>"`.
-- **LOTE:** os ids das tarefas, nesta ordem, e o caminho de `tasks.md`; nele estão a Test Coverage Matrix e os Gate Check Commands. Também `spec.md` e, se existir, `design.md` da feature.
-- **LIMITES:** arquivos que pode tocar (o `Where` de cada tarefa, mais `tasks.md`); o que não pode; fora de escopo. Sem push, branch nova nem escrita fora desta máquina.
-- **PARE E RELATE:** teste que parece errado, tarefa bloqueada, bug fora do escopo ou ação fora da máquina: pare nessa tarefa e relate, sem contornar. Nunca enfraqueça, pule nem apague teste.
-- **RELATÓRIO:** no máximo 30 linhas, no formato do resumo de `references/sub-agents.md` (tarefas feitas com o hash de cada commit, testes, desvios e bloqueios), mais as decisões que a spec não fixava. Não cole saída de teste.
+Escreva num arquivo temporário (`P=$(mktemp)`) o que `sub-agents.md` lista em "What a batch worker receives", com caminhos absolutos, mais o caminho do glossário do projeto (item 1 do SKILL.md da `/implementar`). Diga ao Codex que ele é o ajudante de lote de `sub-agents.md`: faz o que está em "What a batch worker does", segue `implement.md` em cada tarefa, confere a mensagem de cada commit com `python3 <caminho absoluto de ../implementar/scripts/check_commit.py> --message "<msg>"` e, nos casos de parada da `/implementar`, para e relata no resumo.
 
 ## Comandos (não mude)
 
@@ -49,13 +38,7 @@ codex exec resume "<thread_id>" --model gpt-6.1-sol -c model_reasoning_effort="m
 
 ## Conferir cada lote
 
-Antes de mandar o lote, anote o commit atual (`git rev-parse HEAD`).
-
-1. `git status --porcelain` e `git log --oneline <anotado>..HEAD`: um commit por tarefa do lote, com o `tasks.md` marcado no mesmo commit. Arquivo fora dos limites, arquivo solto ou tarefa sem commit entra na lista de conserto.
-2. Rode você o gate do `tasks.md` e confira que a contagem de testes não caiu. O relato do Codex não conta como prova.
-3. Algo vermelho → conserto. Tudo verde → próximo lote; depois do último, a `/build-review` (passo 9 de `references/implement.md`).
-
-Abra código só quando precisar montar um conserto que o teste vermelho não explica, e só o trecho.
+Faça o papel do orquestrador em `sub-agents.md` ("The orchestrating agent's role during Execute", passos 3 a 6). O relato do Codex não conta como prova.
 
 ## Conserto: no máximo 2 rodadas
 
