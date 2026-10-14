@@ -32,8 +32,10 @@ Na ordem em que entram no trabalho. Nos desenhos, verde marca onde a skill para 
 
 Te entrevista até o pedido ficar claro e entrega um pedido pronto pro agente: o que fazer, o
 que não fazer e quando parar e perguntar. Serve pra qualquer tarefa, não só código.
+No fechamento, mostra o combinado e o prompt antes de uma única confirmação: executar aqui,
+ajustar algo ou acionar outra skill.
 
-<p align="center"><img src="docs/skill-ask-me.svg" width="520" alt="A ask-me busca os fatos sozinha, faz rodadas de até 4 perguntas com a resposta recomendada, espera você responder e confere cada resposta com os limites que você já deu; enquanto houver decisão em aberto, faz nova rodada. Depois pergunta se fechamos, entrega o pedido pronto pra colar e pergunta se executa ali ou leva pra spec-plan."></p>
+<p align="center"><img src="docs/skill-ask-me.svg" width="520" alt="A ask-me busca os fatos sozinha, faz rodadas de até 4 perguntas com a resposta recomendada, espera você responder e confere cada resposta com os limites que você já deu; enquanto houver decisão em aberto, faz nova rodada. No fechamento, apresenta o combinado e o prompt em caixa de código na mesma mensagem, e faz uma única pergunta para executar, ajustar ou escolher outra skill."></p>
 
 <details><summary>Detalhe técnico</summary>
 
