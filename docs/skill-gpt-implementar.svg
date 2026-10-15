@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="1140" viewBox="0 0 760 1140" role="img" aria-labelledby="t d">
+<title id="t">gpt-implementar · Codex constrói, Claude coordena</title>
+<desc id="d">A escolha sim, codex ou a invocação da skill inicia a construção de uma feature aprovada. Confere instalação e login; sem Codex, para e informa o erro. Claude prepara cada lote. GPT-6.1-sol executa tarefas sequencialmente, com testes, código, checagem e commit. Devolve resumo e evidências; Claude verifica os registros no git. Correções voltam à mesma sessão do Codex por até duas rodadas; falha restante exige decisão do usuário. Só depois de conferir o lote começa o próximo. Após o último, inicia build-review; correções aprovadas nessa revisão também vão ao Codex. Cada push precisa de autorização.</desc>
+<style>svg{--tx:#1f2328;--mu:#59636e;--ln:#59636e;--ns:#d1d9e0}
+@media(prefers-color-scheme:dark){svg{--tx:#e6edf3;--mu:#a6b0bb;--ln:#9198a1;--ns:#3d444d}}
+text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;fill:var(--mu);font-size:16px}
+.h{font-size:19px;font-weight:600;fill:var(--tx)}.title{font-size:23px;font-weight:700;fill:var(--tx)}.small{font-size:14px}
+.box{fill:transparent;stroke:var(--ns);stroke-width:1.3}.hot{fill:#0f6e56;stroke:#0f6e56}
+.ln{fill:none;stroke:var(--ln);stroke-width:1.5}.dash{stroke-dasharray:6 5}
+</style>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ln" d="M2 1L8 5L2 9"/></marker></defs>
+<text x="380" y="36" class="title" text-anchor="middle">gpt-implementar · Codex constrói, Claude coordena</text>
+<rect x="100" y="65" width="560" height="82" rx="7" class="box hot"/>
+<text x="380.0" y="93" class="h" text-anchor="middle" style="fill:#fff">Você escolhe o Codex</text>
+<text x="380.0" y="118" class="" text-anchor="middle" style="fill:#fff">“sim, codex” ou /gpt-implementar; feature já aprovada.</text>
+<path d="M380 147 V180" class="ln" marker-end="url(#a)"/>
+<rect x="100" y="186" width="560" height="101" rx="7" class="box"/>
+<text x="380.0" y="214" class="h" text-anchor="middle">Conferir Codex e login</text>
+<text x="380.0" y="239" class="" text-anchor="middle">Instalado e logado? Segue para o primeiro lote.</text>
+<text x="380.0" y="261" class="" text-anchor="middle">Se faltar ou falhar: para e informa o erro.</text>
+<path d="M380 287 V320" class="ln" marker-end="url(#a)"/>
+<rect x="100" y="326" width="560" height="82" rx="7" class="box"/>
+<text x="380.0" y="354" class="h" text-anchor="middle">Claude prepara o lote</text>
+<text x="380.0" y="379" class="" text-anchor="middle">Tarefas, plano, regras, glossário e provas esperadas.</text>
+<path d="M380 408 V441" class="ln" marker-end="url(#a)"/>
+<rect x="100" y="447" width="560" height="105" rx="7" class="box"/>
+<text x="380.0" y="475" class="h" text-anchor="middle">GPT-6.1-sol constrói as tarefas</text>
+<text x="380.0" y="500" class="" text-anchor="middle">Teste → falha → código → checagem → commit.</text>
+<text x="380.0" y="522" class="" text-anchor="middle">Uma tarefa por vez; lotes também seguem em sequência.</text>
+<path d="M380 552 V585" class="ln" marker-end="url(#a)"/>
+<rect x="100" y="591" width="560" height="82" rx="7" class="box"/>
+<text x="380.0" y="619" class="h" text-anchor="middle">Codex devolve resumo e evidências</text>
+<text x="380.0" y="644" class="" text-anchor="middle">Tarefas, commits, resultados e possíveis bloqueios.</text>
+<path d="M380 673 V706" class="ln" marker-end="url(#a)"/>
+<rect x="100" y="712" width="560" height="82" rx="7" class="box"/>
+<text x="380.0" y="740" class="h" text-anchor="middle">Claude confere a entrega</text>
+<text x="380.0" y="765" class="" text-anchor="middle">Confere o git e as provas; o relato não basta.</text>
+<path d="M660 753 H715 V367 H666" class="ln dash" marker-end="url(#a)"/>
+<text x="735" y="563" class="small" text-anchor="middle" transform="rotate(-90 735 563)">Conferiu: próximo lote</text>
+<path d="M100 753 H43 V501 H94" class="ln dash" marker-end="url(#a)"/>
+<text x="68" y="847" class="small" text-anchor="start">Conserto: mesma sessão do Codex.</text>
+<text x="68" y="872" class="small" text-anchor="start">Até 2 rodadas; depois, pede sua decisão.</text>
+<path d="M380 794 V928" class="ln" marker-end="url(#a)"/>
+<text x="362" y="911" class="small" text-anchor="end">Último lote conferido</text>
+<rect x="100" y="934" width="560" height="82" rx="7" class="box"/>
+<text x="380.0" y="962" class="h" text-anchor="middle">build-review começa automaticamente</text>
+<text x="380.0" y="987" class="" text-anchor="middle">Correções aprovadas nessa revisão também vão ao Codex.</text>
+<text x="380" y="1062" class="small" text-anchor="middle">GPT relata bloqueios; Claude leva a pergunta ao usuário.</text>
+<text x="380" y="1087" class="small" text-anchor="middle">Cada push precisa de autorização. Verde: escolha do usuário.</text>
+</svg>
