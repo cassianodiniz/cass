@@ -1,81 +1,118 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 740" width="1000" height="740" role="img" aria-labelledby="t d">
-<title id="t">Qual skill do cass usar</title>
-<desc id="d">Três entradas para planejar uma feature. Fluxo atual: spec-plan publica uma branch, issue e PR rascunho; implementar constrói tarefas em sequência; build-review revisa ao final; correções aprovadas voltam a implementar por até três rodadas. A entrega precisa de autorização para commit, push e PR pronta. gpt-implementar segue o mesmo fluxo da implementar, com o Codex construindo. Ferramentas de apoio aparecem ao lado.</desc>
-<style>svg{--tx:#1f2328;--mu:#59636e;--ln:#59636e;--ns:#d1d9e0}
-@media(prefers-color-scheme:dark){svg{--tx:#e6edf3;--mu:#a6b0bb;--ln:#9198a1;--ns:#3d444d}}
-text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;fill:var(--mu);font-size:13px}
-.h{font-size:16px;font-weight:600;fill:var(--tx)}
-.small{font-size:12px}.title{font-size:18px;font-weight:700;fill:var(--tx)}
-.nb rect{fill:transparent;stroke:var(--ns);stroke-width:1.2}
-.hot rect{fill:#0f6e56;stroke:#0f6e56;stroke-width:1.2}.hot text{fill:#fff}
-.ln{fill:none;stroke:var(--ln);stroke-width:1.4}.dash{stroke-dasharray:5 4}
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="1480" viewBox="0 0 1300 1480" role="img" aria-labelledby="title desc">
+<title id="title">Fluxo principal de implementação do cass</title>
+<desc id="desc">As três entradas convergem para spec-plan, detalhada em entender, documentar e aprovar. GPT-implementar ocupa o caminho principal. Lateralmente, um agente GPT Sol recebe cada lote, executa testes, código e commits e devolve provas ao Claude. Lotes sequenciais; até duas correções no mesmo GPT. Build-review mostra Verifier, Standards e Spec, capturas e teste guiado quando aplicáveis, com correções aprovadas voltando à construção e revisão, até três rodadas. A entrega pede autorização. Aprender-com-a-sessao entra quando chamada pelo usuário, registra sugestões e aplica apenas as escolhidas.</desc>
+<style>
+svg{--tx:#e6edf3;--mu:#a6b0bb;--line:#9198a1;--border:#3d444d}
+@media(prefers-color-scheme:light){svg{--tx:#1f2328;--mu:#59636e;--line:#59636e;--border:#d1d9e0}}
+text{font-family:Arial,Helvetica,sans-serif;fill:var(--mu);font-size:16px}
+.title{font-size:26px;font-weight:700;fill:var(--tx)}
+.h{font-size:20px;font-weight:700;fill:var(--tx)}
+.sh{font-size:16px;font-weight:700;fill:var(--tx)}
+.small{font-size:14px}.tiny{font-size:13px}
+.box{fill:transparent;stroke:var(--border);stroke-width:1.5}
+.green{fill:#0f6e56;stroke:#0f6e56}.white{fill:#fff}
+.line{fill:none;stroke:var(--line);stroke-width:1.6}
+.dash{stroke-dasharray:6 5}.accent{stroke:#32a78b}
 </style>
-<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ln" d="M2 1L8 5L2 9"/></marker></defs>
-<text class="title" x="340" y="32" text-anchor="middle">Qual é a sua situação?</text>
-<g class="nb"><rect x="35" y="65" width="190" height="61" rx="6"/>
-<text class="h small" x="130.0" y="90" text-anchor="middle">Mudança a esclarecer</text>
-<text class="" x="130.0" y="112" text-anchor="middle">spec-plan</text>
-</g>
-<g class="nb"><rect x="245" y="65" width="190" height="61" rx="6"/>
-<text class="h small" x="340.0" y="90" text-anchor="middle">Pesquisar ideias</text>
-<text class="" x="340.0" y="112" text-anchor="middle">ask-me → search</text>
-</g>
-<g class="nb"><rect x="455" y="65" width="190" height="61" rx="6"/>
-<text class="h small" x="550.0" y="90" text-anchor="middle">Problema sem resposta</text>
-<text class="" x="550.0" y="112" text-anchor="middle">ask-me → auto-think</text>
-</g>
-<path class="ln" d="M130 126 V165 H550 V126 M340 126 V186" marker-end="url(#a)"/>
-<g class="hot"><rect x="125" y="188" width="430" height="80" rx="6"/>
-<text class="h" x="340.0" y="213" text-anchor="middle">spec-plan</text>
-<text class="" x="340.0" y="235" text-anchor="middle">Aprovar os documentos da feature.</text>
-<text class="" x="340.0" y="254" text-anchor="middle">Último sim: branch + issue + PR rascunho.</text>
-</g>
-<path class="ln" d="M340 268 V299" marker-end="url(#a)"/>
-<g class="nb"><rect x="125" y="302" width="430" height="80" rx="6"/>
-<text class="h" x="340.0" y="327" text-anchor="middle">implementar</text>
-<text class="" x="340.0" y="349" text-anchor="middle">Uma tarefa por vez, checagem e commit.</text>
-<text class="" x="340.0" y="368" text-anchor="middle">Começa depois da publicação do plano.</text>
-</g>
-<path class="ln" d="M340 382 V413" marker-end="url(#a)"/>
-<g class="nb"><rect x="125" y="416" width="430" height="80" rx="6"/>
-<text class="h" x="340.0" y="441" text-anchor="middle">build-review</text>
-<text class="" x="340.0" y="463" text-anchor="middle">Automática depois da última tarefa.</text>
-<text class="" x="340.0" y="482" text-anchor="middle">Critérios, testes, código e telas.</text>
-</g>
-<path class="ln" d="M340 496 V527" marker-end="url(#a)"/>
-<g class="hot"><rect x="125" y="530" width="430" height="80" rx="6"/>
-<text class="h" x="340.0" y="555" text-anchor="middle">Seu sim para a entrega</text>
-<text class="" x="340.0" y="577" text-anchor="middle">Commit da validação + push + PR pronta.</text>
-<text class="" x="340.0" y="596" text-anchor="middle">Cada push pede autorização; merge é seu.</text>
-</g>
-<path class="ln dash" d="M555 450 H658 V340 H558" marker-end="url(#a)"/>
-<text class="small" x="652" y="384" text-anchor="end">Correções</text>
-<text class="small" x="652" y="401" text-anchor="end">com seu sim</text>
-<text class="small" x="652" y="418" text-anchor="end">até 3 rodadas</text>
-<g class="nb"><rect x="710" y="65" width="265" height="80" rx="6"/>
-<text class="h" x="842.5" y="90" text-anchor="middle">gpt-optimizer</text>
-<text class="" x="842.5" y="112" text-anchor="middle">Opcional: atacar uma decisão grande</text>
-<text class="" x="842.5" y="131" text-anchor="middle">antes de aprová-la.</text>
-</g>
-<g class="nb"><rect x="710" y="190" width="265" height="61" rx="6"/>
-<text class="h" x="842.5" y="215" text-anchor="middle">handoff</text>
-<text class="" x="842.5" y="237" text-anchor="middle">Continuar em outra conversa.</text>
-</g>
-<g class="nb"><rect x="710" y="292" width="265" height="61" rx="6"/>
-<text class="h" x="842.5" y="317" text-anchor="middle">otimizar-arquitetura</text>
-<text class="" x="842.5" y="339" text-anchor="middle">Organizar o código em módulos.</text>
-</g>
-<g class="nb"><rect x="710" y="394" width="265" height="80" rx="6"/>
-<text class="h" x="842.5" y="419" text-anchor="middle">gpt-implementar</text>
-<text class="" x="842.5" y="441" text-anchor="middle">O fluxo da implementar,</text>
-<text class="" x="842.5" y="460" text-anchor="middle">com o Codex construindo.</text>
-</g>
-<path class="ln" d="M340 610 V636" marker-end="url(#a)"/>
-<g class="nb"><rect x="125" y="638" width="430" height="80" rx="6"/>
-<text class="h" x="340.0" y="663" text-anchor="middle">aprender-com-a-sessao</text>
-<text class="" x="340.0" y="685" text-anchor="middle">Rever a sessão e sugerir melhorias.</text>
-<text class="" x="340.0" y="704" text-anchor="middle">Depois de revisar e publicar.</text>
-</g>
-<text class="small" x="840" y="562" text-anchor="middle">Verde: sua decisão.</text>
-<text class="small" x="840" y="582" text-anchor="middle">Tracejado: volta para correções.</text>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="line" d="M2 1L8 5L2 9" /></marker></defs>
+<text x="450" y="42" text-anchor="middle" class="title">Qual é a sua situação?</text>
+<rect x="40" y="78" width="245" height="80" rx="7" class="box" />
+<text x="162.5" y="105" text-anchor="middle" class="sh">Mudança a esclarecer</text>
+<text x="162.5" y="128" text-anchor="middle" class="small ">spec-plan</text>
+<rect x="300" y="78" width="245" height="80" rx="7" class="box" />
+<text x="422.5" y="105" text-anchor="middle" class="sh">Pesquisar ideias</text>
+<text x="422.5" y="128" text-anchor="middle" class="small ">ask-me → search</text>
+<rect x="560" y="78" width="245" height="80" rx="7" class="box" />
+<text x="682.5" y="105" text-anchor="middle" class="sh">Problema sem resposta</text>
+<text x="682.5" y="128" text-anchor="middle" class="small ">ask-me → auto-think</text>
+<path d="M162 158 V188 H682 V158" class="line" />
+<path d="M422 158 V214" class="line" marker-end="url(#arrow)" />
+<rect x="100" y="220" width="650" height="262" rx="7" class="box" />
+<rect x="100" y="220" width="650" height="48" rx="7" class="green" />
+<text x="425" y="251" text-anchor="middle" class="h white" style="fill:#ffffff">spec-plan</text>
+<text x="127" y="300" text-anchor="start" class="sh">1</text>
+<text x="154" y="300" text-anchor="start" class="sh">Entender o pedido</text>
+<text x="154" y="323" text-anchor="start" class="small">Perguntas, limites e requisitos que não podem ficar esquecidos.</text>
+<path d="M121 339 H729" class="line" />
+<text x="127" y="365" text-anchor="start" class="sh">2</text>
+<text x="154" y="365" text-anchor="start" class="sh">Escrever os documentos na medida da feature</text>
+<text x="154" y="388" text-anchor="start" class="small">Spec sempre; contexto, design e tarefas quando necessários.</text>
+<path d="M121 404 H729" class="line" />
+<rect x="119" y="411" width="612" height="54" rx="7" class="box green" />
+<text x="425" y="432" text-anchor="middle" class="sh white" style="fill:#ffffff">Você aprova cada documento</text>
+<text x="425" y="454" text-anchor="middle" class="small white" style="fill:#ffffff">Último sim: branch + issue + PR rascunho.</text>
+<path d="M425 482 V562" class="line" marker-end="url(#arrow)" />
+<text x="410" y="525" text-anchor="end" class="small">“sim, codex” inicia a construção</text>
+<rect x="165" y="569" width="520" height="104" rx="7" class="box" />
+<text x="425.0" y="596" text-anchor="middle" class="h">gpt-implementar</text>
+<text x="425.0" y="619" text-anchor="middle" class="">Claude coordena; o Codex constrói os lotes.</text>
+<text x="425.0" y="641" text-anchor="middle" class="">Uma tarefa por vez, checagem e commit.</text>
+<text x="1005" y="599" text-anchor="middle" class="sh">Por dentro da gpt-implementar</text>
+<rect x="850" y="617" width="310" height="79" rx="7" class="box" />
+<text x="1005.0" y="644" text-anchor="middle" class="sh">GPT-6.1-sol · lote atual</text>
+<text x="1005.0" y="667" text-anchor="middle" class="small ">Teste → código → checagem → commit.</text>
+<text x="1005.0" y="689" text-anchor="middle" class="small ">Devolve resumo e evidências.</text>
+<path d="M685 640 H844" class="line" marker-end="url(#arrow)" />
+<text x="767" y="625" text-anchor="middle" class="tiny">Envia lote</text>
+<path d="M1005 696 V723" class="line" marker-end="url(#arrow)" />
+<rect x="850" y="730" width="310" height="63" rx="7" class="box" />
+<text x="1005.0" y="757" text-anchor="middle" class="sh">Claude confere</text>
+<text x="1005.0" y="780" text-anchor="middle" class="small ">Git e provas de cada tarefa.</text>
+<path d="M850 762 H785 V663 H691" class="line" marker-end="url(#arrow)" />
+<text x="776" y="709" text-anchor="end" class="tiny">Conferido:</text>
+<text x="776" y="729" text-anchor="end" class="tiny">próximo lote</text>
+<path d="M1160 762 H1205 V656 H1166" class="line dash" marker-end="url(#arrow)" />
+<text x="1005" y="824" text-anchor="middle" class="small">Conserto no mesmo GPT: até 2 rodadas.</text>
+<text x="1005" y="847" text-anchor="middle" class="small">Um lote por vez; só depois começa o próximo.</text>
+<path d="M425 673 V819" class="line" marker-end="url(#arrow)" />
+<text x="410" y="747" text-anchor="end" class="small">Todos os lotes conferidos</text>
+<rect x="100" y="826" width="650" height="284" rx="7" class="box" />
+<text x="425" y="858" text-anchor="middle" class="h">build-review</text>
+<text x="425" y="883" text-anchor="middle" class="small">Automática depois da última tarefa.</text>
+<rect x="119" y="902" width="196" height="79" rx="7" class="box" />
+<text x="217.0" y="929" text-anchor="middle" class="sh">Verifier</text>
+<text x="217.0" y="952" text-anchor="middle" class="small ">Critérios e testes que</text>
+<text x="217.0" y="974" text-anchor="middle" class="small ">detectam defeitos.</text>
+<rect x="327" y="902" width="196" height="79" rx="7" class="box" />
+<text x="425.0" y="929" text-anchor="middle" class="sh">Standards</text>
+<text x="425.0" y="952" text-anchor="middle" class="small ">Regras e padrões</text>
+<text x="425.0" y="974" text-anchor="middle" class="small ">do projeto.</text>
+<rect x="535" y="902" width="196" height="79" rx="7" class="box" />
+<text x="633.0" y="929" text-anchor="middle" class="sh">Spec</text>
+<text x="633.0" y="952" text-anchor="middle" class="small ">O que foi construído</text>
+<text x="633.0" y="974" text-anchor="middle" class="small ">cumpre o pedido?</text>
+<text x="425" y="1008" text-anchor="middle" class="small">Testes verdes → telas → teste guiado, quando aplicável.</text>
+<text x="425" y="1031" text-anchor="middle" class="small">Verifier dá o veredito; os outros relatos ficam separados.</text>
+<rect x="119" y="1049" width="612" height="44" rx="7" class="box green" />
+<text x="425" y="1077" text-anchor="middle" class="sh white" style="fill:#ffffff">Você aprova as correções, item por item.</text>
+<path d="M750 1072 H814 V588 H691" class="line dash" marker-end="url(#arrow)" />
+<text x="832" y="934" text-anchor="start" class="small">Correções aprovadas</text>
+<text x="832" y="957" text-anchor="start" class="small">voltam ao Codex</text>
+<text x="832" y="980" text-anchor="start" class="small">e passam por nova revisão.</text>
+<text x="832" y="1003" text-anchor="start" class="small">Limite: 3 rodadas; depois, chama você.</text>
+<path d="M425 1110 V1158" class="line" marker-end="url(#arrow)" />
+<text x="410" y="1140" text-anchor="end" class="tiny">PASS e sem correções aprovadas pendentes</text>
+<rect x="165" y="1165" width="520" height="104" rx="7" class="box green" />
+<text x="425.0" y="1192" text-anchor="middle" class="h white" style="fill:#ffffff">Seu sim para a entrega</text>
+<text x="425.0" y="1215" text-anchor="middle" class="white" style="fill:#ffffff">Commit da validação + push + PR pronta.</text>
+<text x="425.0" y="1237" text-anchor="middle" class="white" style="fill:#ffffff">Cada push pede autorização; merge é seu.</text>
+<path d="M425 1269 V1321" class="line dash" marker-end="url(#arrow)" />
+<text x="410" y="1300" text-anchor="end" class="small">Quando você chamar, ao fim da sessão</text>
+<rect x="100" y="1328" width="1160" height="132" rx="7" class="box" />
+<text x="680" y="1358" text-anchor="middle" class="h">aprender-com-a-sessao</text>
+<text x="680" y="1383" text-anchor="middle" class="small">Rever a sessão e sugerir melhorias. Depois de revisar e publicar.</text>
+<rect x="126" y="1399" width="220" height="40" rx="7" class="box" />
+<text x="236.0" y="1425" text-anchor="middle" class="sh">Rever o caminho</text>
+<rect x="397" y="1399" width="260" height="40" rx="7" class="box" />
+<text x="527.0" y="1425" text-anchor="middle" class="sh">Guardar sugestões</text>
+<rect x="710" y="1399" width="230" height="40" rx="7" class="box green" />
+<text x="825.0" y="1425" text-anchor="middle" class="sh white" style="fill:#ffffff">Você escolhe</text>
+<path d="M346 1419 H391" class="line" marker-end="url(#arrow)" />
+<path d="M657 1419 H704" class="line" marker-end="url(#arrow)" />
+<text x="1094" y="1415" text-anchor="middle" class="small">Aplica só as escolhidas.</text>
+<text x="1094" y="1437" text-anchor="middle" class="small">As demais ficam pendentes.</text>
+<path d="M940 1419 H967" class="line" marker-end="url(#arrow)" />
+<text x="1048" y="1120" text-anchor="middle" class="small">Verde: sua decisão.</text>
+<text x="1048" y="1144" text-anchor="middle" class="small">Tracejado: correções ou chamada manual.</text>
 </svg>
