@@ -5,7 +5,7 @@ sai construindo antes de entender o pedido, que diz "pronto" sem ter testado, qu
 número de pesquisa. Cada skill resolve um desses momentos e pode ser chamada sozinha.
 
 <p align="center">
-  <img src="docs/qual-sua-situacao.svg" width="1000" alt="Mapa do fluxo atual: uma mudança a esclarecer segue para spec-plan; pesquisar ideias passa por ask-me e search; um problema sem resposta passa por ask-me e auto-think. Spec-plan publica uma feature aprovada em uma branch, issue e PR em rascunho; implementar constrói tarefas em sequência; build-review revisa ao final. Correções precisam de aprovação e voltam a implementar. Cada push e a PR pronta pedem autorização. Handoff, otimizar-arquitetura e aprender-com-a-sessao apoiam o trabalho.">
+  <img src="docs/qual-sua-situacao.svg" width="1000" alt="Fluxo principal de implementação: as três entradas levam à spec-plan, que entende o pedido, escreve os documentos e pede sua aprovação. O último sim publica branch, issue e PR em rascunho; sim, codex escolhe gpt-implementar. Claude envia cada lote ao GPT Sol, recebe evidências e confere o git antes do próximo; até duas rodadas de conserto na mesma sessão. Build-review reúne Verifier, Standards e Spec, testes, telas e teste guiado quando aplicável. Correções aprovadas voltam ao Codex e passam por nova revisão, até três rodadas. A entrega pede autorização para commit, push e PR pronta; merge é seu. Aprender-com-a-sessao, quando chamada, revê a sessão, guarda sugestões e aplica apenas as escolhidas.">
 </p>
 
 ## Como eu uso no dia a dia
@@ -114,6 +114,8 @@ Segue a `implementar` inteira e troca só quem constrói: cada lote de até ~7 t
 sessão do Codex, que escreve o código e faz o commit de cada tarefa. O Claude coordena, roda
 os testes ele mesmo, confere pelo git e, depois da última tarefa, inicia a `build-review`.
 No sim final da `spec-plan`, responda **"sim, codex"** para cair aqui.
+
+<p align="center"><img src="docs/skill-gpt-implementar.svg" width="650" alt="A gpt-implementar começa com uma feature aprovada e a escolha do Codex. Confere instalação e login; sem eles, para e informa o erro. Claude prepara o lote; GPT-6.1-sol constrói uma tarefa por vez com testes, código, checagem e commit. Codex devolve resumo e evidências, que Claude confere pelo git antes do próximo lote. Consertos voltam à mesma sessão por até duas rodadas; falha restante pede decisão do usuário. Após o último lote, build-review começa automaticamente. Correções aprovadas nessa revisão também vão ao Codex; cada push precisa de autorização."></p>
 
 <details><summary>Detalhe técnico</summary>
 
@@ -233,6 +235,8 @@ Módulos fundos (Ousterhout) e costuras (Feathers); 4 categorias de dependência
 Ajuda a transformar um processo em skill, acertar quando ela deve ser chamada e testar
 se o agente segue suas instruções. Traz as referências e ferramentas da versão local.
 É uma ferramenta para cuidar das próprias skills; fica fora do mapa principal de trabalho.
+
+<p align="center"><img src="docs/skill-writin-skills.svg" width="650" alt="A writin-skills entende uso, gatilhos, limites e resultado esperado. Mudanças mecânicas recebem verificação objetiva. Para nova skill ou mudança de comportamento, define cenários, critérios, repetições e limite de correções e congela a versão. RED demonstra uma falha sem a skill ou uma contradição comprovada em skill existente. Escreve ou ajusta, congela a candidata e testa. Falhas voltam ao ajuste dentro do limite; se ele chegar, relata pendências sem aprovar. Depois dos critérios passarem, uma revisão independente confere a candidata; achados procedentes voltam ao ajuste e aos testes afetados. A entrega registra arquivos, resultados e limites."></p>
 
 <details><summary>Detalhe técnico</summary>
 
