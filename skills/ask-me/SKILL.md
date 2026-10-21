@@ -65,15 +65,13 @@ Every block that offers lettered options carries a number, the ⚠️ ones inclu
 
 ## Closing
 
-When the frontier is empty and no ⚠️ is open, ask one last question, in a message of its own (after the check, if any, and the note from Shared understanding):
+When the frontier is empty and no ⚠️ is open, deliver the closing in one message, in this order:
 
-```
-📝 Fechamos? Quer que eu transforme isso no pedido pronto pra IA?
- a) Sim, pode gerar
- b) Se quiser alterar ou adicionar algo, é só me falar
-```
+1. **Conferi o combinado:** the check against the agreed limits and the note from Shared understanding, as usual.
+2. **O prompt pra essa tarefa seria:** the brief in one code block, ready to paste to the agent, using the template below.
+3. The single closing question shown at the end of this section.
 
-Use this text as is: two options, no number (it is the only question in the message) and no ✅ line, since the frontier is already empty and there is nothing left to recommend. The closing question goes alone and ends the message; the brief comes only after the user answers "a" to it. If the user answers with a change or an addition instead, the interview is open again: a change is a new answer, and it usually brings decisions of its own that nobody has discussed yet. Recompute the frontier, run the check against the limits already set, and ask as many rounds as it takes, in the usual format, until the frontier is empty again; only then ask the closing question again. Don't fill in what the change implies by guessing just because the interview seemed finished. A "pode fechar" said earlier means it's time to ask the closing question, not to skip it. Then deliver it in one block, ready to paste to the agent. Every item comes from an answer or a stated assumption the user did not correct: if you can't point to where the user said it, it stays out.
+Generate the brief before asking for execution. Every item comes from an answer or a stated assumption the user did not correct: if you can't point to where the user said it, it stays out.
 
 ```
 Objetivo: <o que é pra fazer, em uma frase>
@@ -100,15 +98,14 @@ If the task depends on information spread across several places (Drive, WhatsApp
 Antes de mexer em qualquer coisa: olhe tudo que pode ser relevante (<os lugares desta tarefa>), inclusive o que o pedido não cita. Se o que encontrar contradisser este pedido, pare e me pergunte.
 ```
 
-Right after the brief, in the same message, end with one execution question. Pick it with this check: does the brief change code in a repository **and** its "Fazer" list name two or more separate features (for example: login, a trash bin and an export)?
-
-- **No** (one feature, a small edit, or any task outside code: files, spreadsheets, messages, research): ask "Executo aqui agora?"
-- **Yes**: ask the question below, because an agent that builds several features in one go tends to skip steps, and /spec-plan slices them into tasks built and tested one at a time:
+Right after the brief, in the same message, end with this single question:
 
 ```
-Executo aqui agora, ou levo pra /spec-plan fatiar em tarefas?
- a) Executa aqui
- b) Leva pra /spec-plan
+📝 Quer que eu execute aqui agora ou quer ajustar algo?
+ a) Sim, execute
+ b) Explique se quiser alterar ou acione a skill que gostaria de executar o prompt
 ```
 
-Execute only on a yes (or a). On b, invoke /spec-plan and hand it the brief as its input.
+Use this text as is: two options, no number (it is the only question in the message) and no ✅ line, since the frontier is already empty and there is nothing left to recommend. Execute here only on a yes (or a), without another confirmation. If the user invokes another skill to execute the prompt, hand it the brief as its input.
+
+If the user answers with a change or an addition instead, the interview is open again: a change is a new answer, and it usually brings decisions of its own that nobody has discussed yet. Recompute the frontier, run the check against the limits already set, and ask as many rounds as it takes, in the usual format, until the frontier is empty again; then deliver the updated note, brief and single closing question together. Don't fill in what the change implies by guessing just because the interview seemed finished. A "pode fechar" said earlier means it's time to deliver this closing, not to execute the task.
