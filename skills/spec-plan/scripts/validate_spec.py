@@ -142,10 +142,31 @@ def classify_ears(text):
     return (True, "warn: SHALL present but no EARS lead keyword")
 
 
+def strip_fences(lines, keep=("mermaid",)):
+    """
+    Drop fenced code blocks so a template example inside the file is not parsed.
+
+    Blocks whose info string matches `keep` survive: a mermaid erDiagram is content in
+    this artifact, not an example, and the columns check has to see inside it.
+    """
+    out, fence_info = [], None
+    for ln in lines:
+        stripped = ln.strip()
+        if stripped.startswith("```"):
+            if fence_info is None:
+                fence_info = stripped.strip("`").strip().lower()
+            else:
+                fence_info = None
+            out.append("")
+            continue
+        out.append(ln if (fence_info is None or fence_info in keep) else "")
+    return out
+
+
 def check(spec_path):
     with open(spec_path, "r", encoding="utf-8") as f:
         text = f.read()
-    lines = text.splitlines()
+    lines = strip_fences(text.splitlines())
     errors, warnings = [], []
 
     # 1. Required sections.
@@ -154,13 +175,21 @@ def check(spec_path):
             errors.append(f"missing required section: ## {name}")
 
     # 2. Acceptance criteria are EARS-shaped (have a SHALL).
-    in_ac = False
+    in_ac, blanks = False, 0
+    # A blank line does NOT close the block - well-formed markdown puts one between the
+    # label and the list, and treating it as a terminator silently skips every criterion.
     for i, ln in enumerate(lines, start=1):
         stripped = ln.strip()
-        if re.match(r"^\*{0,2}Acceptance Criteria\*{0,2}\s*:?\s*$", stripped):
-            in_ac = True
+        if re.match(r"^\*{0,2}Acceptance Criteria\*{0,2}\s*:?\s*$", stripped, re.IGNORECASE):
+            in_ac, blanks = True, 0
             continue
         if in_ac:
+            if stripped == "":
+                blanks += 1
+                if blanks >= 2:
+                    in_ac = False
+                continue
+            blanks = 0
             m = re.match(r"^\s*\d+\.\s+(.*)$", ln)
             if m:
                 item = m.group(1).strip()
@@ -171,7 +200,7 @@ def check(spec_path):
                     errors.append(f"L{i}: acceptance criterion has no SHALL (not testable): {item[:70]}")
                 elif note.startswith("warn"):
                     warnings.append(f"L{i}: AC has SHALL but no EARS keyword (WHEN/WHILE/WHERE/IF or ubiquitous 'The … shall'): {item[:60]}")
-            elif stripped == "" or re.match(r"^#{1,3}\s", ln) or stripped.startswith("**"):
+            elif re.match(r"^#{1,4}\s", ln) or stripped.startswith("**") or re.match(r"^\s*[-*+]\s", ln):
                 in_ac = False
 
     # 3. Assumptions table cells filled.

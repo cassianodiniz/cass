@@ -40,8 +40,8 @@ text{font-family:Arial,Helvetica,sans-serif;fill:var(--mu);font-size:16px}
 <text x="154" y="388" text-anchor="start" class="small">Spec sempre; contexto, design e tarefas quando necessários.</text>
 <path d="M121 404 H729" class="line" />
 <rect x="119" y="411" width="612" height="54" rx="7" class="box green" />
-<text x="425" y="432" text-anchor="middle" class="sh white" style="fill:#ffffff">Você aprova cada documento</text>
-<text x="425" y="454" text-anchor="middle" class="small white" style="fill:#ffffff">Último sim: branch + issue + PR rascunho.</text>
+<text x="425" y="432" text-anchor="middle" class="sh white" style="fill:#ffffff">Um sim só, no fim</text>
+<text x="425" y="454" text-anchor="middle" class="small white" style="fill:#ffffff">O sim abre branch + issue + PR rascunho.</text>
 <path d="M425 482 V562" class="line" marker-end="url(#arrow)" />
 <text x="410" y="525" text-anchor="end" class="small">“sim, codex” inicia a construção</text>
 <rect x="165" y="569" width="520" height="104" rx="7" class="box" />

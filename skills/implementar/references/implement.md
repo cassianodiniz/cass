@@ -11,7 +11,7 @@ This is where code gets written. Every task follows the same cycle: plan → imp
 **Read [coding-principles.md](coding-principles.md) and state:**
 
 1. **Assumptions** - What am I assuming? Any uncertainty?
-2. **Files to touch** - List ONLY files this task requires
+2. **Files to touch** - List ONLY files this task requires, plus any file extended under the exception in step 4b
 3. **Success criteria** - How will I verify this works?
 
 ⚠️ **Do not proceed without stating these explicitly.**
@@ -89,7 +89,9 @@ If the task includes tests (per the Tests field and **Test Coverage Matrix** in 
 - Do NOT delete or skip test cases
 - Do NOT use the test framework's skip/disable/pending mechanism to bypass failing tests
 
-If a test is genuinely wrong (tests the wrong behavior per spec), STOP and ask the user before modifying it. Never silently change a test.
+A test changes only with the claim it proves, and leaves with the code it proves, in the same commit. Changing a test to make a suite pass hides the failure it exists to show: a wrong check is a stop-and-ask. (From tlc-spec-lean 2.1.0, rule 3.)
+
+So: when an existing test fails because the approved `spec.md` changed the behavior it checks (a `Supersedes` entry, or an acceptance criterion that replaces the old behavior), update that test in the same commit as the code, asserting the new spec-defined outcome with the same strength, and cite that criterion in the commit body. That test's file counts as part of the task even when the task does not list it. If a test seems wrong for any other reason, STOP and ask the user before modifying it. Never silently change a test.
 
 If the task does NOT include tests (e.g., entity-only, config-only), skip to Step 4b.
 
@@ -100,13 +102,13 @@ With tests, alternate with step 4, one criterion at a time. Write the minimum im
 **HARD CONSTRAINTS:**
 
 - The test-integrity rules from step 4 still hold: do NOT weaken, delete, or skip/disable tests. The tests are the spec - implementation conforms to them, not the reverse.
-- Modify a test only to fix a genuinely wrong assertion, and ask the user first.
+- Modify a test only as step 4 allows: with the approved spec change it checks, in the same commit, or after asking the user.
 - Minimum code to pass - save structural improvements for a refactor task
 
 Follow [coding-principles.md](coding-principles.md):
 
 - Simplest code that works
-- Touch ONLY listed files
+- Touch ONLY listed files. One exception: a file the task does not list may be extended when (a) the change only adds (an optional prop, a new export, local styling), (b) every other user of that file behaves exactly as before, and (c) you record it in the task's entry in `tasks.md` and in the commit body. A change that alters how another user of that file behaves is a stop.
 - No scope creep
 
 ### 5. Gate Check (VERIFY)
@@ -114,7 +116,7 @@ Follow [coding-principles.md](coding-principles.md):
 Run the gate check command from the task definition. This is MANDATORY - not "if applicable."
 
 1. Look up the command for the task's Gate level (quick/full/build) in the **Gate Check Commands** section of tasks.md, then run it
-2. Non-zero exit code = STOP. Fix the failure. Re-run. Do not proceed until it passes.
+2. Non-zero exit code: do not commit. Fixing the failure and re-running is part of the task, not a stop. If the gate is still red after 3 fix attempts, stop and report it. A failure caused by the environment rather than by the code (a service that is down, a timeout while the machine is under load) is re-run once unchanged; if it fails again, stop and report it.
 3. Confirm the test count matches expectations (no tests were silently deleted or skipped)
 
 **Tiered gates (from the Gate Check Commands section of tasks.md):**
@@ -285,7 +287,7 @@ for reuse across multiple endpoints.
 
 - One task = one commit
 - Description references what was DONE, not what was planned
-- Include only files listed in the task - plus the `tasks.md` / `spec.md` status updates for this task, or the `validation.md` "Fix Plans" mark for a fix task
+- Include only files listed in the task (and any file extended under step 4b's exception) - plus the `tasks.md` / `spec.md` status updates for this task, or the `validation.md` "Fix Plans" mark for a fix task
 - Never sneak in "while I'm here" changes
 - If tests are part of the task, include them in the same commit
 
@@ -308,7 +310,7 @@ During implementation, you will notice things that could be improved, refactored
 - If it's an improvement: add it to the feature's `context.md` under "Deferred Ideas" (or surface it to the user if there is no `context.md`)
 - If it's related to the current task: only include it if it's in the "Done when" criteria
 
-**The heuristic:** "Is this in my task definition?" If no, don't touch it.
+**The heuristic:** "Is this in my task definition?" If no, don't touch it. A file extended under step 4b's exception counts as part of the task.
 
 **Blast radius (approval ≠ remote authority):** Approving a spec or tasks authorizes local implementation and local commits only. Before `git push`, force-push, deploy, production DB migration, or any other remote / externally visible / destructive operation, STOP and get an explicit go-ahead for that action - even if Execute was already approved.
 
@@ -350,7 +352,7 @@ If you are unsure whether more tasks remain, check `tasks.md`: if every task is 
 ### Pre-Implementation (MANDATORY)
 
 - **Assumptions**: [state explicitly]
-- **Files to touch**: [list ONLY these]
+- **Files to touch**: [list ONLY these, plus any extended under step 4b's exception]
 - **Success criteria**: [how to verify]
 
 ### Tests: Write tests derived from spec ACs
@@ -363,7 +365,7 @@ If you are unsure whether more tasks remain, check `tasks.md`: if every task is 
 
 [Write minimum code to pass tests]
 
-- Tests modified: None
+- Tests modified: [None | the test file and the approved AC that changed it]
 - Tests skipped/deleted: None
 
 ### VERIFY: Gate Check

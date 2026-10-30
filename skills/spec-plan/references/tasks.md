@@ -359,13 +359,7 @@ failure handling, and context sizing guidance.
 When the whole feature fits a single batch (≤ ~8 tasks), execution happens inline in the main window
 with no sub-agents spawned.
 
-**The orchestrating agent's role during Execute:**
-1. Count total tasks and pack phases into ~7-task batches - offer batch sub-agents if that yields more than one batch and the user accepts
-2. Dispatch the next batch (to a worker, or execute inline)
-3. Receive the compact batch summary
-4. Update tasks.md with results
-5. If the batch summary shows all tasks complete: proceed to the next batch
-6. If a task failed: decide fix/escalate before dispatching the next batch
+**The orchestrating agent's role during Execute:** Follow the handoff checks in `references/sub-agents.md` of the `/implementar` skill before starting the next batch.
 
 ---
 
