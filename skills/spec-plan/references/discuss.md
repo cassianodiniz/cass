@@ -48,7 +48,7 @@ Ask in rounds, as in [investigate.md](investigate.md). Shared rules:
 2. Lead with your recommended answer and one line of reasoning. You have read the codebase; the user should be able to accept or override in a word.
 3. Offer "You decide" when reasonable - it records agent discretion explicitly.
 4. Resolve anything discoverable from the code yourself (Knowledge Verification Chain); only put genuine product decisions to the user.
-5. When an area is settled: "More on [area], or move on?" After all areas: "Ready to create context?"
+5. When an area is settled: "More on [area], or move on?" After all areas, write context.md and move on to Design, with no question.
 
 ### 5. Scope Guardrail (CRITICAL)
 
@@ -129,4 +129,4 @@ When user suggests scope creep: "That sounds like a separate feature. I'll note 
 - **Scope is sacred** - Deferred Ideas captures scope creep without losing ideas
 - **User = visionary, Agent = builder** - Ask about how they imagine it, not about technical implementation
 - **Don't ask about:** Technical architecture, performance, implementation details - that's Design's job
-- **Confirm before Design** - User approves context.md before moving to design phase
+- **No yes before Design** - context.md joins the one yes at the end of the flow (SKILL.md item 4)

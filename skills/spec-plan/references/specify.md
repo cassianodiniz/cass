@@ -80,7 +80,7 @@ Write every acceptance criterion in **EARS** (Easy Approach to Requirements Synt
 
 ### 4. Requirement Closure Gate (before confirm)
 
-Before presenting the spec for confirmation, run the three checks below. The spec is not presentable for confirmation until every item is resolved or assumption-logged - this is the guarantee that no requirement leaves the spec silently unclear.
+Before presenting the spec for confirmation, run the four checks below. The spec is not presentable for confirmation until every item is resolved or assumption-logged - this is the guarantee that no requirement leaves the spec silently unclear.
 
 **Scope-tiered:** Large/Complex = full gate; Medium = resolve obvious ambiguities, log the rest as assumptions; Small = skip entirely (consistent with skipping the sweep).
 
@@ -89,6 +89,8 @@ Before presenting the spec for confirmation, run the three checks below. The spe
 2. **Open-questions / assumptions closure.** Enumerate every unresolved decision that surfaced during clarification. Each must be either (a) resolved with the user OR (b) recorded as an **assumption** (chosen default + rationale) in the spec's Assumptions & Open Questions section. Nothing proceeds unmarked.
 
 3. **Declined gray areas become assumptions.** Any gray area the user declined to discuss or that went undiscussed is written to the spec's Assumptions & Open Questions section (agent's chosen default + rationale) - never silently dropped. See [discuss.md](discuss.md).
+
+4. **Every sentence of the request lands somewhere.** Read the request again, one sentence at a time: each one lands on a criterion, an `Out of scope` row or an open question. A sentence that lands nowhere is the requirement that goes missing, and nobody downstream reads the request again. (From tlc-spec-lean 2.1.0, `references/plan.md`.)
 
 Fix inline. This gate is bounded to THIS feature's stated dimensions and actual behavior - never to "anything imaginable." The Out of Scope table and anti-scope-creep rules remain the counterweights: the gate clarifies existing requirements, it never invents new ones.
 
@@ -104,6 +106,10 @@ Fix inline. This gate is bounded to THIS feature's stated dimensions and actual 
 ## Problem Statement
 
 [Describe the problem in 2-3 sentences. What pain point are we solving? Why now?]
+
+## Flow
+
+[Mermaid flowchart of the feature - see "Flow diagram" below]
 
 ## Goals
 
@@ -141,7 +147,7 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 
 **Why P1**: [Why this is critical for MVP]
 
-**Acceptance Criteria** (each line is one EARS pattern):
+**Acceptance Criteria**
 
 1. WHEN [user action/event] THEN system SHALL [expected behavior]  <!-- event-driven -->
 2. IF [invalid input / failure] THEN system SHALL [graceful handling]  <!-- unwanted-behavior -->
@@ -217,6 +223,28 @@ How we know the feature is successful:
 
 ---
 
+## Flow diagram
+
+Every spec, Small included, has a `## Flow` section right after Problem Statement: one Mermaid flowchart of how the feature works from the user's side, from the first thing that happens to the last. GitHub draws it on the branch and in the PR.
+
+- First line `%%{init: {'themeVariables': {'fontSize': '13px'}}}%%`, then `flowchart TD`, short boxes (title, plus at most one line after `<br/>`), in the user's language and in the words of the people who use the system.
+- Exactly two colors, always with the same meaning; every other box stays uncolored:
+
+```mermaid
+%%{init: {'themeVariables': {'fontSize': '13px'}}}%%
+flowchart TD
+  A[Você agenda<br/>presencial, online, WhatsApp] --> B[O horário passa]
+  B --> C[Paciente veio<br/>vira realizada sozinha]
+  B --> D[Paciente faltou<br/>você marca, até depois]
+  C --> E[Registro clínico nasce<br/>em branco]
+  classDef auto fill:#E1F5EE,stroke:#0F6E56,color:#04342C
+  classDef person fill:#FAECE7,stroke:#993C1D,color:#4A1B0C
+  class C,E auto
+  class A,D person
+```
+
+`auto` (green) = what happens by itself; `person` (orange) = what a person does. When the spec changes, update the flowchart in the same edit.
+
 ## Tips
 
 - **P1 = Vertical Slice** - A complete, demo-able feature, not just backend or frontend
@@ -224,5 +252,5 @@ How we know the feature is successful:
 - **Requirement IDs are mandatory** - Every story maps to trackable IDs
 - **Edge cases matter** - What breaks? What's empty? What's huge?
 - **Out of Scope prevents creep** - If it's not here, it doesn't get built
-- **Closure gate before confirm** - Three checks: unambiguity + precision, open-questions/assumptions closure, declined gray areas logged; scope-tiered; bounded to stated dimensions; never invents requirements
-- **Confirm after the gate passes** - Present the spec for user confirmation only after the closure gate passes (no unresolved-and-unmarked items remain) and `validate_spec.py` exits clean; user approves spec before moving to discuss phase
+- **Closure gate before confirm** - Four checks: unambiguity + precision, open-questions/assumptions closure, declined gray areas logged, every request sentence landed; scope-tiered; bounded to stated dimensions; never invents requirements
+- **Confirm after the gate passes** - Present the spec for user confirmation only after the closure gate passes (no unresolved-and-unmarked items remain) and `validate_spec.py` exits clean; the spec joins the one yes at the end of the flow (SKILL.md item 4)

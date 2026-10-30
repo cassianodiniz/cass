@@ -5,7 +5,7 @@ sai construindo antes de entender o pedido, que diz "pronto" sem ter testado, qu
 número de pesquisa. Cada skill resolve um desses momentos e pode ser chamada sozinha.
 
 <p align="center">
-  <img src="docs/qual-sua-situacao.svg" width="1000" alt="Fluxo principal de implementação: as três entradas levam à spec-plan, que entende o pedido, escreve os documentos e pede sua aprovação. O último sim publica branch, issue e PR em rascunho; sim, codex escolhe gpt-implementar. Claude envia cada lote ao GPT Sol, recebe evidências e confere o git antes do próximo; até duas rodadas de conserto na mesma sessão. Build-review reúne Verifier, Standards e Spec, testes, telas e teste guiado quando aplicável. Correções aprovadas voltam ao Codex e passam por nova revisão, até três rodadas. A entrega pede autorização para commit, push e PR pronta; merge é seu. Aprender-com-a-sessao, quando chamada, revê a sessão, guarda sugestões e aplica apenas as escolhidas.">
+  <img src="docs/qual-sua-situacao.svg" width="1000" alt="Fluxo principal de implementação: as três entradas levam à spec-plan, que entende o pedido, escreve os documentos e pede sua aprovação. Esse sim publica branch, issue e PR em rascunho; sim, codex escolhe gpt-implementar. Claude envia cada lote ao GPT Sol, recebe evidências e confere o git antes do próximo; até duas rodadas de conserto na mesma sessão. Build-review reúne Verifier, Standards e Spec, testes, telas e teste guiado quando aplicável. Correções aprovadas voltam ao Codex e passam por nova revisão, até três rodadas. A entrega pede autorização para commit, push e PR pronta; merge é seu. Aprender-com-a-sessao, quando chamada, revê a sessão, guarda sugestões e aplica apenas as escolhidas.">
 </p>
 
 ## Como eu uso no dia a dia
@@ -50,11 +50,12 @@ que costumam ficar esquecidos. Prefere a solução mais simples que atende ao co
 A profundidade acompanha o tamanho: toda feature ganha uma spec; contexto entra quando há
 pontos a esclarecer, e design e tarefas formais entram nas features grandes ou complexas.
 
-Você aprova cada documento apresentado. O último sim autoriza salvar e publicar a pasta da
+Os documentos são escritos um depois do outro, e você dá um sim só, no fim, numa mensagem curta
+com o fluxograma da feature. Esse sim autoriza salvar e publicar a pasta da
 feature, criar uma issue com o link para ela e abrir uma PR em rascunho. A construção começa
 em seguida, sem uma nova pergunta. **Uma feature, uma branch, uma issue e uma PR.**
 
-<p align="center"><img src="docs/skill-spec-plan.svg" width="600" alt="A spec-plan investiga em rodadas e verifica os nove requisitos esquecidos. Escreve a spec e, quando necessário, contexto, design e tarefas. Cada documento precisa do seu sim. O último sim publica a pasta da feature na branch, cria uma issue com seu link, abre a PR em rascunho e inicia implementar."></p>
+<p align="center"><img src="docs/skill-spec-plan.svg" width="600" alt="A spec-plan investiga em rodadas e verifica os nove requisitos esquecidos. Escreve a spec e, quando necessário, contexto, design e tarefas. Os documentos são escritos em sequência e recebem um sim só, no fim. Esse sim publica a pasta da feature na branch, cria uma issue com seu link, abre a PR em rascunho e inicia implementar."></p>
 
 <details><summary>Detalhe técnico</summary>
 
@@ -88,7 +89,9 @@ comportamento esperado, vê falhar, implementa, confere e faz um commit com a ta
 como concluída. Depois segue para a próxima sem pedir um novo sim.
 
 Cada push precisa da sua autorização. Também para quando uma tarefa está bloqueada, um
-teste parece errado ou aparece um problema fora do pedido. Após a última tarefa, inicia a
+teste parece errado ou aparece um problema fora do pedido. Teste que falha não é parada:
+conserta e roda de novo, e só para depois de 3 tentativas. Teste antigo que a spec aprovada
+mudou é atualizado junto com o código. Após a última tarefa, inicia a
 `build-review` automaticamente; a revisão completa acontece no final da feature.
 
 <p align="center"><img src="docs/skill-construtoras.svg" width="600" alt="A implementar lê a feature aprovada, as regras e o glossário. Se não há tarefas formais, lista passos; mais de cinco passos ou dependências complexas voltam ao planejamento. Define ferramentas e oferece subagentes para mais de um lote. Constrói uma tarefa por vez com teste, código, verificação e commit. Cada push pede autorização. A última tarefa inicia build-review automaticamente."></p>

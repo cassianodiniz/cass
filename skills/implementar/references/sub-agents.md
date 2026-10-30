@@ -55,6 +55,7 @@ Batches run strictly sequentially: the next batch starts only after the orchestr
 - `references/coding-principles.md`
 - `references/tdd.md`, with `references/tests.md` and `references/mocking.md`
 - Relevant `spec.md` and `design.md` context for the feature (not all specs)
+- The project's environment notes: what the project's `AGENTS.md` (or equivalent) points to for running the tests and the app locally (which env file, local services, logins), plus the environment problems already met in earlier batches of this feature
 
 **What a batch worker does:**
 
@@ -83,7 +84,7 @@ No raw logs, no full test output - only the above fields keep the main context c
 
 Use the records already required by `implement.md`, locally. This handoff creates no additional report or whole-suite rerun; the independent feature-level Verifier still runs at completion.
 
-**Failure handling:** If a task in a batch fails (gate does not pass, blocker hit), the worker stops and includes the failure in its summary. The next batch does not start until the current batch's summary shows all tasks complete. The orchestrator decides: fix and re-run, or escalate to the user.
+**Failure handling:** A gate that fails on the task's own code is fixed and re-run inside the task (`implement.md`, step 5); it is not a stop. The worker stops and includes the failure in its summary only when the gate is still red after 3 fix attempts, when an environment failure repeats after one re-run, or when the fix needs one of the stops in `implement.md` (a test change step 4 does not allow, a file step 4b's exception does not cover, a blocker). The next batch does not start until the current batch's summary shows all tasks complete. The orchestrator decides: fix and re-run, or escalate to the user.
 
 **Context sizing signal:** If a batch's task list would likely push the worker's context beyond ~40k tokens, close the batch at an earlier phase boundary (fewer phases per worker). If a *single* phase alone would blow the budget, that phase is too coarse - split it during Tasks per the granularity guidance in `references/tasks.md` of the `/spec-plan` skill.
 

@@ -191,7 +191,7 @@ After all checks complete, the Verifier MUST:
 1. **Write the persisted report** to `.specs/features/[feature]/validation.md` (see template below). This file is the evidence artifact - it survives the session and can be referenced by CI, reviewers, or future agents.
 2. **Return a compact summary in chat** to the orchestrator (see Compact Chat Summary section below). The orchestrator surfaces it to the user and routes any ranked gaps to fix tasks.
 
-**Deterministic backing (run it, do not eyeball it).** After writing the report, run `python3 <skill-dir>/scripts/validate_state.py <feature>`. It confirms the report is real - present, verdict filled to PASS, and backed by at least one `file:line` evidence citation - so a missing, hollow, placeholder, or FAIL report cannot slip through as done. A non-zero exit means the feature is NOT done: repair the report or route the FAIL gaps to fix tasks, then re-run. This is the closing gate of Execute and runs automatically, the same way the lessons layer runs at distillation; it is never a manual step. If no code-execution tool is available, confirm the same by reading `validation.md`.
+**Deterministic backing (run it, do not eyeball it).** After writing the report, run `python3 <skill-dir>/scripts/validate_state.py <feature>`. It confirms the report is real - present, with a `**Verdict**:` line filled to PASS, backed by at least one `file:line` evidence citation, and not contradicted by its own tables (a mutant marked survived, or an acceptance criterion whose Result is neither PASS nor a spec-precision gap) - so a missing, hollow, placeholder, FAIL or self-contradicting report cannot slip through as done. A non-zero exit means the feature is NOT done: repair the report or route the FAIL gaps to fix tasks, then re-run. This is the closing gate of Execute and runs automatically, the same way the lessons layer runs at distillation; it is never a manual step. If no code-execution tool is available, confirm the same by reading `validation.md`.
 
 ### 10. Distill Lessons (MANDATORY when validation.md has signal)
 
@@ -223,6 +223,7 @@ The Verifier returns this block to the orchestrator after completing all checks:
 ```markdown
 # [Feature] Validation
 
+**Verdict**: [PASS | FAIL]
 **Date**: [YYYY-MM-DD]
 **Spec**: `.specs/features/[feature]/spec.md`
 **Diff range**: [commit range or branch..HEAD]

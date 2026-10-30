@@ -36,6 +36,9 @@ import sys
 
 # A file:line citation: a path with an extension, then :<line>. e.g. src/a.ts:42
 EVIDENCE_RE = re.compile(r"[\w./-]+\.[A-Za-z0-9]+:\d+")
+EMPTY_CELL = {"", "-", "—", "–", "none", "n/a", "na", "nothing"}
+SURVIVED_RE = re.compile(r"\b(no|survived|alive|not killed)\b", re.IGNORECASE)
+VERDICT_LINE_RE = re.compile(r"^\**verdict\**\s*:", re.IGNORECASE)
 
 
 def _feature_dirs(root):
@@ -49,16 +52,58 @@ def _feature_dirs(root):
     return base, dirs
 
 
-def _verdict(text):
-    """Return 'pass', 'fail', 'unfilled', or None from a validation report."""
-    # Look at the '## Validation' heading first, then a '**Result**' line.
-    lines = text.splitlines()
+def split_row(line):
+    return [c.strip() for c in line.strip().strip("|").split("|")]
+
+
+def is_separator(line):
+    return bool(re.match(r"^\s*\|?[\s:|-]+\|?\s*$", line)) and "-" in line
+
+
+def strip_fences(text):
+    """Drop fenced blocks: a report that pasted the template must not be read as data."""
+    out, in_fence = [], False
+    for ln in text.splitlines():
+        if ln.strip().startswith("```"):
+            in_fence = not in_fence
+            continue
+        if not in_fence:
+            out.append(ln)
+    return out
+
+
+def find_tables(lines):
+    """Return [(header_cells_lowercased, [data_row_cells, ...]), ...] for every table."""
+    tables, buf = [], []
+    for ln in lines + [""]:
+        stripped = ln.strip()
+        if stripped.startswith("|"):
+            buf.append(stripped)
+            continue
+        if buf:
+            rows = [split_row(r) for r in buf if not is_separator(r)]
+            if len(rows) >= 2:
+                tables.append(([c.lower() for c in rows[0]], rows[1:]))
+            buf = []
+    return tables
+
+
+def column(header, *names):
+    for i, cell in enumerate(header):
+        for n in names:
+            if n in cell:
+                return i
+    return None
+
+
+def _verdict(lines):
+    """Return 'pass', 'fail', 'unfilled', or None."""
     candidates = [
         ln for ln in lines
-        if re.search(r"^#{1,4}\s*validation\b", ln.strip(), re.IGNORECASE)
-        or re.search(r"\*{0,2}result\*{0,2}\s*:", ln.strip(), re.IGNORECASE)
+        if re.search(r"^\**verdict\**\s*:", ln.strip(), re.IGNORECASE)
+        or re.search(r"^#{1,4}\s*validation\b", ln.strip(), re.IGNORECASE)
     ]
-    hay = " ".join(candidates) if candidates else text
+    hay = " ".join(candidates) if candidates else "\n".join(lines)
     has_pass = re.search(r"\bPASS\b", hay) is not None
     has_fail = re.search(r"\bFAIL\b", hay) is not None
     if has_pass and has_fail:
@@ -103,29 +148,72 @@ def _check_feature(fdir, name):
         )
         return errors
     text = open(vpath, encoding="utf-8", errors="replace").read()
-    verdict = _verdict(text)
+    lines = strip_fences(text)
+    body = "\n".join(lines)
+
+    # The verdict is read from its own line only. Without it the gate would fall back to the
+    # whole text, where any "PASS" from another section (a killed-mutant line, a passing row)
+    # reads as the verdict - so a report with no Verdict line is not a report this gate can read.
+    if not any(VERDICT_LINE_RE.search(ln.strip()) for ln in lines):
+        errors.append(
+            f"{name}: validation.md has no '**Verdict**: PASS | FAIL' line - write it under the "
+            f"title (references/validate.md, report template), then re-run"
+        )
+        return errors
+
+    verdict = _verdict(lines)
     if verdict is None:
         errors.append(f"{name}: validation.md has no PASS/FAIL verdict (a prose-only report does not count)")
     elif verdict == "unfilled":
         errors.append(f"{name}: validation.md verdict is still the template placeholder '[PASS | FAIL]' - not filled")
     elif verdict == "fail":
         errors.append(f"{name}: validation.md verdict is FAIL - route the ranked gaps to fix tasks, then re-verify (feature is not done)")
-    if verdict == "pass" and not EVIDENCE_RE.search(text):
+
+    if verdict != "pass":
+        return errors
+
+    if not EVIDENCE_RE.search(body):
         errors.append(f"{name}: validation.md is PASS but cites no file:line evidence - evidence-or-zero not satisfied")
+
+    # The gate reads the report's own tables and refuses a verdict its rows contradict.
+    for header, rows in find_tables(lines):
+        killed = column(header, "killed")
+        if killed is not None:
+            for r in rows:
+                if killed >= len(r):
+                    continue
+                cell = r[killed]
+                if cell.lower() in EMPTY_CELL and cell.lower() != "no":
+                    continue
+                if SURVIVED_RE.match(cell) or "survived" in cell.lower():
+                    errors.append(
+                        f"{name}: PASS but a mutant survived ({r[0][:50]}) - the assertion would "
+                        f"pass under a plausible wrong implementation"
+                    )
+
+        result = column(header, "result")
+        if result is not None and column(header, "check", "claim", "criterion") is not None:
+            for r in rows:
+                # A spec-precision gap is flagged, not failed (references/validate.md:50 and :251).
+                if result < len(r) and r[result] and "pass" not in r[result].lower() \
+                        and "spec-precision" not in r[result].lower():
+                    errors.append(f"{name}: PASS but check {r[0][:20]} reports '{r[result][:30]}'")
     return errors
 
 
 def _resolve(root, feature):
     base, dirs = _feature_dirs(root)
-    if not os.path.isdir(base):
-        print(f"validate_state: no {base} directory - nothing to check.")
-        return []
+    # An explicit argument is answered on its own terms: "that feature is not here" beats
+    # "there is no features directory", which is true but not what was asked.
     if feature:
         fdir = feature if os.path.isdir(feature) else os.path.join(base, feature)
         if not os.path.isdir(fdir):
             print(f"validate_state: feature not found: {feature}", file=sys.stderr)
             raise SystemExit(2)
         return [(fdir, os.path.basename(fdir.rstrip("/")))]
+    if not os.path.isdir(base):
+        print(f"validate_state: no {base} directory - nothing to check.")
+        return []
     if len(dirs) == 1:
         return [(os.path.join(base, dirs[0]), dirs[0])]
     if not dirs:
@@ -142,10 +230,24 @@ def main(argv=None):
     p = argparse.ArgumentParser(prog="validate_state.py", description="Deterministic completion gate: a done feature must have a real PASS validation report.")
     p.add_argument("feature", nargs="?", default=None, help="Feature dir or name (default: sole feature, else cross-check all completed)")
     p.add_argument("--root", default=".", help="Project root containing .specs/ (default: current dir)")
+    p.add_argument("--allow-empty", action="store_true",
+                   help="Exit 0 when there is no completed feature to gate (repo-wide sweeps)")
     args = p.parse_args(argv)
     root = os.path.abspath(args.root)
 
     targets = _resolve(root, args.feature)
+    if not targets and not args.allow_empty:
+        # Gating nothing is not a pass. This is the completion gate for a feature that was just
+        # built, so an empty run means the report could not be found - which reads as green to
+        # anything checking only the exit code. Exit 2 says "could not gate", like the other
+        # validators do, and leaves 0 to mean a report was read and held up.
+        print(
+            "validate_state: gated nothing - this is NOT a pass. Point it at the feature "
+            "(validate_state.py <feature> --root <project>), or pass --allow-empty if you "
+            "meant to sweep a repo that has no completed feature yet.",
+            file=sys.stderr,
+        )
+        return 2
     all_errors = []
     for fdir, name in targets:
         all_errors += _check_feature(fdir, name)

@@ -45,7 +45,7 @@ Every flagged concern MUST include a mitigation - how the design (or a follow-up
 
 ### 2. Define Architecture
 
-**Large/Complex only - approach exploration:** Before committing to a single architecture, present 2-3 viable approaches with trade-offs and a recommendation. Lead with the recommendation to avoid analysis paralysis. All approaches must deliver the same scoped thing (no alternative scopes). Confirm the chosen approach with the user before detailing components. Medium features: skip - design inline.
+**Large/Complex only - approach exploration:** Before committing to a single architecture, present 2-3 viable approaches with trade-offs and a recommendation. Lead with the recommendation to avoid analysis paralysis. All approaches must deliver the same scoped thing (no alternative scopes). Go on with the recommended approach and record the others and why in the design; ask the user only when the choice meets an unsettled decision on cost, security or behavior (SKILL.md item 4). Medium features: skip - design inline.
 
 Overview of how components interact. Use mermaid diagrams when helpful.
 
@@ -196,4 +196,4 @@ interface AnotherModel {
 - **Keep it visual** - Diagrams save 1000 words
 - **Small components** - If component does 3+ things, split it
 - **Flag concerns inline** - Risks found during research go in Risks & Concerns with a mitigation
-- **Confirm before Tasks** - User approves design before breaking into tasks
+- **No yes before Tasks** - the design joins the one yes at the end of the flow (SKILL.md item 4)

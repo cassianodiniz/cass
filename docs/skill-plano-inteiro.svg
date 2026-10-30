@@ -15,11 +15,11 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <g class="hot"><rect x="55" y="60" width="490" height="80" rx="6"/>
 <text class="h" x="300.0" y="85" text-anchor="middle">Planejar e aprovar</text>
 <text class="" x="300.0" y="107" text-anchor="middle">spec-plan dimensiona a feature e seus documentos.</text>
-<text class="" x="300.0" y="126" text-anchor="middle">Você aprova cada documento apresentado.</text>
+<text class="" x="300.0" y="126" text-anchor="middle">Um sim só, no fim do planejamento.</text>
 </g>
 <path class="ln" d="M300 140 V164" marker-end="url(#a)"/>
 <g class="hot"><rect x="55" y="168" width="490" height="80" rx="6"/>
-<text class="h" x="300.0" y="193" text-anchor="middle">Último sim: publicar e começar</text>
+<text class="h" x="300.0" y="193" text-anchor="middle">O sim publica e começa</text>
 <text class="" x="300.0" y="215" text-anchor="middle">Pasta em .specs/; uma branch, uma issue, uma PR rascunho.</text>
 <text class="" x="300.0" y="234" text-anchor="middle">implementar começa depois da publicação.</text>
 </g>
