@@ -1,111 +1,95 @@
 ---
 name: ask-me
-description: Use when user invokes /ask-me, or asks to be interviewed before a task ("me pergunta antes", "me entrevista", "vamos alinhar o que eu quero"), especially before handing work to an agent that tends to drift or overdo what was asked.
+description: Use when the user invokes /ask-me, asks to be interviewed before a task ("me pergunta antes", "me entrevista", "vamos alinhar o que eu quero"), or wants help explaining a still-vague goal before execution. Do not use for a clear execution request that does not ask for this conversation.
 ---
 
 # /ask-me
 
-Interview the user relentlessly until you reach a shared understanding. Map this as a design tree: every decision branches into the decisions that hang off it.
+Ajude a pessoa a descobrir e explicar o que quer, até chegar a um único prompt fiel e executável. A entrevista, a exploração de possibilidades e a organização do pedido acontecem nesta skill, em qualquer domínio. Outras skills são candidatas à execução final, escolhida pelo usuário.
 
-## Rounds
+## Investigar o contexto
 
-Work the tree in rounds. The frontier is every decision whose prerequisites are already settled: the questions you can ask now without guessing at answers you haven't heard yet. Number each question and give your recommended answer. Then wait for the user's answers before the next round.
+Leia o pedido, o histórico e os materiais indicados antes de perguntar. Busque você os fatos acessíveis no projeto, nos arquivos e nas ferramentas; pergunte ao usuário sobre intenção e preferências. Uma fonte ainda não verificada bloqueia apenas as perguntas que dependem dela.
 
-A round has at most 4 questions. If the frontier is bigger, ask the 4 whose answers unblock the most of the tree; the rest go to the next round. A decision with an obvious default is not a question: state it as an assumption in one line under the round, and the user corrects it only if wrong. At most one question per interview may be open: a numbered block with no letters and no ✅, where "nada" is a fine answer. Use it for the sample in Shared understanding; if no sample fits the task and you can't write options for what makes the result good without guessing, use it for that, with 2 or 3 examples from what you found.
+## Descobrir antes de fechar escolhas
 
-Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a later round, not this one. A settled decision is not asked again unless the user reopens it.
+Adapte a conversa ao que já está claro:
 
-From the second round on, every round opens with a check: list each limit the user already set ("nada", "nunca", "só", "fixo", "sem", "fica como está") and, next to it, whether any new answer touches it (✓ or ⚠️). Read limits literally: "nada pode ser apagado" covers empty folders too. When unsure, mark ⚠️ — asking costs one line. Each ⚠️ becomes a numbered question naming both and asking which holds. Before adding any other question to a round with a ⚠️, ask yourself: "if the user picks option a (keep the old rule), does this question still make sense?" If not, it waits for the next round.
+| Ponto de partida | Próximo movimento |
+|---|---|
+| O pedido já está suficientemente definido | Reflita o entendimento e prepare o fechamento, sem repetir perguntas. |
+| Há uma lacuna importante | Pergunte pelo ponto cuja resposta mais mudaria o resultado. |
+| Há apenas um tema ou uma vontade vaga | Comece com uma pergunta aberta, concreta e fácil de responder sobre o que motivou o pedido ou o que a pessoa quer mudar. |
+| A pessoa diz "não sei" ou trava | Ajude com situações, exemplos diferentes ou pequenas amostras para ela reagir. As sugestões continuam provisórias. |
 
-Finding facts is your job, never the user's. When a frontier question needs a fact from the environment, repository, tools, or other available sources, find it yourself; don't ask the user for anything you could look up once access is available. Don't block on it: an unresolved fact is an unsettled prerequisite, so only the questions downstream of it wait; ask the rest of the frontier now. The decisions are the user's: put each to them and wait.
+Investigue motivos, experiências, dificuldades, referências, limites ou o que tornaria o resultado bom ou frustrante conforme o caso. Cada pergunta nasce do contexto ou da última resposta; isso é território de investigação, não um questionário obrigatório. Explique brevemente o que a resposta muda. "Não sei" e "só tenho o tema" são respostas úteis.
 
-Simplicity must never remove required behavior, input validation at trust boundaries, error handling needed to prevent data loss, security requirements, accessibility basics, or anything explicitly agreed with the user.
+Exemplo: diante de "quero melhorar minhas aulas", descubra o que hoje acontece nas aulas e a pessoa gostaria de mudar, antes de oferecer formatos de aula. Se ela não souber, apresente situações distintas para reconhecer, rejeitar ou acrescentar às suas próprias experiências.
 
-Write the questions in Portuguese, in plain words (the user is not a programmer).
+Use perguntas abertas sempre que possam revelar algo que suas opções esconderiam; elas não têm um limite por entrevista. Use alternativas para facilitar uma comparação que já faça sentido ou ajudar quem pediu sugestões. Diga que a pessoa pode responder livremente, combinar sugestões, rejeitar todas ou pedir outros caminhos. Não transforme exemplos numa lista fechada do que ela pode querer.
 
-## Shared understanding
+Compare opções da mesma dimensão: público com público, finalidade com finalidade. Se as opções puderem coexistir, deixe isso explícito. Dê consequências concretas. Recomende uma resposta quando houver fundamento no objetivo, nas restrições ou em fatos; explique o motivo. Quando a preferência ainda for desconhecida, investigue em vez de marcar um palpite como a resposta certa.
 
-The outcome of the interview is an understanding the user can recognize and correct, grounded in what they want to accomplish.
+## Rodadas curtas
 
-1. **Discover intent.** Use the request and available context to identify the intended outcome, who it is for, and what success looks like. When that information is missing, ask one focused question about it before proposing features or an approach. Knowing the kind of task does not tell you what the user will accept.
-2. **Present a short design.** When the user will judge the result by looking at it (content, design, a rewrite), show in chat a small concrete sample of how it will come out and ask, as the interview's open question, what they would change in it. The test: would the user understand this better by seeing it than reading it?
-3. **Write back your understanding.** Summarize the intended outcome, relevant constraints, and success criteria in a short note the user can assess. Separate what they said from assumptions. Invite correction and incorporate their answer before treating this as the brief.
-4. **Carry intent into the brief.** Preserve the agreed understanding in the brief, with the success criteria in "Pronto quando". Check every item of the brief against that understanding.
+Mantenha perguntas numeradas com alternativas A/B/C como formato principal. Use perguntas abertas para descobrir a intenção e aprofundar o que as alternativas não esclarecerem.
 
-When the request already supplies the purpose and constraints, reflect that understanding instead of asking the same questions again. Keep the note concise; its accuracy and the opportunity to correct it matter.
+Escreva as perguntas em português e em palavras simples. Faça uma pergunta por vez durante a exploração, ou até quatro perguntas independentes quando isso facilitar responder. Numere todas; alternativas usam letras. Perguntas abertas não precisam de letras nem de recomendação. A pessoa pode responder "1a 2c" ou em suas palavras.
 
-## Round format
+Trabalhe as dependências: uma pergunta cuja resposta depende de outra ainda aberta fica para depois. Preserve decisões confirmadas. Uma reação a uma sugestão pode indicar interesse sem encerrar a decisão; esclareça essa diferença antes de usá-la como compromisso. Novas evidências podem justificar revisitar uma preferência provisória.
 
-```
-Conferi com o combinado:
- ✓ "<limite 1>"
- ⚠️ "<limite 2>" × "<resposta nova>"
+A partir da segunda rodada, confira o combinado e os limites já definidos. Interprete-os literalmente. Mostre um lembrete curto dos relevantes à rodada; conflitos vêm primeiro como perguntas numeradas, nomeando o combinado anterior e a informação nova. Resolva o conflito antes das perguntas que dependeriam dele. Não reabra decisões confirmadas sem um motivo concreto.
 
-⚠️ 1 - Antes você disse "<decisão anterior>", agora "<resposta nova>". Qual vale?
- a) <a anterior>
- b) <a nova>
- c) <as duas, combinadas assim: …>
- ✅ <letra> — <por quê>
+Separe o que a pessoa disse das suas propostas e suposições. Não trate silêncio como confirmação de uma preferência importante. Deixe escolhas menores e reversíveis para o executor quando não alterarem o resultado combinado; pergunte sobre escolhas que mudem objetivo, escopo, limites ou critérios de sucesso.
 
-📝 2 - <pergunta>
- a) <opção>
- b) <opção>
- c) <opção>
- ✅ <letra recomendada> — <por quê, em uma frase>
+## Tornar o pedido concreto
 
-📝 3 - <pergunta>
- a) <opção>
- b) <opção>
- ✅ <letra recomendada> — <por quê, em uma frase>
+Quando ver um exemplo ajudar mais que uma explicação, mostre uma amostra curta e provisória e peça uma reação livre. Use-a para descobrir preferências, sem produzir a tarefa inteira nem presumir que gostar de uma parte aprova todas as outras.
 
-Assumindo (corrija se estiver errado): <padrões óbvios, uma linha cada>
-```
+Organize aqui o necessário para executar: entregas, ordem e dependências relevantes, materiais de entrada e como avaliar o resultado. Para pedidos simples, basta uma descrição curta. Não crie um plano separado ou detalhe cada ação operacional por padrão.
 
-Every block that offers lettered options carries a number, the ⚠️ ones included, in one sequence per round (⚠️ first, then 📝). The user answers in short form ("1a 2c") or in their own words, and a block without a number leaves them with a bare letter that could belong to any question.
+Devolva o entendimento em poucas linhas ao longo da conversa quando houver algo importante a conferir. Encerre quando objetivo, contexto necessário, limites e critérios de sucesso estiverem claros o suficiente para seguir sem inventar decisões importantes. A entrevista não precisa esgotar todos os detalhes. Se a pessoa quiser parar antes, registre as incertezas e respeite o que ela deixou a seu critério.
 
-## Closing
+## Investigar e sugerir skills
 
-When the frontier is empty and no ⚠️ is open, deliver the closing in one message, in this order:
+Assim que o pedido estiver delimitado e decidido o que o usuário quer fazer, verifique nas skills instaladas se existe alguma que corresponde ao trabalho do usuário: caso haja, sugira a canditada, se houver mais de uma sugira no máximo duas. Não sugira skills caso nenhuma das instaladas se adequar a o pedido. Não procure por skills que não estejam instaladas.
 
-1. **Conferi o combinado:** the check against the agreed limits and the note from Shared understanding, as usual.
-2. **O prompt pra essa tarefa seria:** the brief in one code block, ready to paste to the agent, using the template below.
-3. The single closing question shown at the end of this section.
+## Fechamento
 
-Generate the brief before asking for execution. Every item comes from an answer or a stated assumption the user did not correct: if you can't point to where the user said it, it stays out.
+Entregue, nesta ordem, na mesma mensagem:
 
-```
-Objetivo: <o que é pra fazer, em uma frase>
-Pronto quando: <linha de chegada verificável, com os critérios de sucesso da nota>
-Fazer: <o que foi decidido, em tópicos>
-NÃO fazer: <lista específica do que ficou de fora — itens concretos, não "não exagere">
-Parar e perguntar: sempre que surgir uma decisão que não está neste pedido, antes de algo irreversível, e quando não der pra seguir sem mim. Na dúvida, pergunte.
-Antes de começar: diga em uma linha o que vai fazer.
-Se tomar alguma decisão que não está neste pedido, diga em uma linha em que se baseou.
-Ao terminar: um resumo curto do que fez; marque o que não conseguiu confirmar e diga onde procurou.
+1. **Conferi o combinado:** síntese curta do resultado esperado, dos limites e das suposições restantes.
+2. **O prompt pra essa tarefa seria:** um único bloco pronto para copiar. Use os campos abaixo conforme a tarefa, omitindo os que não acrescentam informação.
+3. As skills de execução verificadas, com uma frase sobre por que se encaixam e o que muda entre elas, seguida do menu de execução ou ajuste.
+
+```text
+Objetivo: <resultado pretendido>
+Contexto: <para quem, motivação e materiais relevantes>
+Pronto quando: <critérios de sucesso combinados>
+Fazer: <entregas e decisões confirmadas; ordem e dependências se necessárias>
+Preservar: <restrições, valores exatos e referências que precisam acompanhar a execução>
+NÃO fazer: <exclusões concretas estabelecidas pelo usuário>
+A seu critério: <escolhas que o executor pode resolver sem mudar o combinado>
+Suposições: <somente as ainda relevantes, identificadas como tais>
+Parar e perguntar: se precisar mudar o objetivo, o escopo, os limites ou os critérios combinados, ou faltar uma informação indispensável; respeitar as autorizações já dadas.
+Ao terminar: resumir a entrega e indicar o que não foi possível confirmar.
 ```
 
-Before delivering the brief, look at it with fresh eyes:
+Antes de mostrar o prompt, confira cobertura do combinado, consistência e ambiguidades importantes. Preserve nomes, números, fontes e limites com precisão. Considere situações comuns da tarefa que possam frustrar o objetivo; não invente novas exigências. Corrija o que já estiver resolvido no contexto e pergunte apenas pelas lacunas importantes. O prompt deve carregar as decisões necessárias, sem repetir a conversa inteira ou antecipar toda a execução.
 
-1. **Placeholder scan:** Any vague requirement? Fix it.
-2. **Internal consistency:** Does any item contradict another, or the agreed understanding?
-3. **Ambiguity check:** Could any requirement be interpreted two different ways? If the user's answers settle it, make it explicit; if they don't, ask before delivering.
+Com uma skill adequada, o menu final é:
 
-Fix any issues inline. No need to re-review — just fix and move on.
-
-If the task depends on information spread across several places (Drive, WhatsApp, e-mail, spreadsheets), add this line before "Parar e perguntar":
-
-```
-Antes de mexer em qualquer coisa: olhe tudo que pode ser relevante (<os lugares desta tarefa>), inclusive o que o pedido não cita. Se o que encontrar contradisser este pedido, pare e me pergunte.
+```text
+📝 Como quer seguir?
+ a) Executar este prompt com a skill <nome verificado>
+ b) Executar com outra skill — diga qual
+ c) Ajustar o prompt — diga o que quer mudar
 ```
 
-Right after the brief, in the same message, end with this single question:
+Se houver mais de uma adequada, dê uma letra a cada candidata, seguida de "Executar com outra skill — diga qual" e "Ajustar o prompt — diga o que quer mudar". Recomende com base na compatibilidade verificada; não preencha opções com skills que só tangenciam o pedido.
 
-```
-📝 Quer que eu execute aqui agora ou quer ajustar algo?
- a) Sim, execute
- b) Explique se quiser alterar ou acione a skill que gostaria de executar o prompt
-```
+Se a busca ficar incompleta, mantenha no menu as candidatas adequadas já verificadas e informe a limitação. Se nenhuma candidata adequada tiver sido confirmada, diga exatamente o que foi verificado e ofereça: executar aqui sem skill específica, indicar outra skill ou ajustar o prompt. Diferencie "não encontrei" de "não consegui verificar"; não invente uma candidata nem instale nada automaticamente.
 
-Use this text as is: two options, no number (it is the only question in the message) and no ✅ line, since the frontier is already empty and there is nothing left to recommend. Execute here only on a yes (or a), without another confirmation. If the user invokes another skill to execute the prompt, hand it the brief as its input.
+Ao escolher executar, leia a skill escolhida e use o prompt como entrada, preservando as decisões já tomadas, sem pedir uma segunda confirmação da mesma ação. Se o usuário indicar outra skill, localize e confira essa skill antes de executar; se não estiver disponível ou contrariar o pedido, explique o impedimento e peça apenas a escolha necessária.
 
-If the user answers with a change or an addition instead, the interview is open again: a change is a new answer, and it usually brings decisions of its own that nobody has discussed yet. Recompute the frontier, run the check against the limits already set, and ask as many rounds as it takes, in the usual format, until the frontier is empty again; then deliver the updated note, brief and single closing question together. Don't fill in what the change implies by guessing just because the interview seemed finished. A "pode fechar" said earlier means it's time to deliver this closing, not to execute the task.
+Um pedido de ajuste reabre somente as decisões afetadas e suas dependências; atualize o prompt, confira de novo a adequação das skills e reapresente o menu. "Pode fechar" pede o fechamento, não a execução. Execute apenas quando a resposta autorizar claramente uma das opções.

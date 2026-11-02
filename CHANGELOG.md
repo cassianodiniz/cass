@@ -27,6 +27,11 @@
 - Guia auxiliar de redução de consumo removido, junto de suas menções.
 - Auditoria documentada em `docs/auditoria-plugin.md`; sugestões de funcionamento ficam pendentes.
 
+## 4.8.0 — 2026-11-02
+
+- `ask-me`: atualizada para a versão pessoal revisada, com investigação aberta, alternativas A/B/C como formato principal e escolha entre até duas skills instaladas para executar o prompt, outra skill ou ajuste.
+- Demais skills preservadas.
+
 ## 4.7.1 — 2026-10-07
 
 - **`gpt-implementar` sai do fiscal próprio.** Depois dos testes verdes, a skill entrega pronto; quem abre o código e confere cada asserção é o Fiscal da `build-review`. `implementar/references/fiscal.md` removido e `contrato.md` alinhado. Modelo segue `gpt-6.1-sol` · `medium`.
