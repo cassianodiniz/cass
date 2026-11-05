@@ -166,9 +166,10 @@ def _auto_prune(data):
 
 
 def _find(data, signal, text):
-    k = _key(signal, text)
+    # The same rule found through two signals is one lesson: only the text decides.
+    k = _key("", text)
     for l in data["lessons"]:
-        if l.get("key") == k:
+        if _key("", l["text"]) == k:
             return l
     return None
 

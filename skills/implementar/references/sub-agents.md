@@ -50,8 +50,9 @@ Batches run strictly sequentially: the next batch starts only after the orchestr
 
 **What a batch worker receives:**
 
-- The task definitions for **every** phase in its batch (from `tasks.md`)
-- The Test Coverage Matrix and Gate Check Commands (from `tasks.md`)
+- The task definitions for **every** phase in its batch (from `tasks.md`), or the persisted checks.md Execution Plan when Tasks was skipped
+- The Test Coverage Matrix and Gate Check Commands (from `tasks.md`, or `checks.md` when Tasks was skipped)
+- The feature's checks.md (Checks, Coverage and Swept); for fixes, its approved validation.md fix items
 - `references/coding-principles.md`
 - `references/tdd.md`, with `references/tests.md` and `references/mocking.md`
 - Relevant `spec.md` and `design.md` context for the feature (not all specs)
@@ -63,7 +64,7 @@ Executes ALL tasks in its assigned batch **in order** - finishing every task in 
 
 ```
 Batch (phases [N]-[M]) complete:
-- Tasks done: [list with commit hashes]
+- Tasks done: [list with commit hashes and task/status path; for a fix, also its Fix Plan closure]
 - Evidence: [per-task links to existing verification records and gate results]
 - Tests: [N passed, 0 failed]
 - Deviations/blockers: [none | description]
@@ -79,7 +80,8 @@ No raw logs, no full test output - only the above fields keep the main context c
 2. Dispatch the next batch to a worker (or execute inline if not using sub-agents)
 3. Receive the compact summary and open its task-evidence links.
 4. For each task, check its commit and actual prescribed gate result; confirm the result applies to the code in that commit. If `Tests` requires tests, open the cited assertions at their `file:line` in that commit and compare them with the mapped required outcomes. If `Tests: none`, confirm the approved coverage matrix permits that path and the prescribed gate passed.
-5. Reconcile `tasks.md` with those records; dispatch the next batch only when all tasks are supported.
+   Include the task's check IDs, selected assertions and actual gate output in that reconciliation.
+5. Reconcile the task record (tasks.md, or checks.md Execution Plan when absent) and, for a review fix, its validation.md Fix Plan closure with those records. If a fix implemented an open task, both records must reflect that implementation. Dispatch the next batch only when all tasks are supported.
 6. If evidence is missing, inconsistent or insufficient, return the affected task to the worker. Follow the existing approval rules when a correction requires a user decision.
 
 Use the records already required by `implement.md`, locally. This handoff creates no additional report or whole-suite rerun; the independent feature-level Verifier still runs at completion.

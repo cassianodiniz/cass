@@ -1,6 +1,6 @@
 # Approval message
 
-Use this message for the one yes of the flow (SKILL.md item 4), which covers every document written: the spec, `context.md`, the design and the tasks; and for tasks requested by `/implementar` in the middle of a build.
+Use this message for the one yes of the flow (SKILL.md item 4), which covers every document written: the spec, `context.md`, the design, the tasks and checks.md; and for tasks requested by `/implementar` in the middle of a build.
 
 Write the approval message in the user's language, in plain words, for a reader who does not program: they need to understand how the feature works in order to decide well. Tell the feature once, as a story in steps: each fact appears in one place, the step where it happens. How each step is built lives in the document; the message says what changes for the people involved. Keep it to one screen: at most 150 words, the flowchart not counted. When the steps do not fit, keep the ones that touch money, data, people's work or what keeps running; the rest are in the documents (item 7). It is, in this order:
 

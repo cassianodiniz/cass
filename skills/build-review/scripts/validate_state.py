@@ -195,8 +195,8 @@ def _check_feature(fdir, name):
         if result is not None and column(header, "check", "claim", "criterion") is not None:
             for r in rows:
                 # A spec-precision gap is flagged, not failed (references/validate.md:50 and :251).
-                if result < len(r) and r[result] and "pass" not in r[result].lower() \
-                        and "spec-precision" not in r[result].lower():
+                value = re.sub(r"^[^a-z]+", "", r[result].lower()) if result < len(r) else ""
+                if result < len(r) and r[result] and not value.startswith(("pass", "spec-precision")):
                     errors.append(f"{name}: PASS but check {r[0][:20]} reports '{r[result][:30]}'")
     return errors
 

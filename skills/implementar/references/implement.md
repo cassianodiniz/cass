@@ -20,6 +20,14 @@ This is where code gets written. Every task follows the same cycle: plan → imp
 
 ## Process
 
+Read the feature's checks.md before code, including on fix rounds; the approved fix items remain
+in validation.md. Resolve the installed build-review skill directory and run
+`python3 <build-review-dir>/scripts/validate_checks.py <feature> --execute` before the first task.
+Exit non-zero: do not start code; resolve the reported gap under the existing stop/approval rules.
+When Tasks was skipped, references below to the testing matrix and gate commands in tasks.md use
+those sections in checks.md instead. Do not invent a tasks.md merely to hold them.
+On resuming a legacy feature, derive checks.md from its approved spec first; never invent past approval.
+
 **Batch worker context:** When this task is executed as part of a phase-batch sub-agent, the worker
 receives the task definitions for every phase in its batch, coding principles, the TDD guide (`tdd.md`), the generated Test
 Coverage Matrix and Gate Check Commands from tasks.md, and relevant spec/design context. A batch is
@@ -45,6 +53,10 @@ If there is no `tasks.md` for this feature, you MUST list atomic steps before wr
 2. [Step] → files: [list] → verify: [how] → commit: [message]
 3. [Step] → files: [list] → verify: [how] → commit: [message]
 ```
+
+Persist this plan under `## Execution Plan` in checks.md, with completion marks. When tasks.md
+is absent, its task/status references below use that persisted plan. A review fix still uses the
+approved Fix Plans in validation.md. This is the same step list, not an additional task artifact.
 
 **Each step must be:**
 
@@ -83,6 +95,8 @@ If the task includes tests (per the Tests field and **Test Coverage Matrix** in 
 3. Each acceptance criterion from "Done when" maps to at least one test assertion whose asserted value matches the **spec-defined expected outcome**. Where the spec does not define a precise outcome, note it as a **spec-precision gap** rather than writing a vague assertion and passing silently.
 4. Edge cases from spec.md that apply to this task get test cases too.
 
+**The check's proof selects it.** The `Proof:` line of each check this task settles, in checks.md `## Checks`, names this test with a filter that selects it.
+
 **HARD CONSTRAINTS (test integrity - never violate):**
 
 - Do NOT weaken assertions (making them less specific to pass more easily)
@@ -96,6 +110,8 @@ So: when an existing test fails because the approved `spec.md` changed the behav
 If the task does NOT include tests (e.g., entity-only, config-only), skip to Step 4b.
 
 ### 4b. Implement
+
+**Build against the binding source.** When a criterion cites a capture, open it before the first line of that screen and compare as you build: run the app in a browser window at the capture's size and put each state next to its capture. A difference gets fixed; one the spec does not allow gets asked.
 
 With tests, alternate with step 4, one criterion at a time. Write the minimum implementation needed to satisfy the task's success criteria: pass all relevant tests (when present) and meet the defined verification/gate checks when there are no direct tests.
 
@@ -118,6 +134,9 @@ Run the gate check command from the task definition. This is MANDATORY - not "if
 1. Look up the command for the task's Gate level (quick/full/build) in the **Gate Check Commands** section of tasks.md, then run it
 2. Non-zero exit code: do not commit. Fixing the failure and re-running is part of the task, not a stop. If the gate is still red after 3 fix attempts, stop and report it. A failure caused by the environment rather than by the code (a service that is down, a timeout while the machine is under load) is re-run once unchanged; if it fails again, stop and report it.
 3. Confirm the test count matches expectations (no tests were silently deleted or skipped)
+4. For the checks this task settles, keep Proof selectors aligned with the tests actually run;
+   copy the real passing line for a Run proof. Record check IDs with the existing gate evidence.
+   A changed selector does not authorize changing a claim or weakening a test.
 
 **Tiered gates (from the Gate Check Commands section of tasks.md):**
 
@@ -149,7 +168,13 @@ After the gate check passes:
 
 4. **Test Adequacy Review (MANDATORY - hard gate).**
 
-   A task cannot be committed or marked done until all four checks below pass. Tests must be both **necessary** (every test traces to a requirement) and **sufficient** (every requirement is covered). The scope boundary is the feature spec - do not test beyond it.
+   Follow the approved Test Coverage Matrix. If it requires tests, all four checks below apply.
+   If it permits `Tests: none`, instead produce one row per applicable criterion with the approved
+   matrix row, actual command/gesture and observed result (cite the affected artifact at `file:line`).
+   Compare that result with the spec-defined outcome; compilation alone proves only compilation.
+   Preserve existing tests and run the prescribed gate. No new test is required for this approved path.
+
+   On the tests-required path, a task cannot be committed or marked done until all four checks below pass. Tests must be both **necessary** (every test traces to a requirement) and **sufficient** (every requirement is covered). The scope boundary is the feature spec - do not test beyond it.
 
    **Check A - Sufficient coverage (per-layer depth).** Build and output this table:
 
@@ -219,7 +244,7 @@ After the gate check passes:
 
 After the gate is green, close the task record **before** creating the commit, then commit code and status together. Never leave `tasks.md` still open after a successful task commit - a crash between those steps is how resume redoes finished work.
 
-1. Mark the task complete in `tasks.md` (a fix task from the `/build-review` skill: in the "Fix Plans" section of `validation.md`). Update requirement traceability in `spec.md` if requirement IDs are used.
+1. Mark the task complete in `tasks.md`, or the persisted checks.md Execution Plan when tasks.md is absent. For a review fix, also fill its `Closed` record in validation.md with the implementing commit and proving check. When the approved fix implements an open task, close both records in this same commit; an already-complete task stays complete. Implementation closure does not claim independent review passed. Update requirement traceability in `spec.md` if requirement IDs are used.
 2. Create **one** atomic commit that includes the implementation, its tests, and those status/traceability updates.
 
 Each task gets its own commit immediately after verification. Never batch multiple tasks into one commit.
@@ -314,6 +339,12 @@ During implementation, you will notice things that could be improved, refactored
 
 **Blast radius (approval ≠ remote authority):** Approving a spec or tasks authorizes local implementation and local commits only. Before `git push`, force-push, deploy, production DB migration, or any other remote / externally visible / destructive operation, STOP and get an explicit go-ahead for that action - even if Execute was already approved.
 
+### 8b. Walk It Before You Stop (features with a screen)
+
+When the last task is done and the feature has a screen, open the running app and do what each story's **Independent Test** promises, as the user would - the clicks, not a request carrying a finished payload. Something broken that a test covers is a red test you missed; something broken that no test covers is a missing criterion: route it through the existing approved fix-plan rules; a new criterion gets a new requirement ID and check, never a silent scope change.
+
+Save each state a capture draws beside it as `captures/<capture>.running.png`, taken in a browser window at the capture's size so the page lays out as the capture does - an image resized afterwards does not. A state no capture draws gets no picture. Write the `**Walked:**` line in checks.md `## Handoff`: each story, what the screen showed, and how the user reaches each state (sign-in, data, path), so the independent Verifier can reach them too. Use only the project's authorized local test data; backend-only work skips this screen step.
+
 ### 9. Feature-Level Validation (after the LAST task - MANDATORY, always runs)
 
 When the task you just completed is the **last task of the feature**, you MUST run feature-level validation before reporting the work as done. **This is not optional and is never prompted - it runs automatically.** Do not stop at the final task's commit.
@@ -344,7 +375,7 @@ If you are unsure whether more tasks remain, check `tasks.md`: if every task is 
 ```markdown
 ## Implementing T[X]: [Task Title]
 
-**Reading**: task definition from tasks.md
+**Reading**: task definition from tasks.md, checks.md Execution Plan when Tasks was skipped, or approved validation.md Fix Plans
 **Dependencies**: [All done? ✅ | Blocked by: TY]
 **Tests**: [unit/e2e/integration/none]
 **Gate**: [quick/full/build]

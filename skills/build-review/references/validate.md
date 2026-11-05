@@ -9,7 +9,7 @@
 2. **Feature-level validation (independent Verifier sub-agent, always-on, never prompted):** After all tasks for a feature are done, validation runs automatically - the orchestrator dispatches a **fresh Verifier sub-agent** (see [sub-agents.md](sub-agents.md)). Do NOT ask the user whether to run it; it is the safety net, not an opt-in. User interaction is limited to interactive UAT (for user-facing features) and acting on a FAIL verdict ("fix these gaps now?"). The Verifier:
    - Runs **read-only** over the real implementation and tests - mutations run in a scratch/throwaway state only (see Discrimination Sensor section)
    - Scopes coverage to the feature's **git diff surface** (not the full repository)
-   - Re-derives coverage independently using **evidence-or-zero**: every AC must be traced to a `file:line` + assertion expression; a criterion with no `file:line` citation counts as NOT covered
+   - Re-derives coverage independently using **evidence-or-zero**: each AC cites `file:line` plus its exact assertion when tests are required, or the approved Tests:none row and actual command/observation when none is approved; absent outcome evidence counts as NOT covered
    - Runs the **spec-anchored outcome check** and the **discrimination sensor** (both described below)
    - Writes `.specs/features/[feature]/validation.md` with the full evidence report
    - Returns a compact verdict + ranked gap list to the orchestrator in chat
@@ -25,14 +25,14 @@
 
 ### 1. Check Completed Tasks
 
-Go through tasks.md:
+Go through tasks.md when present; otherwise use the persisted checks.md Execution Plan. On fix rounds also read the approved validation.md Fix Plans and their closure records:
 
 - [ ] All tasks marked done?
 - [ ] Any blocked or partial?
 
 ### 2. Spec-Anchored Acceptance Criteria Check
 
-For each acceptance criterion in `spec.md`, the Verifier re-derives the **spec-defined expected outcome** and confirms the test's actual assertion matches it:
+For each acceptance criterion in `spec.md`, the Verifier re-derives the **spec-defined expected outcome** and confirms its evidence matches it. Where the approved testing matrix requires tests, inspect the test's assertion. Where it permits Tests: none, cite that approved row and the actual command/observation proving the outcome; do not invent a test or count mere compilation as proof of an unrelated behavior:
 
 ```markdown
 ### P1: [Story Title]
@@ -48,7 +48,25 @@ For each acceptance criterion in `spec.md`, the Verifier re-derives the **spec-d
 
 - Where the spec defines a precise outcome (specific status code, field value, error message, state), the test assertion MUST target that exact outcome - not just that an assertion exists.
 - Where the spec does NOT define a precise outcome, mark as **⚠️ Spec-precision gap** and flag it in the report. Do NOT silently pass a vague assertion.
-- Evidence-or-zero: a criterion with no `file:line` citation counts as NOT covered.
+- Evidence-or-zero: cite `file:line` for the assertion or affected artifact, together with the actual outcome evidence; a Tests:none row also cites the approved matrix entry. No outcome evidence means NOT covered.
+
+Read checks.md alongside the spec, without replacing the all-AC table above. When tasks.md is
+absent, use the testing matrix and gate commands in checks.md throughout this file.
+
+For checks whose approved matrix requires tests, apply the following TLC judgement:
+
+**Each check's test.** For every check, open the test its proof selects - the one whose line the
+`run` proof names, or the one a lone proof's filter picks - and judge whether it would fail if the
+claim were false: it asserts the value the criterion fixes, on the cases the criterion names, at
+the layer the Test Coverage Matrix names. Write one `## Checks` row per check. A `no` is a finding:
+the test passes without holding its criterion. Look hardest where a wrong decision costs most - a
+returned value, a condition, a bound shifted by one, an order, a sign, a filter - and at rules the
+diff touched that no check names: a rule in the browser with no test is still a rule.
+
+For approved non-test, browser or walk proofs, judge the actual command/observation, saved comparison
+or performed gesture instead of a test name. Preserve the matrix's approved Tests: none path.
+Reconcile each Coverage member and each Swept landing against the spec and actual evidence;
+a missing case or a negative Holds result also becomes GAP in the existing all-AC table and FAIL.
 
 ### 3. Check Edge Cases
 
@@ -57,9 +75,17 @@ From spec.md edge cases:
 - [ ] [Edge case 1] handled correctly
 - [ ] [Edge case 2] handled correctly
 
+**Own examples.** For two rules the spec states, try a value neither the spec nor the checks name -
+the other side of a boundary, an empty set, a large one. Run each at `HEAD` as a throwaway test or a
+request. A rule that breaks on yours is a finding.
+
+**Assertions that do not hold the value.** Report the tests whose assertion is looser than the value
+the criterion fixes, that prove a rule on two cases out of nine, or that sit at another level than
+the Test Coverage Matrix names for that layer.
+
 ### 4. Run Build-Level Gate Check (MANDATORY)
 
-Run the Build-level gate check from the **Gate Check Commands** section in tasks.md. This is NOT optional.
+Run the Build-level gate check from the **Gate Check Commands** section in tasks.md, or checks.md when Tasks was skipped. This is NOT optional.
 
 1. Run: `[Build gate command from the Gate Check Commands section in tasks.md]`
 2. Non-zero exit code = STOP. Do not proceed to Code Quality Check.
@@ -77,7 +103,10 @@ Run the Build-level gate check from the **Gate Check Commands** section in tasks
 
 ### 5. Discrimination Sensor (MANDATORY - always runs after gate check passes)
 
-The sensor provides the empirical guarantee that the tests can actually detect regressions. It runs in a scratch/throwaway state - the real working tree is never modified.
+The sensor checks whether the approved verification can detect a plausible wrong outcome. Where
+the matrix requires tests, use those tests. Where it approves Tests:none, use the same prescribed
+command, browser comparison or observation against the mutated scratch; do not invent a test suite.
+It runs in a scratch/throwaway state - the real working tree is never modified.
 
 **How it works:**
 
@@ -91,10 +120,10 @@ The sensor provides the empirical guarantee that the tests can actually detect r
    - Change a return value (return a wrong status code, wrong field, zero instead of a computed value)
    - Off-by-one (shift a loop bound, change a slice index)
    - Remove a required side effect (delete a method call that the spec requires)
-4. **Run the tests** that cover the mutated code (against the scratch). Use the Quick or Full gate command from tasks.md.
-5. **Confirm the mutant is killed** (tests FAIL). Discard the scratch (remove worktree or delete temp copies).
+4. **Run the approved verification** that covers the mutated outcome against the scratch: the tests and Quick/Full command where required; the prescribed command/gesture/comparison on the Tests:none path.
+5. **Confirm the mutant is killed** (the verification detects the wrong outcome). Record actual expected/observed evidence, then discard the scratch (remove worktree or delete temp copies).
 6. **Verify isolation.** Re-run `git status --porcelain` on the real worktree and confirm it matches the baseline from step 2. If it differs, STOP - restore the real tree before continuing, and treat the sensor run as invalid.
-7. **If a mutant survives** (tests still pass after the fault), the tests are not discriminating for that behavior - add a fix task to strengthen the assertion.
+7. **If a mutant survives**, the approved verification does not discriminate that behavior: add a fix task for its assertion or verification procedure. If no relevant mutation can be exercised or observed, record the concrete blocker and stop before PASS; Tests:none is not a sensor exemption.
 
 **Tiering (proportional, not optional):**
 
@@ -133,10 +162,80 @@ For each changed file, verify against [coding-principles.md](coding-principles.m
 Skip this step for backend-only or infrastructure work. The Verifier runs it, not the author, only after the gate check and the sensor (steps 4 and 5) pass, never at the same time: both use the running app. If the tests fail, skip this step and say the photos come in the next round.
 
 1. Start the app locally, already logged in with the project's own test account (from its example or seed files).
-2. Take a photo of every screen this feature changed, at 375, 768 and 1280 px wide.
+2. Take a photo of every screen this feature changed, at 375, 768 and 1280 px wide. Also take each binding capture's comparison picture at its own viewport size and state as below; keep the three local widths even when the reference has another size. Use one app/browser at a time.
+
+The author's picture is the author's claim, and a picture taken in a wider window and resized to the
+capture's size passes as a match while the page at that size is a different layout. So open the
+running app in a browser window at each capture's size - its pixel size divided by its scale, 1x
+unless the file says otherwise - reach the state it draws the way the `**Walked:**` line says, and
+save `captures/<capture>.running.png` over the author's. Judge your own picture. With no browser, record the blocker and do not claim the mandatory independent photos passed.
 3. Look at every photo before showing it, and note each defect you see.
 4. Each defect goes into the fix plan (step 8) and makes the verdict FAIL, like an issue from the Interactive UAT.
 5. Show the photos to the user with the review result, every time, even when step 7 does not run.
+
+### 6c. Settle the TLC proofs and finish their judgement
+
+After the existing Build gate, sensor and applicable screen photos pass, write screens.md when
+a browser proof needs it, using this same independent Verifier and every current photo width.
+Do not freeze rows from an earlier round; refresh the whole affected screen review after a fix.
+The source comparison follows this inventory, copied from TLC verify-screens.md:
+
+Judge that one state. A fact that lives in another state is not a gap in this picture. A click that
+is not itself in the picture is not a gap when the resulting state is.
+
+Open the capture and its picture together. First write the capture's inventory: one row per thing it
+draws - each region, control, label and sentence, chip, state mark, line, legend entry, and the
+arrangement of each region. Then mark every row `same` or `differs`, applying what
+`## Differences from the source` lists, and for `differs` say what the picture draws instead. The
+fix covers what the rows name and nothing else, so the inventory is the whole judgement: a thing no
+row names is never checked.
+
+What counts as `differs`:
+
+- **controls** - a control the capture shows missing, or one it does not show
+- **arrangement** - not the same regions in the same places, with the same nesting
+- **copy** - visible text the capture fixes, wrong; a date that follows the day the picture was taken
+  is not wrong
+- **drawing** - an element drawn differently: a line, a border, a badge, the shape of a bar, the
+  layout of a meter or a form
+- **render** - overlapping, cut off, scrolled off the window, unreadable, or a component the rest of
+  the app does not use
+
+Exact spacing, shade and type weight are a note on a `same` row. A picture with one `differs` row
+`diverges`; otherwise it `matches`.
+
+```markdown
+# <Feature> screens
+**Round**: <1 initially, then 2/3/4 after each of at most three fix rounds>
+**HEAD**: <the commit reviewed>
+
+| Screen | Compared to | Verdict |
+| --- | --- | --- |
+| captures/<name>.running.png | <the bound capture or approved criterion actually examined> | matches / diverges - <reason> |
+
+### `captures/<name>.running.png`
+
+| Element | Result | Picture draws |
+| --- | --- | --- |
+| <each region, control, text and arrangement> | same / differs | <actual difference, applying approved departures> |
+```
+
+Record the same independent Verifier and current HEAD in screens.md. A divergence becomes a finding
+under the existing fix/approval rules. Local photos at other widths are also inspected against their
+approved responsive outcomes; they do not replace the binding comparison. Rebuild the whole inventory
+of each affected screen on every fix round; the upstream frozen-row/two-round shortcut is not imported.
+
+Record each walk in checks.md Handoff with what was done and observed. Then run, sequentially:
+
+```bash
+python3 <skill-dir>/scripts/validate_checks.py <feature>
+python3 <skill-dir>/scripts/check_proofs.py <feature>
+```
+
+Non-zero means no PASS: route the actual failure under the existing fix/approval rules.
+Reconcile every resulting proof with the step-2 judgement at this HEAD before writing the report.
+Keep browser comparison judgements independent; a screenshot's existence alone is not a match.
+This ordering preserves tests-before-photos and avoids requiring screens.md before its reviewer runs.
 
 ### 7. Interactive UAT (if user-facing feature)
 
@@ -179,6 +278,12 @@ For each issue found during UAT, in the photos (step 6b), by the Verifier, or in
    - Verify: How to prove the fix works
    - Done when: Acceptance criteria for the fix
 3. **Present fix plan** - Show all fix tasks to user for approval
+4. **Close each fix** - Whoever fixes fills `Closed` with the commit that fixes it, then the check that now proves it; an item the user refused carries `Refused` with the user's words instead. A fix that needs a new criterion appends it to the spec with a new requirement ID and a check - never edits an approved one.
+
+Keep checks.md in sync with approved fixes: cite the existing check, or append a new check for
+an approved new criterion without rewriting an approved claim. Preserve each finding's closure or
+verbatim Refused decision in the Findings index across reports; the index links to the existing
+Fix Plans, it is not a second fix plan. Re-run the fresh Verifier and both gates after each fix.
 
 Fix tasks follow the same format as regular tasks and are executed by the `/implementar` skill.
 
@@ -191,7 +296,7 @@ After all checks complete, the Verifier MUST:
 1. **Write the persisted report** to `.specs/features/[feature]/validation.md` (see template below). This file is the evidence artifact - it survives the session and can be referenced by CI, reviewers, or future agents.
 2. **Return a compact summary in chat** to the orchestrator (see Compact Chat Summary section below). The orchestrator surfaces it to the user and routes any ranked gaps to fix tasks.
 
-**Deterministic backing (run it, do not eyeball it).** After writing the report, run `python3 <skill-dir>/scripts/validate_state.py <feature>`. It confirms the report is real - present, with a `**Verdict**:` line filled to PASS, backed by at least one `file:line` evidence citation, and not contradicted by its own tables (a mutant marked survived, or an acceptance criterion whose Result is neither PASS nor a spec-precision gap) - so a missing, hollow, placeholder, FAIL or self-contradicting report cannot slip through as done. A non-zero exit means the feature is NOT done: repair the report or route the FAIL gaps to fix tasks, then re-run. This is the closing gate of Execute and runs automatically, the same way the lessons layer runs at distillation; it is never a manual step. If no code-execution tool is available, confirm the same by reading `validation.md`.
+**Deterministic backing (run it, do not eyeball it).** After writing the report, run `python3 <skill-dir>/scripts/validate_state.py <feature>` and then `python3 <skill-dir>/scripts/validate_verification.py <feature>`. Both must pass; the latter checks TLC proofs and Findings and does not replace the existing gate. Always pass this feature explicitly, never a historical sweep. It confirms the report is real - present, with a `**Verdict**:` line filled to PASS, backed by at least one `file:line` evidence citation, and not contradicted by its own tables (a mutant marked survived, or an acceptance criterion whose Result is neither PASS nor a spec-precision gap) - so a missing, hollow, placeholder, FAIL or self-contradicting report cannot slip through as done. A non-zero exit means the feature is NOT done: repair the report or route the FAIL gaps to fix tasks, then re-run. This is the closing gate of Execute and runs automatically, the same way the lessons layer runs at distillation; it is never a manual step. If no code-execution tool is available, confirm the same by reading `validation.md`.
 
 ### 10. Distill Lessons (MANDATORY when validation.md has signal)
 
@@ -228,6 +333,23 @@ The Verifier returns this block to the orchestrator after completing all checks:
 **Spec**: `.specs/features/[feature]/spec.md`
 **Diff range**: [commit range or branch..HEAD]
 **Verifier**: independent sub-agent (author ≠ verifier)
+**Proofs**: `proofs.md` at <sha>
+**HEAD**: <the code commit independently reviewed>
+
+## Checks
+
+| Check | Test | Holds |
+| --- | --- | --- |
+| C1 | <file and selected test, or approved command/browser/walk evidence> | yes / no - <reason> |
+
+## Findings
+
+| Finding | Evidence | Fix | Closed | Refused |
+| --- | --- | --- | --- | --- |
+| <issue> | <actual evidence> | <link to its existing Fix Plan> | <closing commit and check> | <user's exact refusal, or -> |
+
+With no findings: replace the table with `None - <what was probed>`.
+On later rounds retain earlier findings and their closure/refusal, then append new ones.
 
 ---
 
@@ -317,6 +439,7 @@ The Verifier returns this block to the orchestrator after completing all checks:
 - **Root cause**: [What's actually wrong]
 - **Fix task**: [Task definition]
 - **Priority**: [Blocker/Major/Minor/Cosmetic]
+- **Closed**: [the commit that fixes it and the check that now proves it]
 
 ---
 

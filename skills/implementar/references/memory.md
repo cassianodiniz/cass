@@ -127,11 +127,11 @@ Both are silent data loss. The section-scoped write rule is the single correctne
    - Current branch vs Handoff `Branch`
    - `git status --porcelain` (uncommitted / unexpected paths)
    - Recent commits on the branch (messages and touched files)
-   - `tasks.md` completion marks and, when present, gate evidence / commit references
+   - `tasks.md` completion marks, or checks.md Execution Plan when Tasks was skipped; also validation.md Fix Plan closures on fix rounds, with gate evidence / commit references
 5. **Resolve conflicts with evidence, not narrative:**
-   - A task with a green gate and an atomic commit already on the branch → do **not** redo it; mark it complete in `tasks.md` if the file still shows it open, then continue from the next incomplete task
+   - A task with a green gate and an atomic commit already on the branch → do **not** redo it; mark it complete in tasks.md (or checks.md Execution Plan when absent) if still open; for an approved review fix, reconcile its validation.md closure too, then continue from the next incomplete task
    - Partial unverified work in the working tree → preserve it, re-run the relevant gate, then finish the status+commit cycle
-   - Stale or missing Handoff → rebuild next-step from git + `tasks.md`, then propose that to the user
+   - Stale or missing Handoff → rebuild next-step from git + the persisted task/step and applicable Fix Plan records, then propose that to the user
    - Unexplained local changes you cannot map to the current task → STOP and ask; do not discard them
 6. Propose the reconciled next step to the user before writing any code.
 

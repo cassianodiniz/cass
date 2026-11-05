@@ -78,6 +78,58 @@ Write every acceptance criterion in **EARS** (Easy Approach to Requirements Synt
 
 **Rules:** one requirement per criterion (never bundle two behaviors); use concrete values (a specific status code, a specific message, a bound) rather than "quickly" or "gracefully"; every criterion contains a SHALL and is measurable. `python3 <skill-dir>/scripts/validate_spec.py` flags any criterion without a SHALL and any that matches no recognized pattern.
 
+### 3b. Walk the surfaces
+
+Each kind of surface carries the same decisions every time. Walk the row for every surface this
+feature exposes; each item becomes a criterion, an existing behaviour you name, or nothing to
+decide. There is no table for it in the plan.
+
+| Surface | The decisions it always has |
+| --- | --- |
+| a screen or view | empty, loading, error and unauthorised states; ordering of content; the window widths it must work at - the captures' sizes, or asked when no capture settles it; what a long list or a wide table does - what scrolls and what stays in view; what a destructive action confirms; what each control does when used - who acts, which control, what the page shows afterwards |
+| an API or webhook | response shape, error shape with its codes, who may call it, versioning, rate limit behaviour |
+| a command or scheduled task | output format, every flag and its default, exit codes, what it prints when it fails halfway |
+| a document or copy | structure, tone, depth, what the reader does next |
+| a collection being organised | grouping, naming, ordering, duplicates, the exception that does not fit |
+
+The two that hide best: the error shape (decided by whoever writes the first handler) and the empty
+state (invisible until a new account opens the page). State, persistence and contracts are the
+implicit-requirement dimensions above, not this list. (From tlc-spec-lean 2.2.0, `references/plan.md`.)
+
+### 3c. Binding screen references
+
+**Which references bind.** A capture, screenshot, design frame or live site that comes with the
+request binds: it is the result the user expects, and the user does not have to say so. It is
+`non-binding` only when the user called it inspiration, and its `Sources` line quotes them:
+`non-binding - user: "<their words>"`. Something the source draws that the stored model cannot hold
+- a code, a field - is a departure you ask about, never a reason to make the source non-binding.
+
+**A binding source lives in files.** Export each frame or state to
+`.specs/features/[feature]/captures/` and show each one on its `Sources` line,
+`![<name>](captures/<file>) - binding - <what it draws>`, so whoever approves sees the screen.
+
+**A screen with a binding source points at it.** Each screen or state the source draws gets one
+criterion naming the gesture that reaches it and its capture file:
+
+```
+3. WHEN a member uses "Update card" THEN the system SHALL show the form in
+   `.specs/features/billing/captures/card-form.png`
+```
+
+The builder matches the image for composition and look. Do not retype the screen into criteria;
+add criteria for what the source cannot show: what a control does, states nobody captured, the rules
+behind a form. Labels and sentences the capture draws are copied character for character; its sample
+data - names, quantities, dates - is not transcribed: the builder recreates it with the capture open.
+
+**Departing from a binding source is the user's call.** Removing, renaming or changing something it
+draws is asked, with your recommendation. The answer becomes an `AD-NNN` in `.specs/STATE.md` whose
+rationale quotes the question and the option chosen, and each departure gets a row in
+`## Differences from the source` citing it. Show these with the other planning documents in the
+single plan approval; never record an answer or approval the user did not give.
+
+**A screen with no reference gets outcomes, not layout.** Say what a user can see and do, never where
+things sit; layout is the builder's call, held to the design system.
+
 ### 4. Requirement Closure Gate (before confirm)
 
 Before presenting the spec for confirmation, run the four checks below. The spec is not presentable for confirmation until every item is resolved or assumption-logged - this is the guarantee that no requirement leaves the spec silently unclear.
@@ -86,9 +138,9 @@ Before presenting the spec for confirmation, run the four checks below. The spec
 
 1. **Unambiguity + precision (hard).** Every AC must (a) have a single interpretation and (b) define a precise, spec-defined expected outcome. Any AC that fails either check: resolve with the user, split it, or log it as an explicit assumption with the chosen interpretation and rationale. No AC proceeds readable two ways or with an undefined outcome.
 
-2. **Open-questions / assumptions closure.** Enumerate every unresolved decision that surfaced during clarification. Each must be either (a) resolved with the user OR (b) recorded as an **assumption** (chosen default + rationale) in the spec's Assumptions & Open Questions section. Nothing proceeds unmarked.
+2. **Open-questions / assumptions closure.** Enumerate every unresolved decision that surfaced during clarification. A decision that is the user's - scope, product behaviour, a departure from a binding source - is asked before the spec is presented, with your recommendation; when nobody is there to answer, end your turn with the questions. An assumption never stands in for one of those to save a question. Only a default the code settles, or one the user delegated ("you decide"), is recorded as an **assumption** (chosen default + rationale). Nothing proceeds unmarked.
 
-3. **Declined gray areas become assumptions.** Any gray area the user declined to discuss or that went undiscussed is written to the spec's Assumptions & Open Questions section (agent's chosen default + rationale) - never silently dropped. See [discuss.md](discuss.md).
+3. **Declined gray areas become assumptions.** A gray area the user declined to discuss is written to the spec's Assumptions & Open Questions section (agent's chosen default + rationale, `user declined`) - never silently dropped. See [discuss.md](discuss.md).
 
 4. **Every sentence of the request lands somewhere.** Read the request again, one sentence at a time: each one lands on a criterion, an `Out of scope` row or an open question. A sentence that lands nowhere is the requirement that goes missing, and nobody downstream reads the request again. (From tlc-spec-lean 2.1.0, `references/plan.md`.)
 
@@ -210,6 +262,21 @@ Each requirement gets a unique ID for tracking across design, tasks, and validat
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
 **Coverage:** X total, Y mapped to tasks, Z unmapped ⚠️
+
+---
+
+## Differences from the source
+
+Only when a source binds. Every way the product departs from what it draws, each one approved.
+
+| Source shows | Product shows | Confirmed |
+| ------------ | ------------- | --------- |
+| [label, control or state in the capture] | [what the product shows instead, or nothing] | y - [AD-NNN] |
+
+## Sources
+
+- [ticket or document] - [what it settles]
+- ![[capture]](captures/[capture].png) - binding - [what it draws]
 
 ---
 

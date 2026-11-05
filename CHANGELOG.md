@@ -2,6 +2,13 @@
 
 ## Não lançado
 
+## 4.9.0 — 2026-11-05
+
+- Adiciona `design-critique`, preservada integralmente da pasta Design-1.2.0-v1 fornecida pelo autor.
+- Sincroniza `spec-plan`, `implementar`, `gpt-implementar` e `build-review` com as versões instaladas do repositório skills-cassiano: núcleo Lean, compatibilidade LEGACY, delegação, referências, scripts e licenças.
+- Atualiza apresentação das quatro entradas e inclui a nova skill no catálogo e na instalação. Desenhos anteriores continuam em docs como material histórico; as seções atualizadas apontam para as instruções atuais.
+
+
 - `spec-plan`: um sim só, no fim do planejamento, em vez de um sim por documento. Mensagem de aprovação curta, com fluxograma Mermaid na spec, no pedido de sim e na PR. Cada frase do pedido vira critério, fora de escopo ou pergunta. As ferramentas de cada tarefa entram na mesma mensagem. Só para antes por custo, segurança ou comportamento.
 - `implementar` e `gpt-implementar`: quem constrói conserta o próprio erro de teste e só para depois de 3 tentativas; falha de ambiente roda de novo uma vez; peça não listada pode ser estendida, só acrescentando e sem mudar os outros usos, com anotação em `tasks.md` e no commit; teste antigo que a spec aprovada mudou é atualizado no mesmo commit. O pedido de cada lote leva as notas de ambiente.
 - `build-review` e `spec-plan`: conferidores com trechos da `tlc-spec-lean`. O `validate_state` lê só a linha `**Verdict**:`, confere as tabelas do relatório e responde 2 quando não há o que conferir; o `validate_spec` confere de fato os critérios de aceite e ignora blocos de código.
