@@ -7,24 +7,19 @@ are each closed by a commit. That is prose a long trajectory quietly drops, so t
 pass/fail run as the closing step. It reads the artifacts, never the target codebase.
 
 What it checks:
-  ERROR  - no validation.md, or no proofs.md (run check_proofs.py)
+  ERROR  - no verification.md, or no proofs.md (run check_proofs.py)
   ERROR  - proofs.md written at another commit than HEAD, or over uncommitted changes
   ERROR  - a check in checks.md with no row in proofs.md, or a row that is not `pass`
   ERROR  - checks.md names `Build:` commands and proofs.md has no Build row, or one that failed
-  ERROR  - no `## Checks` table in validation.md, a check with no row in it, or a row with no test
-  ERROR  - no `## Findings` section in validation.md, or a finding with no commit in `Closed`
-  ERROR  - pictures owed (a criterion cites a capture, or a check is proven in the browser) and no
-           screens.md, a row in it that does not read `matches`, a cited capture with no
-           `<capture>.running.png`, or a picture at another size than its capture (1x, 2x, 3x pass)
-  ERROR  - a browser proof that names no `.running.png`, or one that is not on disk
+  ERROR  - no `## Checks` table in verification.md, a check with no row in it, or a row with no test
+  ERROR  - no `## Findings` section in verification.md, or a finding with no commit in `Closed`
   ERROR  - a `walk` proof and no `**Walked:**` line in the Handoff
-  ERROR  - spec.md with no `**Approved**: <date> - user: "<their words>"` line
-  ERROR  - screens.md with no `**Round**:` line or past round 4 (initial review plus three fixes), no `**HEAD**`, or code changed after
-           the HEAD it judged
+  ERROR  - plan.md (or checks.md without a plan) with no actual `**Approved**:` authorization
+  ERROR  - verification.md names no reviewed HEAD, code changed since it, or Fixes is not 0..3
   WARN   - the report says self-verified (author == verifier: a degraded gate)
 
 Usage:
-  python3 <skill-dir>/scripts/validate_verification.py [feature] [--root DIR] [--strict]
+  python3 <build-review>/scripts/validate_verification.py [feature] [--root DIR] [--strict]
 
   Pass --root when cwd is not the project that contains .specs/.
 
@@ -37,20 +32,20 @@ import re
 import subprocess
 import sys
 
-from lean_config import _section, plan_approved, plan_marks_binding, plan_owes_pictures
-from check_proofs import dirty_paths
-from validate_checks import PLACEHOLDER_RE
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "spec-plan", "scripts"))
+from lean_config import _section, plan_approved
 
 PROOF_RE = re.compile(r"^\**\s*Proof\s*\**\s*:\s*(.+)$", re.IGNORECASE)
-RUNNING_SUFFIX = ".running.png"
-ROUND_RE = re.compile(r"^\**\s*Round\s*\**\s*:\s*\**\s*(\d+)", re.IGNORECASE)
 JUDGED_HEAD_RE = re.compile(r"^\**\s*HEAD\s*\**\s*:\s*\**\s*`?([0-9a-f]{7,40})", re.IGNORECASE)
-MAX_ROUNDS = 4
-BROWSER_PROOF_RE = re.compile(r"^`?browser\b", re.IGNORECASE)
+FIXES_RE = re.compile(r"^\**\s*Fixes\s*\**\s*:\s*(\d+)\s*$", re.IGNORECASE)
+MAX_CODE_FIXES = 3
+# Local compatibility: F's explicit user refusal, stored in Lean's existing Closed cell.
+REFUSED_RE = re.compile(r'^Refused\s*-\s*user:\s*(?:"([^"\r\n]+)"|“([^“”\r\n]+)”)\s*$', re.IGNORECASE)
+EMPTY_CELL = {"", "-", "—", "–", "none", "n/a", "na", "nothing"}
+SURVIVED_RE = re.compile(r"\b(no|survived|alive|not killed)\b", re.IGNORECASE)
+VERDICT_LINE_RE = re.compile(r"^\**verdict\**\s*:", re.IGNORECASE)
 WALK_PROOF_RE = re.compile(r"^`?walk\b", re.IGNORECASE)
 WALKED_RE = re.compile(r"^\s*[-*]?\s*\**walked\**\s*:", re.IGNORECASE)
-SHOT_RE = re.compile(r"[\w./-]+\.running\.png")
-CAPTURE_RE = re.compile(r"`([^`\s]+\.(?:png|jpe?g|webp|gif))`", re.IGNORECASE)
 
 
 def _feature_dirs(root):
@@ -110,85 +105,10 @@ def _read(path):
 
 
 def _plan_lines(fdir):
-    path = os.path.join(fdir, "spec.md")
+    path = os.path.join(fdir, "plan.md")
     if not os.path.exists(path):
         return []
     return strip_fences(_read(path))
-
-
-def _image_size(path):
-    """(width, height) of a PNG or JPEG file, or None when the header is not one of those."""
-    try:
-        with open(path, "rb") as f:
-            data = f.read(65536)
-    except OSError:
-        return None
-    if data[:8] == b"\x89PNG\r\n\x1a\n" and len(data) >= 24:
-        return int.from_bytes(data[16:20], "big"), int.from_bytes(data[20:24], "big")
-    if data[:2] == b"\xff\xd8":
-        i = 2
-        while i + 9 < len(data):
-            if data[i] != 0xFF:
-                i += 1
-                continue
-            marker = data[i + 1]
-            if 0xC0 <= marker <= 0xCF and marker not in (0xC4, 0xC8, 0xCC):
-                return int.from_bytes(data[i + 7:i + 9], "big"), int.from_bytes(data[i + 5:i + 7], "big")
-            i += 2 + int.from_bytes(data[i + 2:i + 4], "big")
-    return None
-
-
-def _same_layout(picture, capture):
-    """A picture matches a capture's size at 1x, 2x or 3x - the same layout at another pixel ratio."""
-    return any(picture == (capture[0] * k, capture[1] * k) for k in (1, 2, 3))
-
-
-def _picture_sizes(fdir, root, cited, name):
-    """A picture judged against a capture is taken at the capture's size: a wider window lays the
-    page out differently, so the judge compares a layout the capture never drew."""
-    errors = []
-    for cap in cited:
-        path = os.path.join(root, cap)
-        twin = os.path.splitext(path)[0] + RUNNING_SUFFIX
-        c, r = _image_size(path), _image_size(twin)
-        if c and r and not _same_layout(r, c):
-            errors.append(
-                f"{name}: `{os.path.basename(twin)}` is {r[0]}x{r[1]} and its capture is {c[0]}x{c[1]} - take "
-                f"the picture at the capture's size"
-            )
-    return errors
-
-
-def _screen_evidence(fdir, plan, name):
-    """The builder's comparison left files behind: a running screenshot per capture.
-
-    This judges nothing about the screens - the screens sub-agent's `screens.md` does that. It only
-    makes "the screen was saved" something a file shows, so a build that skipped the UI cannot pass.
-    """
-    errors = []
-    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(fdir))))
-    running = set()
-    for dirpath, _, files in os.walk(fdir):
-        running |= {f for f in files if f.endswith(RUNNING_SUFFIX)}
-    if not running:
-        errors.append(
-            f"{name}: the feature has a screen but no `*{RUNNING_SUFFIX}` sits under the feature folder - "
-            f"the builder saves a screenshot of each screen it compared"
-        )
-    cited = sorted({c for ln in plan for c in CAPTURE_RE.findall(ln) if not c.endswith(RUNNING_SUFFIX)})
-    for cap in cited:
-        path = os.path.join(root, cap)
-        if not os.path.isfile(path):
-            continue
-        twin = os.path.splitext(os.path.basename(cap))[0] + RUNNING_SUFFIX
-        if not os.path.isfile(os.path.splitext(path)[0] + RUNNING_SUFFIX) and twin not in running:
-            errors.append(
-                f"{name}: the capture `{cap}` has no `{twin}` beside it - the running screen was "
-                f"never set next to the picture it has to match"
-            )
-    errors += _picture_sizes(fdir, root, cited, name)
-    errors += _browser_shots(fdir, name, running)
-    return errors
 
 
 def _code_changed_since(root, sha):
@@ -206,52 +126,6 @@ def _code_changed_since(root, sha):
     return [f for f in p.stdout.split() if not f.startswith(".specs/")]
 
 
-def _screens_verdicts(fdir, name):
-    """screens.md is the screens sub-agent's verdict; a PASS cannot stand beside a screen that diverges.
-
-    The verdict holds only for the code it judged: a commit that changes code after the judged HEAD
-    is a screen nobody looked at.
-    """
-    path = os.path.join(fdir, "screens.md")
-    tables, lines = [], []
-    if os.path.exists(path):
-        lines = strip_fences(_read(path))
-        tables = [(h, rows) for h, rows in find_tables(lines)
-                  if column(h, "verdict") is not None and column(h, "screen") is not None]
-    if not tables:
-        return [
-            f"{name}: the feature has a screen but there is no `screens.md` with a Screens table - each "
-            f"picture is judged by a screens sub-agent on controls, arrangement, copy, drawing and render "
-            f"(verify-screens.md)"
-        ]
-    errors = []
-    rounds = [int(m.group(1)) for m in (ROUND_RE.match(ln.strip()) for ln in lines) if m]
-    if not rounds:
-        errors.append(f"{name}: screens.md has no `**Round**:` line - record initial review as 1 and fixes as 2 to 4")
-    elif rounds[0] > MAX_ROUNDS:
-        errors.append(f"{name}: screens.md reads `**Round**: {rounds[0]}` - after three fix rounds it goes to the user")
-    judged = next((m.group(1) for m in (JUDGED_HEAD_RE.match(ln.strip()) for ln in lines) if m), None)
-    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(fdir))))
-    if not judged:
-        errors.append(f"{name}: screens.md names no `**HEAD**` - the screens sub-agent writes the commit it judged")
-    else:
-        changed = _code_changed_since(root, judged)
-        if changed:
-            errors.append(
-                f"{name}: screens.md judged {judged} and code changed since ({', '.join(changed[:4])}) - the "
-                f"Verifier judges again at HEAD; after three fix rounds it goes to the user")
-    for header, rows in tables:
-        verdict_col = column(header, "verdict")
-        for r in rows:
-            if verdict_col < len(r) and not r[verdict_col].lower().startswith("match"):
-                errors.append(
-                    f"{name}: PASS but the screen '{r[0][:40]}' reads '{r[verdict_col][:40]}' in screens.md - "
-                    f"a missing control, another arrangement, wrong copy or an element drawn differently "
-                    f"fails like a red proof"
-                )
-    return errors
-
-
 def _walk_logged(checks_lines, name):
     """A `walk` proof's evidence is the author's `**Walked:**` line; with none, nothing was visited."""
     walks = [ln for ln in checks_lines
@@ -262,33 +136,6 @@ def _walk_logged(checks_lines, name):
             f"the visit the proof names is not on record"
         ]
     return []
-
-
-def _browser_shots(fdir, name, running):
-    """Every browser proof names a screenshot that exists. The screens sub-agent judges that picture."""
-    errors = []
-    cpath = os.path.join(fdir, "checks.md")
-    if not os.path.exists(cpath):
-        return errors
-    lines = strip_fences(_read(cpath))
-    for ln in lines:
-        match = PROOF_RE.match(ln.strip())
-        if not match or not BROWSER_PROOF_RE.match(match.group(1).strip()):
-            continue
-        shots = SHOT_RE.findall(match.group(1))
-        if not shots:
-            errors.append(
-                f"{name}: a browser proof names no `.running.png` - the screens sub-agent judges the saved "
-                f"picture, and a check with no picture is unproven"
-            )
-            continue
-        for rel in shots:
-            saved = os.path.isfile(os.path.join(fdir, rel)) or os.path.basename(rel) in running
-            if not saved:
-                errors.append(
-                    f"{name}: browser proof names `{rel}`, which is not under the feature folder"
-                )
-    return errors
 
 
 CHECK_ID_RE = re.compile(r"^\**\s*(C\d+)\s*\**\s*[-–—:]")
@@ -303,9 +150,29 @@ def _git_head(root):
     return p.stdout.strip() if p.returncode == 0 else None
 
 
+def _verdict(lines):
+    """Return 'pass', 'fail', 'unfilled', or None."""
+    candidates = [
+        ln for ln in lines
+        if re.search(r"^\**verdict\**\s*:", ln.strip(), re.IGNORECASE)
+        or re.search(r"^#{1,4}\s*validation\b", ln.strip(), re.IGNORECASE)
+    ]
+    hay = " ".join(candidates) if candidates else "\n".join(lines)
+    has_pass = re.search(r"\bPASS\b", hay, re.IGNORECASE) is not None
+    has_fail = re.search(r"\bFAIL\b", hay, re.IGNORECASE) is not None
+    if has_pass and has_fail:
+        # Both present on the verdict line = unfilled template "[PASS | FAIL]".
+        return "unfilled"
+    if has_pass:
+        return "pass"
+    if has_fail:
+        return "fail"
+    return None
+
+
 def _check_with_proofs(fdir, name, lines, checks_lines):
     """The report format where check_proofs.py ran the proofs: proofs.md holds the evidence,
-    validation.md the Verifier's judgement of each check and its findings, each closed by a commit."""
+    verification.md the Verifier's judgement of each check and its findings, each closed by a commit."""
     errors, warnings = [], []
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(fdir))))
     plines = strip_fences(_read(os.path.join(fdir, "proofs.md")))
@@ -316,11 +183,7 @@ def _check_with_proofs(fdir, name, lines, checks_lines):
     if not m:
         errors.append(f"{name}: proofs.md names no `**HEAD**` - run check_proofs.py again")
     elif head and not (head.startswith(m.group(1)) or m.group(1).startswith(head)):
-        changed = _code_changed_since(root, m.group(1))
-        if changed is None or changed:
-            errors.append(f"{name}: code changed after proofs.md at {m.group(1)} - run check_proofs.py again")
-    if dirty_paths(root):
-        errors.append(f"{name}: code has uncommitted changes - commit it and renew proofs/review")
+        errors.append(f"{name}: proofs.md was written at {m.group(1)} and HEAD is {head} - run check_proofs.py again")
 
     tree = re.search(r"\*\*Tree\*\*\s*:\s*(\S+)", pbody)
     if tree and tree.group(1).lower().startswith("dirty"):
@@ -351,37 +214,82 @@ def _check_with_proofs(fdir, name, lines, checks_lines):
             if check < len(r):
                 judged[r[check].strip("*` ")] = r[test].strip() if test < len(r) else ""
     if ids and not judged:
-        errors.append(f"{name}: validation.md has no `## Checks` table - the Verifier opens the test each check's "
+        errors.append(f"{name}: verification.md has no `## Checks` table - the Verifier opens the test each check's "
                       f"proof selects and writes whether it holds the criterion")
     elif judged:
         for cid in sorted(ids, key=lambda c: int(c[1:])):
             if cid not in judged:
-                errors.append(f"{name}: validation.md `## Checks` has no row for {cid} - judge its test against "
+                errors.append(f"{name}: verification.md `## Checks` has no row for {cid} - judge its test against "
                               f"the criterion")
             elif judged[cid] in ("", "-"):
-                errors.append(f"{name}: validation.md `## Checks` row {cid} names no test - write the test the "
+                errors.append(f"{name}: verification.md `## Checks` row {cid} names no test - write the test the "
                               f"proof selects, file and name")
 
     findings = _section(lines, "Findings")
     if not findings:
-        errors.append(f"{name}: validation.md has no `## Findings` section (write `None - <why>` when empty)")
+        errors.append(f"{name}: verification.md has no `## Findings` section (write `None - <why>` when empty)")
+    finding_rows = {}
     for header, rows in find_tables(findings):
         closed = column(header, "closed")
-        refused = column(header, "refused")
+        finding = header.index("finding") if "finding" in header else None
         for r in rows:
-            if (refused is not None and refused < len(r) and r[refused].strip() not in ("", "-")
-                    and not PLACEHOLDER_RE.match(r[refused].strip())):
-                continue  # Existing policy: the user's explicit refusal, recorded verbatim.
-            if closed is None or closed >= len(r) or not SHA_RE.search(r[closed]):
-                errors.append(f"{name}: finding '{r[0][:50]}' is not closed - fix it and write the commit in `Closed`")
+            cell = r[closed].strip() if closed is not None and closed < len(r) else ""
+            refusal = REFUSED_RE.fullmatch(cell)
+            refused = bool(refusal and any(s and s.strip() for s in refusal.groups()))
+            if finding is not None and finding < len(r):
+                finding_rows.setdefault(r[finding], []).append(refused)
+            # F permits an actual user refusal instead of a fix; the local wrapper keeps
+            # that decision in Closed, not F's separate Refused column.
+            if re.match(r"^Refused\b", cell, re.IGNORECASE):
+                if refused:
+                    continue
+                closed_by_commit = False
+            else:
+                closed_by_commit = bool(SHA_RE.search(cell))
+            if not closed_by_commit:
+                errors.append(f"{name}: finding '{r[0][:50]}' is not closed - write the fixing commit or the "
+                              "user's actual quoted refusal in `Closed`")
+    # Preserve F's survivor contradiction guard without requiring a sensor table or count.
+    if any(VERDICT_LINE_RE.search(ln.strip()) for ln in lines) and _verdict(lines) == "pass":
+        sensor_tables = [(h, rows) for h, rows in find_tables(lines)
+                         if column(h, "killed") is not None]
+        fault_counts = {}
+        for header, rows in sensor_tables:
+            fault = header.index("fault") if "fault" in header else None
+            if fault is not None:
+                for r in rows:
+                    if fault < len(r):
+                        fault_counts[r[fault]] = fault_counts.get(r[fault], 0) + 1
+        # The gate reads the report's own tables and refuses a verdict its rows contradict.
+        for header, rows in sensor_tables:
+            killed = column(header, "killed")
+            fault = header.index("fault") if "fault" in header else None
+            if killed is not None:
+                for r in rows:
+                    if killed >= len(r):
+                        continue
+                    cell = r[killed]
+                    if cell.lower() in EMPTY_CELL and cell.lower() != "no":
+                        continue
+                    if SURVIVED_RE.match(cell) or "survived" in cell.lower():
+                        # Only this uniquely identified fault's own quoted refusal can
+                        # settle its survivor. Other findings and ambiguous labels cannot.
+                        label = r[fault] if fault is not None and fault < len(r) else ""
+                        if (label and fault_counts.get(label) == 1
+                                and finding_rows.get(label) == [True]):
+                            continue
+                        errors.append(
+                            f"{name}: PASS but a mutant survived ({r[0][:50]}) - the assertion would "
+                            f"pass under a plausible wrong implementation"
+                        )
     return errors, warnings
 
 
 def _check_feature(fdir, name):
     errors, warnings = [], []
-    if not os.path.exists(os.path.join(fdir, "validation.md")):
+    if not os.path.exists(os.path.join(fdir, "verification.md")):
         errors.append(
-            f"{name}: no validation.md - the feature is not done until a fresh Verifier "
+            f"{name}: no verification.md - the feature is not done until a fresh Verifier "
             f"(author != verifier) writes its findings over <feature base>..HEAD"
         )
     if not os.path.exists(os.path.join(fdir, "proofs.md")):
@@ -389,30 +297,47 @@ def _check_feature(fdir, name):
     if errors:
         return errors, warnings
 
-    lines = strip_fences(_read(os.path.join(fdir, "validation.md")))
+    lines = strip_fences(_read(os.path.join(fdir, "verification.md")))
     cpath = os.path.join(fdir, "checks.md")
     checks_lines = strip_fences(_read(cpath)) if os.path.exists(cpath) else []
     errors, warnings = _check_with_proofs(fdir, name, lines, checks_lines)
+    verdicts = [
+        VERDICT_LINE_RE.sub("", ln.strip()).strip().upper()
+        for ln in lines if VERDICT_LINE_RE.search(ln.strip())
+    ]
+    if verdicts != ["PASS"]:
+        errors.append(f"{name}: verification.md needs an explicit `**Verdict**: PASS`")
+    # Mechanical proofs at HEAD do not replace judgement on the corrected code.
+    fixes = next((int(m.group(1)) for m in (FIXES_RE.match(ln.strip()) for ln in lines) if m), None)
+    if fixes is None or fixes > MAX_CODE_FIXES:
+        errors.append(f"{name}: verification.md needs `**Fixes**: 0..3` - initial review plus at most three "
+                      "code fix-to-review iterations; remaining failures go to the user")
     judged = next((m.group(1) for m in (JUDGED_HEAD_RE.match(ln.strip()) for ln in lines) if m), None)
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(fdir))))
-    changed = _code_changed_since(root, judged) if judged else None
-    if changed is None or changed:
-        errors.append(f"{name}: validation.md needs an independent review at the current code HEAD")
+    head = _git_head(root)
+    unknown = any(re.match(r"^\**\s*HEAD\s*\**\s*:\s*unknown\s*$", ln.strip(), re.IGNORECASE) for ln in lines)
+    if not judged and not (head is None and unknown):
+        errors.append(f"{name}: verification.md names no reviewed `**HEAD**` - a fresh Verifier records it")
+    if head is None:
+        warnings.append(f"{name}: no git HEAD - independent review freshness cannot be checked (degraded)")
+    elif judged:
+        changed = _code_changed_since(root, judged)
+        if changed is None or changed:
+            errors.append(f"{name}: verification.md needs a fresh independent review at the current code HEAD")
     if "self-verified" in "\n".join(lines).lower():
-        warnings.append(f"{name}: validation.md says self-verified - author == verifier, a degraded gate")
+        warnings.append(f"{name}: verification.md says self-verified - author == verifier, a degraded gate")
     plan = _plan_lines(fdir)
-    if plan and not plan_approved(plan):
-        errors.append(f"{name}: spec.md has no `**Approved**: <YYYY-MM-DD> - user: \"<their words>\"` line - the "
-                      f"plan is approved by the user, in their words, before the checks")
-    if plan_owes_pictures(plan, checks_lines):
-        errors += _screens_verdicts(fdir, name)
-        errors += _screen_evidence(fdir, plan, name)
+    approval = plan if os.path.isfile(os.path.join(fdir, "plan.md")) else checks_lines
+    if not plan_approved(approval):
+        document = "plan.md" if os.path.isfile(os.path.join(fdir, "plan.md")) else "checks.md"
+        errors.append(f"{name}: {document} has no `**Approved**: <YYYY-MM-DD> - user: \"<their words>\"` line - "
+                      "record the user's actual authorization before code")
     errors += _walk_logged(checks_lines, name)
     return errors, warnings
 
 
 def _appears_complete(fdir):
-    if os.path.exists(os.path.join(fdir, "validation.md")):
+    if os.path.exists(os.path.join(fdir, "verification.md")):
         return True
     checks = os.path.join(fdir, "checks.md")
     if not os.path.exists(checks):

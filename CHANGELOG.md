@@ -2,6 +2,11 @@
 
 ## Não lançado
 
+- Sincroniza `spec-plan`, `implementar`, `gpt-implementar` e `build-review` com as versões de 12/11/2026 do repositório skills-cassiano.
+- Sai o caminho antigo (`spec.md`/`tasks.md`, os `LEGACY.md` e os arquivos usados só por eles): a feature fica só com `plan.md` e `checks.md`. Créditos de licença passam para `CREDITS.md` em cada skill.
+- `spec-plan`: antes da primeira pergunta, explora o código em volta do pedido com um agente auxiliar, quando a sessão ainda não leu aquele código. Três guias de arquitetura de Matt Pocock entram em `references/skills/` (desenho de módulos, exploração e vocabulário do domínio). O plano nomeia cada regra de outra área de que depende e onde ela mora; regra escrita em vários lugares vira pergunta ao usuário.
+- `implementar`: quem constrói roda só os testes de cada fatia; a bateria completa roda na revisão, pelo Verifier da `build-review`, que vai até o fim mesmo com um teste falhando.
+
 ## 4.9.0 — 2026-11-05
 
 - Adiciona `design-critique`, preservada integralmente da pasta Design-1.2.0-v1 fornecida pelo autor.

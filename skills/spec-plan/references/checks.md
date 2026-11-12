@@ -1,32 +1,14 @@
 # Checks
 
-One small, frozen obligation set. Every claim carries the proof that settles it, and every
-enumerated set is joined member by member, so an omission leaves an empty cell instead of a
-confident sentence. Everything downstream refers to a check by number.
+One small, frozen obligation set. Every claim carries the proof that settles it, and every enumerated set is joined member by member, so an omission leaves an empty cell instead of a confident sentence. Everything downstream refers to a check by number.
 
-This file is derived from [spec.md](spec.md), not decided here. Every route's statuses, every door and every entity in the spec's approved
-behavior owes a `Coverage` row or a check. A plan section nothing points back at is dead or unproven.
-
-In this flow, spec.md is required, including Small scope; never use Intent as a substitute for a missing spec.
-Resolve <build-review-dir> through the installed build-review skill. All four proof scripts live there;
-no upstream TLC skill needs to be installed. A missing script is a blocker, never a green proof.
-When Tasks is skipped, generate Test Coverage Matrix and Gate Check Commands here using this skill's
-references/tasks.md step 1.5; this does not create a task list. Cite the requirement ID and AC, or the approved Small
-one-liner, in each claim. If AC numbers repeat across stories, qualify them with the story heading
-key, e.g. `(P1 AC 1)` and `(P2 AC 1)`; keep the same key in the all-AC evidence table. A bare AC number
-is accepted only when it is unique in the spec. Only approved behavior may become an obligation;
-Swept never invents scope.
-For a new test, plan its name, then copy the actual passing output line after the test is written;
-changing that selector must not change the claim or weaken the assertion.
+This file is derived from [plan.md](plan.md), not decided here. Every route's statuses in `Surface`, every door in `Landing` and every entity in the stored shape owes a `Coverage` row or a check. A plan section nothing points back at is dead or unproven.
 
 ## Find the real commands first
 
-Prefer a command CI already runs, written as the project runs it - its script, its runner, its
-flags. Where nothing exists for what a check needs, ask. A proof names a specific test, not a whole
-suite. Repeat `Proof:` when one test cannot settle the whole claim.
+Prefer a command CI already runs, written as the project runs it - its script, its runner, its flags. Where nothing exists for what a check needs, ask. A proof names a specific test, not a whole suite. Repeat `Proof:` when one test cannot settle the whole claim.
 
-When several checks' tests run in one command, name the command once as a group and point each
-check at the line its test prints:
+When several checks' tests run in one command, name the command once as a group and point each check at the line its test prints:
 
 ```markdown
 Run unit: `npx vitest run src/billing --reporter=verbose`
@@ -39,24 +21,13 @@ Proof: run unit | ✓ billing > suspends on a failed charge
 Proof: run api | test_retry_is_idempotent PASSED
 ```
 
-`check_proofs.py` runs each group once and matches the complete passing line after `|`, allowing
-whitespace, ANSI styling and a trailing duration/progress percentage, but no skipped or extended
-test-name words. A runner's file/context prefix may precede it. Copy the line from a real run and keep the pass
-marker (`✓`, `PASSED`, `ok`, `= .`): a renamed test, or a filter that selects nothing, then reads
-`no test ran` instead of passing on a green exit code. This needs a reporter that prints a line per
-test; where the default prints only a summary, put the verbose flag in the `Run` line. A test that
-cannot share a run - an end-to-end suite that starts its own server, a command that must run alone -
-is a lone `Proof: <command>`, judged by its exit code. A runner that exits 0 when its filter selects
-nothing (`node --test`, `dotnet test`) passes a lone proof on a typo, so with one of those even a
-single test gets a `Run` line and a `run` proof.
+`check_proofs.py` runs each group once and matches the full test identity after `|` on one line of the group's output. Copy its real line, not words from a longer test name. Reporter timing and progress metadata are ignored, including a Rails duration before `= .`; keep the pass marker (`✓`, `PASSED`, `ok`, `= .`): a renamed test, or a filter that selects nothing, then reads `no test ran` instead of passing on a green exit code. This needs a reporter that prints a line per test; where the default prints only a summary, put the verbose flag in the `Run` line. A test that cannot share a run - an end-to-end suite that starts its own server, a command that must run alone - is a lone `Proof: <command>`, judged by its exit code. A runner that exits 0 when its filter selects nothing (`node --test`, `dotnet test`) passes a lone proof on a typo, so with one of those even a single test gets a `Run` line and a `run` proof.
 
-Groups and lone proofs run one after another, never side by side, so tests that share a database or
-a port stay safe; the parallelism inside a group is whatever the project configured for it.
+Groups and lone proofs run one after another, never side by side, so tests that share a database or a port stay safe; the parallelism inside a group is whatever the project configured for it.
 
-Under the title, a `Build:` line names the repo's own build, type check and lint commands - the
-ones CI or the package manifest runs over the code this feature touches - separated by `;`.
-`check_proofs.py` runs them at `HEAD`: a green test suite does not show that the code compiles.
-`Build: none - <why>` when the repo has none.
+Under the title, a `Build:` line names the repo's own build, type check and lint commands - the ones CI or the package manifest runs over the code this feature touches - separated by `;`. `check_proofs.py` runs them at `HEAD`: a green test suite does not show that the code compiles. `Build: none - <why>` when the repo has none.
+
+When there is no plan.md, write the `## Gate Check Commands` section here, discovered as [plan.md](plan.md) describes; `validate_checks.py` refuses to start without it.
 
 ## What makes a check writable
 
@@ -69,51 +40,33 @@ Missing one, ask. A vague check becomes a vague assertion that passes.
 
 ## The proof has to reach the claim
 
-A claim about nine provider statuses is not proven by a
-test that exercises two. A claim about a response at a boundary is not settled by a test that never
-crosses it. When claim and proof sit at different levels, split the claim or name a second proof.
+A claim about nine provider statuses is not proven by a test that exercises two. A claim about a response at a boundary is not settled by a test that never crosses it. When claim and proof sit at different levels, split the claim or name a second proof.
 
-A gesture is proven by performing it: the proof opens, clicks, chooses the file, submits, and reads
-the page. A label in the markup, or a request that posts the finished document, does not prove the
-control.
+A gesture is proven by performing it: the proof opens, clicks, chooses the file, submits, and reads the page. A label in the markup, or a request that posts the finished document, does not prove the control.
 
-Obligations add up. A test proves the layer where it asserts, not the layers it passes through; an
-end-to-end test exercises one path through a branch table and cannot fail when another branch is
-wrong.
+Obligations add up. A test proves the layer where it asserts, not the layers it passes through; an end-to-end test exercises one path through a branch table and cannot fail when another branch is wrong.
 
 ## Coverage - the join
 
-Every set a proof must cover gets a row, and every member is written as its own token beside the
-check that proves it. A set collapsed into a sentence has no empty cell, so a member can go missing
-unseen. One table-driven proof over the whole set may stand for it, with the size stated.
+Every set a proof must cover gets a row, and every member is written as its own token beside the check that proves it. A set collapsed into a sentence has no empty cell, so a member can go missing unseen. One table-driven proof over the whole set may stand for it, with the size stated.
 
-Walk it from the sets, not from the checks: the doors in the spec, the decision tables in the code,
-the input space behind a claim, anything enumerated in prose.
+Walk it from the sets, not from the checks: the doors in `Landing`, the decision tables in the code, the input space behind a claim, anything enumerated in prose.
 
-- **Every route in the spec owes a row**, and its members are the statuses.
-- **A binding source's controls are a set.** Its members are the controls each capture draws,
-  minus what `## Differences from the source` removes, each beside a check whose proof performs the
-  gesture. The capture says how it looks; the proof says it works.
-- **A backend rule is one check, and its examples are the members**, the plan's strong case
-  included.
-- **Startup configuration is a set of places.** Each assembly that boots the app - the entry
-  point, the test harness, every app that mounts the module - is a member. Prefer one shared
-  assembly both paths use.
+- **Every route in `Surface` owes a row**, and its members are the statuses.
+- **A binding source's controls are a set.** Its members are the controls each capture draws, minus what `## Differences from the source` removes, each beside a check whose proof performs the gesture. The capture says how it looks; the proof says it works.
+- **A backend rule is one check, and its examples are the members**, the plan's strong case included.
+- **Startup configuration is a set of places.** Each assembly that boots the app - the entry point, the test harness, every app that mounts the module - is a member. Prefer one shared assembly both paths use.
 
 Write the count and its denominator; `-` in `Unproven` is earned by the row beside it.
 
-**A screen criterion's check cites the same capture files**, never a list of the screen's labels.
-Its proof is the comparison, not a test:
+**A screen criterion's check cites the same capture files**, never a list of the screen's labels. Its proof is the comparison, not a test:
 
 ```markdown
 **C40** - The Administrator view matches `.specs/features/<f>/captures/admin.png` (AC 49)
 Proof: browser - the Verifier reaches the state, photographs it at the capture's size and compares
 ```
 
-Checks that end in the same captured state name the same file. A state no capture draws gets no
-capture comparison: its proof is a test, or `walk` when only a visit shows it. So does an existing screen the
-feature does not change, reached through the nav: the author's `**Walked:**` line names the visit.
-The existing build-review screen-photo and UAT rules still apply, including screens without a capture.
+Checks that end in the same captured state name the same file. A state no capture draws gets no capture comparison: its proof is a test, or `walk` when only a visit shows it. So does an existing screen the feature does not change, reached through the nav: the author's `**Walked:**` line names the visit. [core.md](core.md) rule 9.
 
 ```markdown
 **C41** - The nav still opens Items (AC 2)
@@ -122,9 +75,7 @@ Proof: walk - open Items from the nav
 
 ## Swept - the nine dimensions
 
-The plan covers what somebody thought of; this list covers what nobody writes down. Each dimension
-lands on a check, on `existing - <the guard that already covers it>`, or on `n/a - <reason>`. A
-dimension that needs a product answer is a question, never a check you invented.
+The plan covers what somebody thought of; this list covers what nobody writes down. Each dimension lands on a check, on `existing - <the guard that already covers it>`, or on `n/a - <reason>`. A dimension that needs a product answer is a question, never a check you invented.
 
 | Dimension | What to cover |
 | --- | --- |
@@ -138,16 +89,11 @@ dimension that needs a product answer is a question, never a check you invented.
 | state transitions | valid transitions, guards |
 | observability | logging, metrics, tracing |
 
-Concurrency and observability hide best; neither is visible until it fails. A landing must
-observe that dimension: a duplicate rejected because a row exists says nothing about two requests
-arriving at once.
+Concurrency and observability hide best; neither is visible until it fails. A landing must observe that dimension: a duplicate rejected because a row exists says nothing about two requests arriving at once.
 
 ## The level of each proof
 
-Prove each rule at the level the repo's `AGENTS.md` or test docs name for that layer. Where they name
-none, a rule that changes an outcome - a dispatch over a status, a boundary, a state transition, a
-mapping with more than one row, a guard, an order - gets a test at its own layer, and code that only
-forwards its arguments gets none of its own: a test over it re-asserts the framework.
+Prove each rule at the level the repo's `AGENTS.md` or test docs name for that layer. Where they name none, a rule that changes an outcome - a dispatch over a status, a boundary, a state transition, a mapping with more than one row, a guard, an order - gets a test at its own layer, and code that only forwards its arguments gets none of its own: a test over it re-asserts the framework.
 
 ## Template: `.specs/features/<feature>/checks.md`
 
@@ -156,7 +102,15 @@ forwards its arguments gets none of its own: a test over it re-asserts the frame
 
 Build: `<build command>`; `<lint command>`
 Run unit: `<the command that runs this feature's tests, a line per test>`
-Plan: `.specs/features/<feature>/spec.md`
+Plan: `.specs/features/<feature>/plan.md`
+
+## Intent
+
+<Only when there is no plan.md: the problem in the present tense, then what is different for a
+user when this ships. Record `**Approved**: <date> - user: "<actual words>"` outside this placeholder
+before code. An authorization already given is recorded, not requested again.>
+
+<Only when there is no plan.md: `## Gate Check Commands`, as in plan.md.>
 
 <N checks in M slices · K one-way doors · Q open, of which B block>
 
@@ -198,17 +152,14 @@ Proof: `bin/rails test test/billing/status_map_test.rb -n "/every_provider_statu
 <The run's live state. A compaction gives no warning, so each line is written as it happens:>
 
 - **Settled mid-build:** <each answer the user gave while building, in their words, the turn it came - or none>
-- **Dispatched:** <each sub-agent before it is sent: Verifier, screens round 1 or 2 - at which `HEAD`, and `returned` when it is back>
+- **Dispatched:** <each sub-agent before it is sent: fresh Verifier, code Fixes 0-3; screens round 1 or 2 - at which `HEAD`, and `returned` when it is back>
 - **Boundary:** C1-C7 closed at `<sha>`
 - **Abandoned:** <tried, discarded, and why>
 - **Walked:** <only with a screen: what you did, what the page showed, how the user reaches each state, and each visit a `walk` check names>
 ````
 
+With no plan.md, add `## Out of scope` with the excluded capabilities and why.
+
 ## Gate, then keep going
 
-Before the single plan approval, run `python3 <build-review-dir>/scripts/validate_checks.py <feature>`
-for structure only. Include checks.md with the other planning documents in that same approval.
-After the yes, record the user's actual approval in spec.md; implement.md runs this script with
---execute before code, which also runs Build once. A non-zero exit is a blocker to resolve.
-Whether each proof is the right one stays yours. Continue through the existing publishing/implementar
-handoff; approval still authorizes only the actions explicitly named there.
+Before code, record actual approval in plan.md, or checks.md when there is no plan. If approval has not been given, present that document and stop for it; never create the user's reply. Run `python3 <spec-plan>/scripts/validate_checks.py <feature> --execute`; it checks approval and structure and runs the `Build:` line once, and whether each proof is the right one stays yours. A `Build:` command red before any change is not the repo's gate: name the repo's own commands, and when those are red, tell the user and stop. Then continue into [build.md](../../implementar/references/build.md) without waiting. Stop only for scope the sweep raised, a derivation that contradicts the approved plan, or a writability gap asking did not resolve.

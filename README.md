@@ -49,10 +49,11 @@ plano em `plan.md` e os critérios verificáveis em `checks.md`. A mensagem fina
 as ações autorizadas pelo seu sim: registrar a aprovação, publicar a branch, criar a issue
 e abrir a PR em rascunho. “Sim, codex” escolhe a `gpt-implementar`.
 
-Features antigas com `spec.md`/`tasks.md` aprovados seguem o contrato existente, sem migração
-automática. O núcleo Lean, as referências e os validadores acompanham a skill.
+Antes da primeira pergunta, explora o código em volta do pedido com um agente auxiliar. Usa
+três guias de arquitetura de Matt Pocock (desenho de módulos, exploração e vocabulário do
+domínio), que acompanham a skill com os validadores.
 
-[Instruções](skills/spec-plan/SKILL.md) · [Contrato antigo](skills/spec-plan/LEGACY.md)
+[Instruções](skills/spec-plan/SKILL.md)
 
 ### `/cass:gpt-optimizer` — revisão opcional de um plano grande
 
@@ -72,10 +73,11 @@ Codex `gpt-6.1-sol` esforço `high`, só leitura; a 2ª rodada audita o filtro q
 
 Escolhe o contrato aprovado pela `spec-plan`. No Lean, constrói uma fatia por vez,
 com testes e evidências; atualiza os checks antes do commit e inclui tudo no mesmo commit.
-Segue para a próxima fatia sem pedir outro sim. Na delegação, prepara o contexto e confere
+Segue para a próxima fatia sem pedir outro sim. A bateria completa de testes roda só na
+revisão final. Na delegação, prepara o contexto e confere
 as evidências devolvidas. Quando a feature está pronta para verificação, inicia `build-review`.
 
-[Instruções](skills/implementar/SKILL.md) · [Contrato antigo](skills/implementar/LEGACY.md)
+[Instruções](skills/implementar/SKILL.md)
 
 ### `/cass:gpt-implementar` — construir com o Codex
 
@@ -90,10 +92,10 @@ o coordenador inicia `build-review`.
 
 No Lean, reúne Verifier, Standards e Spec em contextos independentes. Usa os relatórios
 nativos, capturas e teste guiado quando aplicável; pede a decisão sobre cada correção e
-o sim final. As correções aprovadas voltam ao executor escolhido. Uma feature Lean não
-precisa do `validation.md` antigo; features antigas mantêm sua própria verificação.
+o sim final. As correções aprovadas voltam ao executor escolhido. O Verifier roda a bateria
+completa e vai até o fim mesmo quando um teste falha.
 
-[Instruções](skills/build-review/SKILL.md) · [Contrato antigo](skills/build-review/LEGACY.md)
+[Instruções](skills/build-review/SKILL.md)
 
 ### `/cass:design-critique` — avaliar uma tela ou proposta visual
 

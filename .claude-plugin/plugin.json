@@ -1,7 +1,7 @@
 {
   "name": "cass",
   "version": "4.9.0",
-  "description": "Treze skills para trabalhar com IA: entrevista, planejamento, construção, revisão, pesquisa e design. spec-plan, implementar, gpt-implementar e build-review usam o fluxo Lean com plan.md e checks.md, preservando contratos antigos aprovados. design-critique avalia usabilidade, hierarquia, consistência e acessibilidade. Inclui ask-me, auto-think, search, gpt-optimizer, handoff, otimizar-arquitetura, aprender-com-a-sessao e writin-skills.",
+  "description": "Treze skills para trabalhar com IA: entrevista, planejamento, construção, revisão, pesquisa e design. spec-plan, implementar, gpt-implementar e build-review usam o fluxo Lean com plan.md e checks.md. design-critique avalia usabilidade, hierarquia, consistência e acessibilidade. Inclui ask-me, auto-think, search, gpt-optimizer, handoff, otimizar-arquitetura, aprender-com-a-sessao e writin-skills.",
   "author": {
     "name": "Cassiano Diniz",
     "email": "cassi.diniz@gmail.com"
