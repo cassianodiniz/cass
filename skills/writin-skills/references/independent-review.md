@@ -10,7 +10,7 @@ The author freezes the candidate using the existing Versions mechanism and gives
 - The frozen candidate; for an edit, the previous version and diff.
 - Relevant source material and version-linked test artifacts needed to check the result.
 
-Run the reviewer on GPT in the same format /gpt-review uses. Copy the frozen candidate and the artifacts into one new temporary folder, and write there one input file with the instruction below followed by the request and accepted decisions. Never include the author's conversation history, verdict or proposed answers. Real people's data stays out: use invented examples. Then run `bash ../gpt-review/scripts/run-gpt.sh <input> <output>` (gpt-6.1-sol, high effort: /gpt-review's default). No thread file: each review is a new session. Paths are relative to this skill's folder.
+Run the reviewer on GPT. Copy the frozen candidate and the artifacts into one new temporary folder, and write there one input file with the instruction below followed by the request and accepted decisions. Never include the author's conversation history, verdict or proposed answers. Real people's data stays out: use invented examples. Then run `bash ../gpt-optimizer/scripts/run-gpt.sh <input> <output>` (gpt-6.1-sol, high effort: the script's default). No thread file: each review is a new session. Paths are relative to this skill's folder.
 
 If the wrapper exits 3, 5 or 6, tell the user why and use a Claude subagent with fresh context instead; do not assume a history-inheriting fork is independent. If neither is available, report review pending rather than substituting the author's self-review.
 

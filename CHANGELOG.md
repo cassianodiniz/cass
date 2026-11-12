@@ -6,7 +6,7 @@
 - Sai o caminho antigo (`spec.md`/`tasks.md`, os `LEGACY.md` e os arquivos usados só por eles): a feature fica só com `plan.md` e `checks.md`. Créditos de licença passam para `CREDITS.md` em cada skill.
 - `spec-plan`: antes da primeira pergunta, explora o código em volta do pedido com um agente auxiliar, quando a sessão ainda não leu aquele código. Três guias de arquitetura de Matt Pocock entram em `references/skills/` (desenho de módulos, exploração e vocabulário do domínio). O plano nomeia cada regra de outra área de que depende e onde ela mora; regra escrita em vários lugares vira pergunta ao usuário.
 - `implementar`: quem constrói roda só os testes de cada fatia; a bateria completa roda na revisão, pelo Verifier da `build-review`, que vai até o fim mesmo com um teste falhando.
-- `writin-skills`: roteiro para ajustar skill existente, com escada de testes em dois níveis (leitura; trabalho num repositório de mentira), sempre começando pela leitura. Sai o modelo de teste fixo. Nova referência da página de mudança de skill, para quando o usuário aplica a mudança à mão. A revisão independente passa a rodar no GPT pelo script da `gpt-review`, e cai para um subagente do Claude quando o script falha.
+- `writin-skills`: roteiro para ajustar skill existente, com escada de testes em dois níveis (leitura; trabalho num repositório de mentira), sempre começando pela leitura. Sai o modelo de teste fixo. Nova referência da página de mudança de skill, para quando o usuário aplica a mudança à mão. A revisão independente passa a rodar no GPT pelo script da `gpt-optimizer`, que vai no plugin, e cai para um subagente do Claude quando o script falha.
 
 ## 4.9.0 — 2026-11-05
 
