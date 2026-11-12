@@ -182,7 +182,8 @@ Módulos fundos (Ousterhout) e costuras (Feathers); 4 categorias de dependência
 ### `/cass:writin-skills` — criar, ajustar e testar skills
 
 Ajuda a transformar um processo em skill, acertar quando ela deve ser chamada e testar
-se o agente segue suas instruções. Traz as referências e ferramentas da versão local.
+se o agente segue suas instruções. Para ajustar uma skill que já existe, segue um roteiro
+com testes em dois níveis, começando pela leitura. Traz as referências e ferramentas da versão local.
 É uma ferramenta para cuidar das próprias skills; fica fora do mapa principal de trabalho.
 
 <p align="center"><img src="docs/skill-writin-skills.svg" width="650" alt="A writin-skills entende uso, gatilhos, limites e resultado esperado. Mudanças mecânicas recebem verificação objetiva. Para nova skill ou mudança de comportamento, define cenários, critérios, repetições e limite de correções e congela a versão. RED demonstra uma falha sem a skill ou uma contradição comprovada em skill existente. Escreve ou ajusta, congela a candidata e testa. Falhas voltam ao ajuste dentro do limite; se ele chegar, relata pendências sem aprovar. Depois dos critérios passarem, uma revisão independente confere a candidata; achados procedentes voltam ao ajuste e aos testes afetados. A entrega registra arquivos, resultados e limites."></p>
