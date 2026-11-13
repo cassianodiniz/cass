@@ -1,7 +1,7 @@
 {
   "name": "cass",
-  "version": "4.8.0",
-  "description": "Skills do Cassiano Diniz pra trabalhar com IA: pensar antes de fazer, construir com prova e conferir antes de confiar. ask-me entrevista; spec-plan aprova uma feature em .specs/ e publica uma branch, issue e PR em rascunho; implementar constrói tarefas em sequência; build-review revisa a feature inteira com validação, telas e correções aprovadas. auto-think estuda problemas; search pesquisa com fontes; gpt-optimizer confronta decisões; handoff passa contexto; otimizar-arquitetura organiza módulos; aprender-com-a-sessao sugere melhorias; writin-skills cria e testa skills. gpt-implementar faz o mesmo que a implementar, com o Codex construindo.",
+  "version": "4.9.0",
+  "description": "Treze skills para trabalhar com IA: entrevista, planejamento, construção, revisão, pesquisa e design. spec-plan, implementar, gpt-implementar e build-review usam o fluxo Lean com plan.md e checks.md. design-critique avalia usabilidade, hierarquia, consistência e acessibilidade. Inclui ask-me, auto-think, search, gpt-optimizer, handoff, otimizar-arquitetura, aprender-com-a-sessao e writin-skills.",
   "author": {
     "name": "Cassiano Diniz",
     "email": "cassi.diniz@gmail.com"
@@ -21,7 +21,8 @@
     "codex",
     "handoff",
     "arquitetura",
-    "retrospectiva"
+    "retrospectiva",
+    "design"
   ],
   "homepage": "https://github.com/cassianodiniz/cass",
   "repository": "https://github.com/cassianodiniz/cass"

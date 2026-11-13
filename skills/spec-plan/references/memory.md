@@ -1,144 +1,86 @@
-# Memory Layer
+# Memory
 
-**File:** `.specs/STATE.md`
+Two things outlive a session under `.specs/`: decisions that constrain future features, and lessons distilled from real verification failures. Where a feature stopped is in its `checks.md` `## Handoff` and in git.
 
-A single file with two section-scoped parts. Each section has its own lifecycle; writes are always targeted - never whole-file overwrites.
-
----
-
-## Sections
-
-### `## Decisions` - append-only log
-
-Records **project-level** decisions only: conventions, patterns, constraints, or cross-cutting technology choices that future features must follow or supersede.
-
-**Not project-level → stays in the feature's `design.md` Tech Decisions table.**  
-Heuristic: would a different feature need to know about this? If yes → project-level. If no → feature-local.
-
-**Record sparingly - the log stays useful only by staying small.** Even a project-level decision earns an `AD-NNN` entry only when all three hold:
-
-1. **Hard to reverse** - changing course later carries real cost.
-2. **Surprising without context** - a future reader will look at the result and wonder "why did they do it this way?"
-3. **The product of a real trade-off** - there were genuine alternatives and you chose one for specific reasons.
-
-If any one is missing, skip it: an easily-reversed choice you will just reverse; an unsurprising one nobody questions; a no-alternative choice records nothing beyond "we did the obvious thing." What typically qualifies: architectural shape, integration patterns between areas, technology choices that carry lock-in, boundary and ownership decisions, and deliberate deviations from the obvious path. A choice that clears all three but is only feature-local still stays in `design.md`.
-
-**Format** (one entry per decision):
+## `.specs/STATE.md`
 
 ```markdown
-## Decisions
-
-### AD-001
-- **Decision**: [what was decided - one sentence]
-- **Reason**: [why this option was chosen]
-- **Trade-off**: [what was given up]
-- **Scope**: [which features / packages / layers this governs]
-- **Date**: YYYY-MM-DD
-- **Status**: active | superseded by AD-NNN
-```
-
-**Supersession rule:** When a new decision replaces an old one, append a new `AD-NNN` entry and update the old entry's `status` field to `superseded by AD-NNN`. Never delete old entries - the history is the audit trail.
-
----
-
-### `## Handoff` - pause snapshot (~500 tokens, overwritten each pause)
-
-Captures mid-task / in-flight state so work can resume without re-reading the full task history. It complements `tasks.md` and git evidence: on resume, the Handoff is a starting hypothesis that must be reconciled against the real branch, commits, and working tree (see Resume below).
-
-**Format:**
-
-```markdown
-## Handoff
-
-- **Feature**: [feature name / .specs path]
-- **Phase / Task**: [e.g., Phase 2 / T4 - implement repository layer]
-- **Completed**: [comma-separated task IDs or "none"]
-- **In-progress** (file:line): [e.g., `src/billing/subscription.service.ts:88` - mid-write]
-- **Next step**: [one sentence - exactly what to do next]
-- **Blockers**: [none | description]
-- **Uncommitted files**: [list or "none"]
-- **Branch**: [git branch name]
-```
-
----
-
-## File shape
-
-```markdown
-# STATE
+# Project state
 
 ## Decisions
 
-[AD-NNN entries…]
-
-## Handoff
-
-[latest snapshot…]
+| ID | Decision | Rationale | Status | Date |
+| --- | --- | --- | --- | --- |
+| AD-001 | Webhook ingest is idempotent on provider delivery id | replays are routine and cheap to dedup at the edge | active | 2026-02-14 |
+| AD-002 | Money is stored in integer cents | superseded by AD-007 | superseded by AD-007 | 2026-03-02 |
 ```
 
-If the file does not yet exist, create it with both section headers and empty bodies.
+Edit only the body of `## Decisions`; overwriting the file loses the log. Where the repo already keeps ADRs or a decision log, append there instead and do not start a second one.
 
----
+A decision belongs here when a future feature has to conform to it: a convention, a pattern, a constraint. Write it when the choice is made. An answer that departs from a binding source is one too: the Decision says what the product shows instead, the Rationale quotes the question and the option chosen, and the plan's `## Differences from the source` rows cite the id. A `Landing` door that reaches past the feature gets a row in each place: the shape in `Landing`, the constraint here.
 
-## Read / Write Triggers
+Every `active` `AD-NNN` constrains the work. Conform, or append an entry that supersedes it (set the old row's status to `superseded by AD-NNN`) and say why.
 
-| Trigger | Section | Operation |
-| ------- | ------- | --------- |
-| Design phase, Step 1 (Load Context) | `## Decisions` | **Read** - conform to active decisions or supersede |
-| Design phase, Tech Decisions step | `## Decisions` | **Append** - only for project-level decisions |
-| Pause work / end of session | `## Handoff` | **Replace** - overwrite Handoff section only |
-| Resume work / start of session | `## Handoff` | **Read** - load snapshot, then reconcile with git before acting |
-| Resume work / start of session | `## Decisions` | **Read** - re-confirm active constraints before designing |
+## Resuming work - a new session, or after a compaction
 
----
+A compaction is a resume: the summary keeps the task and drops the rules. Re-read `core.md` and the reference for the phase the files show, then read `.specs/STATE.md` and the feature's files - `plan.md` and its `**Approved**:` line (or that authorization in checks.md when there is no plan), `checks.md` with its completion marks and `## Handoff`, `proofs.md`, `verification.md` - and reconcile them against git: the commits are fact; a note written before a crash is intent. After a compaction in the middle of a run, continue when the files and git agree, and stop only on a conflict. In a new session, propose the next step before writing code.
 
-## Section-scoped write rule (critical)
+Where the files put you - the first row that holds:
 
-One file holds two lifecycles. Writes MUST target their section only:
+| The files show | Next |
+| --- | --- |
+| plan.md exists without actual `**Approved**:` authorization, or checks.md exists without a plan and without that authorization | present the plan or checks and stop; record authorization already given without asking twice |
+| no `checks.md` | Checks |
+| a check not closed | Build; a check whose commit is on the branch is closed - mark it |
+| a screen and no `**Walked:**` line | the walk (build.md) |
+| no `proofs.md`, or one at another commit than `HEAD`, and nothing dispatched | `check_proofs.py` |
+| `**Dispatched:**` names a sub-agent with no returned report for its dispatched code `HEAD` (`verification.md`); an older report does not count | wait for it; send it again only when it cannot return - a new session - and say so on the line |
+| verification.md names an older code `HEAD` | proofs, then a fresh Verifier; preserve its `**Fixes**` count (0-3); evidence-only commits do not stale the review |
+| an open finding | fix within scope if fewer than 3 code fixes; increment `**Fixes**`, rerun proofs and a fresh Verifier (with its photos) after a code fix; at the limit go to the user |
 
-- **Design appends** to `## Decisions`. It MUST NOT touch `## Handoff`.
-- **Pause replaces** `## Handoff`. It MUST NOT rewrite, reorder, or drop any entry in `## Decisions`.
+## Lessons
 
-The correct technique: locate the target section header, replace only the content between it and the next `##` header (or end of file). Never overwrite the full file.
+You supply the judgement - read the failure, phrase the lesson, cite its grounding - and `scripts/lessons.py` does the bookkeeping: IDs, recurrence across distinct features, candidate→confirmed promotion, pruning, demotion, rendering.
 
-Violating this rule causes one of two failures:
-1. A pause write clobbers the decisions log → decisions are silently lost.
-2. A design append touches the handoff snapshot → mid-task state is corrupted.
+| File | Owner |
+| --- | --- |
+| `.specs/lessons.json` | the script - do not hand-edit |
+| `.specs/LESSONS.md` | the script - read it, do not write it |
 
-Both are silent data loss. The section-scoped write rule is the single correctness invariant of this memory layer.
+`confirmed` lessons are the playbook. `candidate` ones need a second distinct feature. `quarantined` ones failed when applied and are ignored.
 
----
+### Write - immediately after the report is written
 
-## Pause / Resume Procedure
+For each finding in `verification.md`, record one lesson:
 
-### Pause
+| Finding | `--signal` |
+| --- | --- |
+| A check whose test passes without holding its criterion - a `no` in `## Checks`, an assertion looser than the value, a rule proven on too few cases | `weak_test` |
+| A criterion that fixed no precise outcome, so no test could hold it | `spec_precision_gap` |
+| An example of the Verifier's own that broke a rule | `ac_gap` |
+| A check or criterion that contradicts a binding capture | `spec_deviation` |
 
-1. Locate the `## Handoff` section in `.specs/STATE.md`.
-2. Replace its body (everything between `## Handoff` and the next `##` or EOF) with the current snapshot.
-3. Do NOT modify anything above or before `## Handoff`.
-4. Commit or stash outstanding changes as appropriate.
+```bash
+python3 <spec-plan>/scripts/lessons.py add \
+  --feature "<feature folder>" \
+  --signal  "weak_test" \
+  --source  "<file:line or check id from the finding>" \
+  --text    "<one general, actionable sentence>" \
+  --scope   "<optional: billing, routes, repo-layer>"
+```
 
-### Resume
+`--source` is required; a lesson with no grounding is an opinion. Deduplication is exact after normalization, so write the general rule in canonical, terse words: "Assert the exact persisted status value, not just that a status field exists", not "the test on line 88 was too weak". One lesson per finding. Lessons about this codebase only, never about how to run the skill. If the report had findings and you recorded nothing, say so in chat.
 
-1. Read `.specs/STATE.md` - both sections.
-2. Re-confirm active decisions from `## Decisions` - nothing superseded since last session?
-3. Read `## Handoff` - treat it as a **hypothesis** for feature, phase/task, next step, blockers, uncommitted files, branch - not as ground truth by itself.
-4. **Reconcile with git before editing anything:**
-   - Current branch vs Handoff `Branch`
-   - `git status --porcelain` (uncommitted / unexpected paths)
-   - Recent commits on the branch (messages and touched files)
-   - `tasks.md` completion marks and, when present, gate evidence / commit references
-5. **Resolve conflicts with evidence, not narrative:**
-   - A task with a green gate and an atomic commit already on the branch → do **not** redo it; mark it complete in `tasks.md` if the file still shows it open, then continue from the next incomplete task
-   - Partial unverified work in the working tree → preserve it, re-run the relevant gate, then finish the status+commit cycle
-   - Stale or missing Handoff → rebuild next-step from git + `tasks.md`, then propose that to the user
-   - Unexplained local changes you cannot map to the current task → STOP and ask; do not discard them
-6. Propose the reconciled next step to the user before writing any code.
+### Read - at Plan and before writing checks
 
----
+```bash
+python3 <spec-plan>/scripts/lessons.py --root <project> list --status confirmed
+python3 <spec-plan>/scripts/lessons.py --root <project> list --status confirmed --scope billing
+python3 <spec-plan>/scripts/lessons.py --root <project> list --status confirmed --query idempotency
+```
 
-## AD-NNN numbering
+Load `confirmed` only, filtered to the area this feature touches.
 
-- Numbers are sequential, project-scoped, and permanent - never reused.
-- The counter starts at `AD-001`. Check existing entries before assigning the next number.
-- If `.specs/STATE.md` does not exist, the first decision is `AD-001`.
+### Demotion and turning it off
+
+A confirmed lesson loaded for this feature whose failure recurred anyway: `lessons.py penalize --id L-NNN`. Two penalties quarantine it. To disable the layer for a project, delete `.specs/lessons.json` and `.specs/LESSONS.md`.

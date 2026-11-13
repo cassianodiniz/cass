@@ -1,12 +1,11 @@
 # cass — pensar antes de fazer, construir com prova, conferir antes de confiar
 
-Doze skills pra trabalhar com IA no Claude Code sem cair nas armadilhas de sempre: a IA que
+Treze skills pra trabalhar com IA no Claude Code sem cair nas armadilhas de sempre: a IA que
 sai construindo antes de entender o pedido, que diz "pronto" sem ter testado, que inventa
 número de pesquisa. Cada skill resolve um desses momentos e pode ser chamada sozinha.
 
-<p align="center">
-  <img src="docs/qual-sua-situacao.svg" width="1000" alt="Fluxo principal de implementação: as três entradas levam à spec-plan, que entende o pedido, escreve os documentos e pede sua aprovação. Esse sim publica branch, issue e PR em rascunho; sim, codex escolhe gpt-implementar. Claude envia cada lote ao GPT Sol, recebe evidências e confere o git antes do próximo; até duas rodadas de conserto na mesma sessão. Build-review reúne Verifier, Standards e Spec, testes, telas e teste guiado quando aplicável. Correções aprovadas voltam ao Codex e passam por nova revisão, até três rodadas. A entrega pede autorização para commit, push e PR pronta; merge é seu. Aprender-com-a-sessao, quando chamada, revê a sessão, guarda sugestões e aplica apenas as escolhidas.">
-</p>
+O fluxo de código usa o contrato aprovado: Lean para planos nativos; compatibilidade
+com `spec.md` e `tasks.md` para features antigas. Veja as entradas abaixo.
 
 ## Como eu uso no dia a dia
 
@@ -43,30 +42,18 @@ ajustar algo ou acionar outra skill.
 
 </details>
 
-### `/cass:spec-plan` — transformar uma ideia em feature aprovada
+### `/cass:spec-plan` — transformar uma ideia em plano aprovado
 
-Conversa em rodadas até fechar o que a feature deve fazer, incluindo os nove requisitos
-que costumam ficar esquecidos. Prefere a solução mais simples que atende ao combinado.
-A profundidade acompanha o tamanho: toda feature ganha uma spec; contexto entra quando há
-pontos a esclarecer, e design e tarefas formais entram nas features grandes ou complexas.
+Esclarece o pedido em rodadas e usa o vocabulário do projeto. No fluxo Lean, registra o
+plano em `plan.md` e os critérios verificáveis em `checks.md`. A mensagem final explica
+as ações autorizadas pelo seu sim: registrar a aprovação, publicar a branch, criar a issue
+e abrir a PR em rascunho. “Sim, codex” escolhe a `gpt-implementar`.
 
-Os documentos são escritos um depois do outro, e você dá um sim só, no fim, numa mensagem curta
-com o fluxograma da feature. Esse sim autoriza salvar e publicar a pasta da
-feature, criar uma issue com o link para ela e abrir uma PR em rascunho. A construção começa
-em seguida, sem uma nova pergunta. **Uma feature, uma branch, uma issue e uma PR.**
+Antes da primeira pergunta, explora o código em volta do pedido com um agente auxiliar. Usa
+três guias de arquitetura de Matt Pocock (desenho de módulos, exploração e vocabulário do
+domínio), que acompanham a skill com os validadores.
 
-<p align="center"><img src="docs/skill-spec-plan.svg" width="600" alt="A spec-plan investiga em rodadas e verifica os nove requisitos esquecidos. Escreve a spec e, quando necessário, contexto, design e tarefas. Os documentos são escritos em sequência e recebem um sim só, no fim. Esse sim publica a pasta da feature na branch, cria uma issue com seu link, abre a PR em rascunho e inicia implementar."></p>
-
-<details><summary>Detalhe técnico</summary>
-
-Arquivos em `.specs/features/<feature>/`: `spec.md`, `context.md` quando Discuss roda,
-`design.md` e `tasks.md` para Large/Complex. As fases e tarefas ficam em `tasks.md`;
-a issue não copia o plano nem o progresso. Os scripts validam a spec (exceto Small), as
-tarefas e as mensagens de commit. O vocabulário vem do glossário do projeto.
-Uma pausa antes da aprovação final pode publicar a branch e abrir a PR com autorização;
-a issue espera a aprovação final.
-
-</details>
+[Instruções](skills/spec-plan/SKILL.md)
 
 ### `/cass:gpt-optimizer` — revisão opcional de um plano grande
 
@@ -84,80 +71,39 @@ Codex `gpt-6.1-sol` esforço `high`, só leitura; a 2ª rodada audita o filtro q
 
 ### `/cass:implementar` — construir a feature aprovada
 
-Trabalha na branch que a `spec-plan` criou. Constrói uma tarefa por vez: escreve o teste do
-comportamento esperado, vê falhar, implementa, confere e faz um commit com a tarefa marcada
-como concluída. Depois segue para a próxima sem pedir um novo sim.
+Escolhe o contrato aprovado pela `spec-plan`. No Lean, constrói uma fatia por vez,
+com testes e evidências; atualiza os checks antes do commit e inclui tudo no mesmo commit.
+Segue para a próxima fatia sem pedir outro sim. A bateria completa de testes roda só na
+revisão final. Na delegação, prepara o contexto e confere
+as evidências devolvidas. Quando a feature está pronta para verificação, inicia `build-review`.
 
-Cada push precisa da sua autorização. Também para quando uma tarefa está bloqueada, um
-teste parece errado ou aparece um problema fora do pedido. Teste que falha não é parada:
-conserta e roda de novo, e só para depois de 3 tentativas. Teste antigo que a spec aprovada
-mudou é atualizado junto com o código. Após a última tarefa, inicia a
-`build-review` automaticamente; a revisão completa acontece no final da feature.
+[Instruções](skills/implementar/SKILL.md)
 
-<p align="center"><img src="docs/skill-construtoras.svg" width="600" alt="A implementar lê a feature aprovada, as regras e o glossário. Se não há tarefas formais, lista passos; mais de cinco passos ou dependências complexas voltam ao planejamento. Define ferramentas e oferece subagentes para mais de um lote. Constrói uma tarefa por vez com teste, código, verificação e commit. Cada push pede autorização. A última tarefa inicia build-review automaticamente."></p>
+### `/cass:gpt-implementar` — construir com o Codex
 
-<details><summary>Detalhe técnico</summary>
+Segue o contrato da `implementar`, com o Codex escrevendo o código e o coordenador
+conferindo as evidências. O contexto enviado usa os arquivos nativos do contrato escolhido.
+O operador Codex e as regras de delegação acompanham o pacote. Depois da construção,
+o coordenador inicia `build-review`.
 
-Testes derivados dos critérios de aceitação da spec, nunca do código que acabou de escrever.
-A checagem da tarefa deve passar antes do commit, que inclui a atualização de `tasks.md`.
-Sem `tasks.md`, lista passos; mais de cinco passos ou dependências complexas pedem tarefas
-formais à `spec-plan`. Mais de um lote de tarefas (> cerca de oito) exige oferecer subagentes
-e esperar a escolha. Lotes seguem em sequência, sem tarefas em paralelo.
+[Instruções](skills/gpt-implementar/SKILL.md) · [Operador Codex](skills/gpt-implementar/references/codex-runner.md)
 
-Retomar: `.specs/STATE.md` guarda decisões e passagem de contexto; o estado é conferido
-contra o git antes de continuar. Pausar: commit local, sem stash; push só com seu sim.
+### `/cass:build-review` — conferir a feature inteira
 
-</details>
+No Lean, reúne Verifier, Standards e Spec em contextos independentes. Usa os relatórios
+nativos, capturas e teste guiado quando aplicável; pede a decisão sobre cada correção e
+o sim final. As correções aprovadas voltam ao executor escolhido. O Verifier roda a bateria
+completa e vai até o fim mesmo quando um teste falha.
 
-<p align="center"><img src="docs/skill-plano-inteiro.svg" width="600" alt="Uma feature inteira: planejamento aprovado, uma branch, uma issue e uma PR em rascunho; tarefas construídas em sequência com commits locais; revisão final automática; eventuais correções aprovadas e nova revisão, até três rodadas; aprovação para commitar a validação, fazer push e marcar a PR pronta. Merge continua com você."></p>
+[Instruções](skills/build-review/SKILL.md)
 
-### `/cass:gpt-implementar` — o mesmo fluxo da `implementar`, com o Codex construindo
+### `/cass:design-critique` — avaliar uma tela ou proposta visual
 
-Segue a `implementar` inteira e troca só quem constrói: cada lote de até ~7 tarefas vai a uma
-sessão do Codex, que escreve o código e faz o commit de cada tarefa. O Claude coordena, roda
-os testes ele mesmo, confere pelo git e, depois da última tarefa, inicia a `build-review`.
-No sim final da `spec-plan`, responda **"sim, codex"** para cair aqui.
+Recebe uma captura ou descrição, o contexto e o estágio do design. Aponta o que funciona,
+os problemas de usabilidade, hierarquia, consistência e acessibilidade, com gravidade,
+recomendações e prioridades. O foco pode ser uma tela, navegação ou fluxo específico.
 
-<p align="center"><img src="docs/skill-gpt-implementar.svg" width="650" alt="A gpt-implementar começa com uma feature aprovada e a escolha do Codex. Confere instalação e login; sem eles, para e informa o erro. Claude prepara o lote; GPT-6.1-sol constrói uma tarefa por vez com testes, código, checagem e commit. Codex devolve resumo e evidências, que Claude confere pelo git antes do próximo lote. Consertos voltam à mesma sessão por até duas rodadas; falha restante pede decisão do usuário. Após o último lote, build-review começa automaticamente. Correções aprovadas nessa revisão também vão ao Codex; cada push precisa de autorização."></p>
-
-<details><summary>Detalhe técnico</summary>
-
-Usa `codex exec` com `gpt-6.1-sol`, esforço `medium` e `service_tier="default"` (sem modo
-rápido), sempre explícitos. Antes do primeiro lote confere `codex --version` e
-`codex login status`; sem Codex, para e avisa. Conserto: até 2 rodadas na mesma sessão do
-Codex; depois, para e pergunta. Os consertos aprovados na `build-review` também vão ao Codex.
-
-</details>
-
-### `/cass:build-review` — revisar a feature inteira
-
-Começa automaticamente depois da última tarefa. Um Verifier independente confere os
-resultados contra a spec e verifica se os testes pegam defeitos introduzidos de propósito
-numa cópia isolada. Standards e Spec revisam as regras do projeto e o pedido; seus relatos
-ficam separados. O Verifier dá o veredito.
-
-Se há tela, depois dos testes verdes vêm as capturas e, quando cabe, um teste guiado com
-você. Os problemas dessas verificações e dos revisores entram num único plano de correção,
-que você aprova item por item. A `implementar` faz as correções aprovadas e a revisão roda
-novamente; depois de três rodadas com problemas, para e chama você.
-
-Com tudo aprovado e nenhuma correção aprovada pendente, pergunta uma vez se pode commitar
-a validação e os aprendizados, fazer push e marcar a PR existente como pronta. O merge é seu.
-Se faltou acesso ou ambiente para revisar, diz **“Não deu para revisar”** e explica o que falta.
-
-<p align="center"><img src="docs/skill-build-review.svg" width="600" alt="A build-review começa ao final da feature. Verifier confere critérios e testa se defeitos são detectados; Standards e Spec entregam relatos separados. Depois de testes verdes, captura telas e faz teste guiado quando aplicável. Registra validação e reúne correções para aprovação item a item; implementar corrige e uma nova revisão começa, até três rodadas. Sem pendências, pede autorização para commit, push e PR pronta."></p>
-
-<details><summary>Detalhe técnico</summary>
-
-Revisão desde `git merge-base main HEAD`. `validation.md` guarda PASS/FAIL, evidências por
-critério, resultado das falhas injetadas e “Fix Plans”. `validate_state.py` confere o relatório
-final após incorporar telas e teste guiado. Falhas fundamentadas geram candidatos a
-aprendizados em `.specs/lessons.json` e `.specs/LESSONS.md`; só os confirmados são usados
-em planejamentos futuros. Uma revisão limpa não inventa aprendizados.
-
-A PR leva `Closes #<issue>`; a issue só fecha no merge. Não se cria uma nova PR nesta etapa.
-
-</details>
+[Instruções](skills/design-critique/SKILL.md)
 
 ### `/cass:auto-think` — quando você ainda não sabe a resposta
 
@@ -236,7 +182,8 @@ Módulos fundos (Ousterhout) e costuras (Feathers); 4 categorias de dependência
 ### `/cass:writin-skills` — criar, ajustar e testar skills
 
 Ajuda a transformar um processo em skill, acertar quando ela deve ser chamada e testar
-se o agente segue suas instruções. Traz as referências e ferramentas da versão local.
+se o agente segue suas instruções. Para ajustar uma skill que já existe, segue um roteiro
+com testes em dois níveis, começando pela leitura. Traz as referências e ferramentas da versão local.
 É uma ferramenta para cuidar das próprias skills; fica fora do mapa principal de trabalho.
 
 <p align="center"><img src="docs/skill-writin-skills.svg" width="650" alt="A writin-skills entende uso, gatilhos, limites e resultado esperado. Mudanças mecânicas recebem verificação objetiva. Para nova skill ou mudança de comportamento, define cenários, critérios, repetições e limite de correções e congela a versão. RED demonstra uma falha sem a skill ou uma contradição comprovada em skill existente. Escreve ou ajusta, congela a candidata e testa. Falhas voltam ao ajuste dentro do limite; se ele chegar, relata pendências sem aprovar. Depois dos critérios passarem, uma revisão independente confere a candidata; achados procedentes voltam ao ajuste e aos testes afetados. A entrega registra arquivos, resultados e limites."></p>
@@ -307,7 +254,7 @@ de dentro da própria pasta. O resto é o original, sob a licença MIT dele
 Auditoria anterior do plugin: [achados, verificações e sugestões](docs/auditoria-plugin.md).
 
 A **`spec-plan`**, a **`implementar`** e a **`build-review`** adaptam o fluxo
-`tlc-spec-driven v3.3.0` de **Felipe Rodrigues (Tech Leads Club)**, sob CC BY 4.0,
+`tlc-spec-driven v3.3.0` e o núcleo `tlc-spec-lean` de **Felipe Rodrigues (Tech Leads Club)**, sob CC BY 4.0,
 e incorporam material de **Matt Pocock**, sob MIT. Créditos e licenças acompanham cada
 pasta: [spec-plan](skills/spec-plan/LICENSE), [implementar](skills/implementar/LICENSE)
 e [build-review](skills/build-review/LICENSE).

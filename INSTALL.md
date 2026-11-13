@@ -1,6 +1,6 @@
 # Instalar o plugin `cass` (e o que ele usa por fora)
 
-O plugin `cass` (skills `ask-me`, `spec-plan`, `auto-think`, `implementar`, `gpt-implementar`, `search`, `build-review`, `handoff`, `gpt-optimizer`, `otimizar-arquitetura`, `aprender-com-a-sessao`, `writin-skills`) **orquestra** ferramentas externas —
+O plugin `cass` (skills `ask-me`, `spec-plan`, `auto-think`, `implementar`, `gpt-implementar`, `search`, `build-review`, `handoff`, `gpt-optimizer`, `otimizar-arquitetura`, `aprender-com-a-sessao`, `writin-skills`, `design-critique`) **orquestra** ferramentas externas —
 ele não empacota elas. Este arquivo reúne tudo que precisa instalar pra ele rodar completo.
 
 As dependências variam por skill. Sem Codex, a `gpt-implementar` para e informa o erro;

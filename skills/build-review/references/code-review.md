@@ -3,20 +3,20 @@ name: code-review
 description: "Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes: Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/spec asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\"."
 ---
 
-Two-axis review of the diff between `HEAD` and a fixed point:
+Two-axis review of the diff between `HEAD` and the approved feature's supplied fixed point:
 
 - **Standards**: does the code conform to this repo's documented coding standards?
 - **Spec**: does the code faithfully implement the originating issue / spec?
 
-Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
+Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings. Start every sub-agent with a fresh context window.
 
-The issue tracker is described in `references/issue-tracker-github.md` of the `/spec-plan` skill.
+The local feature contract supplies the approved `plan.md`, or `checks.md` with its approved `Intent` when no plan exists. No Matt setup or installed Matt skill is required.
 
 ## Process
 
 ### 1. Pin the fixed point
 
-The fixed point is where the feature branch left main: `git merge-base main HEAD`. Use it without asking.
+Use the feature's supplied diff base (a commit SHA, branch name, tag, or merge-base). If it is missing or ambiguous, explain the proposed comparison in the user's language and ask; do not silently assume `main`.
 
 Capture the diff command once: `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base). Also note the list of commits via `git log <fixed-point>..HEAD --oneline`.
 
@@ -24,12 +24,7 @@ Before going further, confirm the fixed point resolves (`git rev-parse <fixed-po
 
 ### 2. Identify the spec source
 
-Look for the originating spec, in this order:
-
-1. Issue references in the commit messages (`#123`, `Closes #45`, GitLab `!67`, etc.), fetched via the workflow in the tracker doc.
-2. A path the user passed as an argument.
-3. A spec file under `.specs/features/<feature>/`, `docs/`, `specs/`, or `.scratch/` matching the branch name or feature.
-4. If nothing is found, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent will skip and report "no spec available".
+Use the approved `plan.md`; when the approved feature has no plan, use the approved `Intent` and fixed claims in `checks.md`. Include approved departures and the project glossary. An issue may add context but cannot replace or silently change that approved authority. If that authority or its actual approval is missing, return to the local feature contract; do not skip the Spec axis or invent a spec.
 
 ### 3. Identify the standards sources
 
@@ -59,6 +54,8 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 
 Issue both sub-agent calls together, in the foreground, and aggregate the reports they return.
 
+Both get the same resolved fixed point and code `HEAD` as the Verifier, without its report, the author's Handoff or each other's conclusions. Record their dispatch and return in the existing `checks.md` Handoff. Each report names the reviewed `HEAD`; no code changes while the three code reviews run.
+
 **Standards sub-agent prompt** should include:
 
 - The full diff command and commit list.
@@ -71,13 +68,15 @@ Issue both sub-agent calls together, in the foreground, and aggregate the report
 - The path or fetched contents of the spec.
 - The brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong. Quote the spec line for each finding. Under 400 words."
 
-If the spec is missing, skip the Spec sub-agent and note this in the final report.
+A missing approved contract stops this local review; the Spec sub-agent is required.
 
 ### 5. Aggregate
 
 Present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings, because the two axes are deliberately separate (see _Why two axes_).
 
 End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes: that's the reranking the separation exists to prevent.
+
+After the Verifier has returned, retain the two reports under those separate headings in `verification.md`, with each report's reviewed `HEAD`. Keep earlier reports with their original HEAD after a fix; label the new reports by that HEAD. Do not replace the Verifier's findings, verdict or reviewed HEAD on its behalf. The local [review safeguards](../../implementar/references/local-review.md) route every source's findings through the one Findings index and require a fresh Standards and a fresh Spec context after each code fix.
 
 ## Why two axes
 
@@ -87,3 +86,7 @@ A change can pass one axis and fail the other:
 - Code that does exactly what the issue asked but breaks the project's conventions → **Spec pass, Standards fail.**
 
 Reporting them separately stops one axis from masking the other.
+
+## Source and local adaptations
+
+Copied from Matt Pocock, `skills/engineering/code-review/SKILL.md`, commit `4ae2317ddb22b046e26455e4f9c9b3aaaf62212d` (MIT; see [LICENSE](../LICENSE)). The setup/tracker dependency and spec lookup use this approved contract; dispatch/report metadata and corrections use the local HEAD/Findings loop. The two fresh contexts, complete smell baseline, prompt briefs, separate presentation and no reranking remain literal source text.

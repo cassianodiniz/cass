@@ -62,6 +62,14 @@ Before writing the first baseline scenario of a new skill, or whenever the reque
 
 Before choosing a skill's type or workflow pattern, planning its folder and supporting files, writing the SKILL.md skeleton, deciding what each step does when it fails and when a loop stops, drawing a flowchart, adding code examples, or reviewing a skill for format anti-patterns, read [references/skill-format.md](references/skill-format.md).
 
+## Change the User Applies by Hand
+
+When the user asks for a document, drawing or artifact of a skill change, or says they will edit the skill themselves, read [references/change-guide-page.md](references/change-guide-page.md) before proposing any text.
+
+## Changing an Existing Skill
+
+When the request is to adjust, fix or audit a skill that already exists, read [references/changing-an-existing-skill.md](references/changing-an-existing-skill.md) before proposing any text.
+
 ## Description, Naming and Discovery
 
 Before writing or changing a skill's `name` or `description`, choosing its keywords, trimming its token cost, or cross-referencing other skills, read [references/description.md](references/description.md).

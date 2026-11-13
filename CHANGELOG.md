@@ -2,6 +2,19 @@
 
 ## Não lançado
 
+- Sincroniza `spec-plan`, `implementar`, `gpt-implementar` e `build-review` com as versões de 12/11/2026 do repositório skills-cassiano.
+- Sai o caminho antigo (`spec.md`/`tasks.md`, os `LEGACY.md` e os arquivos usados só por eles): a feature fica só com `plan.md` e `checks.md`. Créditos de licença passam para `CREDITS.md` em cada skill.
+- `spec-plan`: antes da primeira pergunta, explora o código em volta do pedido com um agente auxiliar, quando a sessão ainda não leu aquele código. Três guias de arquitetura de Matt Pocock entram em `references/skills/` (desenho de módulos, exploração e vocabulário do domínio). O plano nomeia cada regra de outra área de que depende e onde ela mora; regra escrita em vários lugares vira pergunta ao usuário.
+- `implementar`: quem constrói roda só os testes de cada fatia; a bateria completa roda na revisão, pelo Verifier da `build-review`, que vai até o fim mesmo com um teste falhando.
+- `writin-skills`: roteiro para ajustar skill existente, com escada de testes em dois níveis (leitura; trabalho num repositório de mentira), sempre começando pela leitura. Sai o modelo de teste fixo. Nova referência da página de mudança de skill, para quando o usuário aplica a mudança à mão. A revisão independente passa a rodar no GPT pelo script da `gpt-optimizer`, que vai no plugin, e cai para um subagente do Claude quando o script falha.
+
+## 4.9.0 — 2026-11-05
+
+- Adiciona `design-critique`, preservada integralmente da pasta Design-1.2.0-v1 fornecida pelo autor.
+- Sincroniza `spec-plan`, `implementar`, `gpt-implementar` e `build-review` com as versões instaladas do repositório skills-cassiano: núcleo Lean, compatibilidade LEGACY, delegação, referências, scripts e licenças.
+- Atualiza apresentação das quatro entradas e inclui a nova skill no catálogo e na instalação. Desenhos anteriores continuam em docs como material histórico; as seções atualizadas apontam para as instruções atuais.
+
+
 - `spec-plan`: um sim só, no fim do planejamento, em vez de um sim por documento. Mensagem de aprovação curta, com fluxograma Mermaid na spec, no pedido de sim e na PR. Cada frase do pedido vira critério, fora de escopo ou pergunta. As ferramentas de cada tarefa entram na mesma mensagem. Só para antes por custo, segurança ou comportamento.
 - `implementar` e `gpt-implementar`: quem constrói conserta o próprio erro de teste e só para depois de 3 tentativas; falha de ambiente roda de novo uma vez; peça não listada pode ser estendida, só acrescentando e sem mudar os outros usos, com anotação em `tasks.md` e no commit; teste antigo que a spec aprovada mudou é atualizado no mesmo commit. O pedido de cada lote leva as notas de ambiente.
 - `build-review` e `spec-plan`: conferidores com trechos da `tlc-spec-lean`. O `validate_state` lê só a linha `**Verdict**:`, confere as tabelas do relatório e responde 2 quando não há o que conferir; o `validate_spec` confere de fato os critérios de aceite e ignora blocos de código.
