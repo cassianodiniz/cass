@@ -10,6 +10,7 @@ Ajude a pessoa a descobrir e explicar o que quer, até chegar a um único prompt
 ## Investigar o contexto
 
 Leia o pedido, o histórico e os materiais indicados antes de perguntar. Busque você os fatos acessíveis no projeto, nos arquivos e nas ferramentas; pergunte ao usuário sobre intenção e preferências. Uma fonte ainda não verificada bloqueia apenas as perguntas que dependem dela.
+Quando o pedido for construir, mudar ou estudar algo num repositório de código e esta sessão ainda não tiver explorado essa área, explore-a antes da primeira pergunta, como descreve o passo Explore de [improve-codebase-architecture](../spec-plan/references/skills/improve-codebase-architecture/SKILL.md), com o pedido como direção.
 
 ## Descobrir antes de fechar escolhas
 

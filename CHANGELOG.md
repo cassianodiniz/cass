@@ -2,6 +2,7 @@
 
 ## Não lançado
 
+- `ask-me`: quando o pedido é construir, mudar ou estudar algo num repositório de código, explora a área antes da primeira pergunta, pelo passo de exploração que a `spec-plan` já usa (`spec-plan/references/skills/improve-codebase-architecture`). A `ask-me` passa a depender desse arquivo da `spec-plan`.
 - `ask-me`: o modelo do pedido final ganha ícones em seis campos (Objetivo, Pronto quando, Fazer, NÃO fazer, A seu critério, Suposições) e o bloco passa a ser descrito como "um único bloco no chat".
 - `spec-plan`: antes de perguntar, olha as pull requests e issues abertas que tocam a área do pedido e avisa o usuário quando acha uma, para não planejar de novo o que já foi planejado.
 - `writin-skills`: voltam, como referência interna da skill, o TDD de código (`references/tdd.md`, sem cabeçalho de skill, com `writing-good-tests.md`) e os guias de Codex e Gemini da writing-skills original (superpowers); as menções a skills que o plugin não tem foram retiradas. Os arquivos ficam só dentro da `writin-skills` e não são usados pelas outras skills.
