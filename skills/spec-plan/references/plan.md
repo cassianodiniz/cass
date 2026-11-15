@@ -10,6 +10,7 @@ Skip this file when the change is under roughly three files with no one-way door
 - Read `.specs/STATE.md` `## Decisions`. Every `active` `AD-NNN` constrains the shape: conform, or append an entry that supersedes it and say why.
 - Open every binding source in full - every capture, frame and state - before the first criterion.
 - If this session has not yet explored the code around this request, explore it as the Explore step of [improve-codebase-architecture](skills/improve-codebase-architecture/SKILL.md) describes, with the request as the direction. Its sub-agent runs on Haiku model.
+- Check the open pull requests and issues for work that touches this request's area. When one does, tell the user before the first round of questions.
 
 Facts you look up; decisions you ask. Ask only what is the user's: scope, priority, product behaviour, a trade-off.
 
