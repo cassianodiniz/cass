@@ -16,6 +16,8 @@ Before writing code, follow “Project vocabulary” in [Spec Plan](../spec-plan
 
 **Delegation.** When delegating construction or approved repairs, read [Delegation](references/delegation.md) completely before dispatch and apply its brief, return, reconciliation and stop contract. This applies to native workers and the Codex adapter; it does not impose delegation, tasks, phases or batches.
 
+**PR body.** Before the first slice, read [PR.md](../build-review/references/PR.md). After each slice and each approved change of direction, update `pr.md` in the feature folder from actual evidence: progress, the change table, delivery and proofs, and the drawing. Keep unfinished work and the final review visible. The update goes into the slice's commit; the PR on GitHub is refreshed only at the next authorized push. Include this reference in delegated-worker briefs.
+
 **Verification.** When the feature is ready for verification, start `/build-review`; it dispatches the independent roles required by the shared core. Do not finish at the last commit.
 
 Keep the user's language in the conversation.

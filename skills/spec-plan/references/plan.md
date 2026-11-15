@@ -77,7 +77,7 @@ The builder matches the image for composition and look. Do not retype the screen
 
 **Which references bind.** A capture, screenshot, design frame or live site that comes with the request binds: it is the result the user expects, and the user does not have to say so. It is `non-binding` only when the user called it inspiration - a mood board, "something like X", a product cited for its feel - and its `Sources` line quotes them: `non-binding - user: "<their words>"`. Something the source draws that the stored model cannot hold, such as a code or a field, is a departure asked as above, never a reason to make the source non-binding. A binding source lives in files: export each frame or state, open ones included, to `.specs/features/<f>/captures/` with its structure beside it where the tool gives one, keep the link in `Sources` with the date, and ask for the files as a `blocks` question when you cannot reach it. Each capture's `Sources` line shows the image, `![<name>](captures/<file>)`, so whoever approves the plan sees the screen beside the criteria.
 
-**A screen with no reference gets outcomes, not layout.** Say what a user can see and do, never where things sit. Layout is the builder's call, held to the design system.
+**A screen with no reference gets outcomes, not layout.** Say what a user can see and do, never where things sit. Layout is the builder's call, held to the project's design manual: the file `AGENTS.md` or `CLAUDE.md` names for screens, or a `DESIGN.md`. When the project has one, add one criterion per changed screen, `The <screen> SHALL follow <manual path>: <rules>`, quoting the manual's rules, with their values, for the pieces that screen uses: space between rows, row height, text styles, control sizes. When a screen needs a piece or a value the manual does not have, ask it as a gray area, with your recommendation: reuse the nearest piece the manual has, or add the new piece and its rule to the manual.
 
 **A backend criterion is a rule with examples under it.** One example is the strong case - the boundary, or the input where an implementation fitted to the obvious sample breaks.
 
@@ -100,7 +100,7 @@ Open with one sentence on what this reuses instead of duplicating, and one on wh
 
 **The path.** One numbered line per hop: what enters, which module it crosses, what it hands on, what persists or goes out at the end. Name only modules that exist today, marked `(exists)`, or that a `Landing` door creates, marked `(door <n>)`; a new module with no door is `(new)` and its placement is the builder's. `single module - <name>` is complete.
 
-**The drawing.** The person approving the plan reads a drawing before a list, so draw the path in mermaid: a `sequenceDiagram` for a request and its answer, a `flowchart` when it branches, fans out or hands off to a queue or job. Number each arrow or node with its line in the list and name the same modules in both: the list says what each hop decides, the drawing shows the shape. Both stay true through the build.
+**The drawing.** The person approving the plan reads a drawing before a list, so draw the path in mermaid, in the user's words: a `flowchart` of what happens for the people involved, with screens and people as the user knows them, before → after when a screen changes, and no module, table or code names. Use only behaviors the list and the criteria already state. The list says which module does each hop; the drawing shows what the people see. Both stay true through the build.
 
 **The data.** An `erDiagram` of the entities this reads or writes and how they relate, then one line, `New: <entities and relations this adds>` (`New: nothing - read only` is complete). No attribute blocks. `Data: none - <why>` when nothing stored is touched.
 
@@ -187,8 +187,8 @@ the source gives, or a note that it gives none.>
 4. out: `<response>`, and `<Module>` (exists) reads `<field>` on the next request
 
 ```mermaid
-sequenceDiagram
-    participant A as <Module> participant B as <Module> A->>B: 1. <what enters> B-->>A: 4. <response>
+flowchart LR
+    A["<who acts, on which screen>"] --> B["<what they see after>"]
 ```
 
 **Changes underneath**

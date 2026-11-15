@@ -12,7 +12,7 @@ A **change guide page** is one page the user works from to apply a skill change 
 
 4. **Prove the list against the files.** Each find text occurs exactly once in its file. Apply the whole list to a throwaway copy and diff it against the original. Done when the diff shows only the intended lines.
 
-5. **Build the page** with the layout below and publish it.
+5. **Build the page** with the layout below and publish it. Then open its address in the machine's default browser (`open <url>` on macOS, `start "" <url>` on Windows), so the user reads it there and not in the app's side pane.
 
 6. **Recheck on every request.** When the user says they pasted something, or asks what is left, read the files again and recompute every edit's state by comparing the current line with the expected final line. Republish at the same address. Done when every edit is in exactly one state and every difference from the expected text is shown.
 
@@ -44,10 +44,11 @@ Top of the page:
 Each pending edit is a card:
 - number, line number in the current file, manual name and file path, kind badge, and a state badge when it is an undo or a leftover;
 - the before/after description;
-- where it goes: the sentence right before the text, on the same line or the line above;
+- where it goes: the sentence right before the text, on the same line or the line above, with a copy icon on its left; this line is not translated;
+- an "Abrir arquivo" button on the right of the "where it goes" label: a link `abrirprojeto://abrir/<Folder>/<path>` that opens the skill file in the machine's default app, where `<Folder>` is the folder's name inside `Projetos` (`Skills` for this repository). It needs the helper in [tools/abrir-projeto](../tools/abrir-projeto/README.md), installed once per machine;
 - the diff box: what leaves in red, what enters in green, with the changed words inside the sentence in a stronger tone;
-- a collapsed translation of the same diff, keeping commands, file names and step names in the original language;
-- two copy buttons: the text to find, and the new text;
+- a translate icon on the left of the "where it goes" label: one click shows the translation inside the diff box, under what leaves and under what enters, and another click hides it. The translation keeps commands, file names and step names in the original language, and is told apart from the original by the page's body font, a slightly dimmer tone and a thin bar on its left, with no label;
+- two copy buttons: the text to find, and the new text. Every copy button copies the original text, keeps its label and shows only a brief press effect; the icons have no border and no selected state;
 - a "done" tick, kept in the user's browser.
 
 Done edits stay on the page as a register, collapsed to their header row; opening one shows the same card, so the user can check or undo it later.

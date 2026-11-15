@@ -11,3 +11,5 @@ It also incorporates material from **Matt Pocock's** skills (tdd) in [mattpocock
 Changes from the sources: the TLC workflow was split into `spec-plan`, `implementar` and `build-review`; instructions and cross-references were adapted to connect the three skills; Matt Pocock's material was integrated into the corresponding stages. This adapted skill is not an unchanged upstream copy.
 
 See [LICENSE](LICENSE) for attribution and license notices for both sources.
+
+Note on file names (2026-11-14): the paragraphs above keep the names of the version they describe. `spec.md` and User Stories now live in `spec-plan/references/plan.md` (plan.md and its `## Criteria`); `validation.md` is now `verification.md`.

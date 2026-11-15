@@ -29,9 +29,9 @@ Read the shared [core.md](references/core.md) and follow [Plan](references/plan.
 **The one yes.** Ask for it with [approval-message.md](references/approval-message.md).
 
 **Publishing on the yes.** On the yes, record `**Approved**: <YYYY-MM-DD> - user: "<their words>"` in plan.md (checks.md when there is no plan), using the actual reply, then publish. Its approval message names every action below, so that yes is the explicit go-ahead for them. In this order:
-1. Create the feature branch from the current main. Commit the feature folder and any change to `.specs/STATE.md`, and push the branch.
-2. Create the feature's issue with [issue-tracker-github.md](references/issue-tracker-github.md). Title: the feature name. Body: only the link to the feature folder on the branch. The issue is a card: it never copies the plan or the progress.
-3. Open a draft PR after the commit in step 1 above (a branch with no commits ahead of main can't open one), marked as closing the feature's issue. The PR body is the plan's `## Shape` Mermaid block plus the link to the feature folder on the branch.
+1. If the feature started from an existing issue, read it with [issue-tracker-github.md](references/issue-tracker-github.md) and keep its number.
+2. Write `.specs/features/<feature>/pr.md` from the approved plan (from checks.md when there is no plan, then with no drawing) with [PR.md](../build-review/references/PR.md), with the plan's `## Shape` drawing and the link to the feature folder on the branch. Create the feature branch from the current main. Commit the feature folder and any change to `.specs/STATE.md`, and push the branch.
+3. Open a draft PR with `pr.md` as its body (a branch with no commits ahead of main can't open one). When step 1 kept an issue number, mark the PR as closing that issue.
 4. Tell the user the PR number and the branch name.
 
 **After publishing.** On its real approval and publishing, continue to `/implementar`, or `/gpt-implementar` when the user chose Codex. When the user chose to only publish, stop after publishing and build nothing.
