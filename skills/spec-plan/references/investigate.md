@@ -17,13 +17,13 @@ Simplicity must never remove required behavior, input validation at trust bounda
 
 ## Format a round like so:
 
-📝 **1** - Quer que eu transforme isso numa spec pronta pra implementar? a) Sim, pode gerar a spec b) Antes disso, quero ajustar alguns pontos c) Quero só revisar o entendimento comigo primeiro
+📝 **1** - Quer que eu transforme isso num plano pronto pra implementar? a) Sim, pode gerar o plano b) Antes disso, quero ajustar alguns pontos c) Quero só revisar o entendimento comigo primeiro
 
-✅ (recommend 1 only if nothing is pending; otherwise recommend 2 and say what is pending
+✅ (recommend 1 only if nothing is pending; otherwise recommend 2 and say what is pending)
 
 📝**2** - Exemplo de pergunta nova.
 
-a) Exemplo de resposta 1 b) Exemplo de resposta 2 c) Exemplo de resposta 3 ✅ (recommend 1 only if nothing is pending; otherwise recommend 2 and say what is pending
+a) Exemplo de resposta 1 b) Exemplo de resposta 2 c) Exemplo de resposta 3 ✅ (recommend 1 only if nothing is pending; otherwise recommend 2 and say what is pending)
 
 Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a later round, not this one.
 

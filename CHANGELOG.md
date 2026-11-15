@@ -2,6 +2,12 @@
 
 ## Não lançado
 
+- Sincroniza `spec-plan`, `implementar`, `build-review` e `writin-skills` com as versões de 15/11/2026 do repositório skills-cassiano.
+- `spec-plan`: o plano traz um desenho só, nas palavras do usuário (telas, pessoas, antes → depois), mostrado no pedido de sim e na PR; deixa de criar issue, e a PR em rascunho passa a ser o único item da feature (fecha a issue de origem, quando existe).
+- `spec-plan`: quando o plano mexe em tela e o projeto tem manual de design, cada tela alterada ganha um critério citando as regras do manual com os valores; peça ou medida que o manual não tem vira pergunta ao usuário, com recomendação.
+- `build-review`: modelo do texto da PR (`references/PR.md`), guardado em `pr.md` na pasta da feature e atualizado a cada fatia e a cada rodada de revisão; o GitHub só recebe no envio final.
+- `implementar`: no passo das fotos, o revisor mede a tela (espaço entre linhas, alturas, textos, controles) e compara com o manual de design; medida errada em parte que a feature não criou nem alterou é anotada como já existente e não reprova a revisão.
+- `writin-skills`: a página de trocas mostra a tradução por um ícone, dentro das caixas do que sai e do que entra; ganha ícone de copiar na linha de referência e botão "Abrir arquivo", que abre o arquivo da skill no aplicativo padrão por um aplicativo auxiliar (`tools/abrir-projeto`, instalado uma vez por máquina); depois de publicar, a página abre no navegador padrão.
 - Sincroniza `spec-plan`, `implementar`, `gpt-implementar` e `build-review` com as versões de 12/11/2026 do repositório skills-cassiano.
 - Sai o caminho antigo (`spec.md`/`tasks.md`, os `LEGACY.md` e os arquivos usados só por eles): a feature fica só com `plan.md` e `checks.md`. Créditos de licença passam para `CREDITS.md` em cada skill.
 - `spec-plan`: antes da primeira pergunta, explora o código em volta do pedido com um agente auxiliar, quando a sessão ainda não leu aquele código. Três guias de arquitetura de Matt Pocock entram em `references/skills/` (desenho de módulos, exploração e vocabulário do domínio). O plano nomeia cada regra de outra área de que depende e onde ela mora; regra escrita em vários lugares vira pergunta ao usuário.

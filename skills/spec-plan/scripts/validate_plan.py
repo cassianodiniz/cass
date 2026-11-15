@@ -57,7 +57,7 @@ What it checks:
   WARN   - template placeholder rows are still present (plan not filled in)
   WARN   - open questions are not explicitly resolved
   WARN   - no Sources section ('nothing' is valid, a missing section is not)
-  ERROR  - a Shape path with no mermaid drawing, or a module on the path the drawings never name
+  ERROR  - a Shape path with no mermaid drawing
   ERROR  - a Shape with no `erDiagram` and no `Data: none - <why>`, or an erDiagram with no `New:` line
   ERROR  - a capture under captures/ that the plan does not show as an image (`![..](captures/..)`)
   WARN   - a path hop, or a flowchart node, naming a module marked neither existing
@@ -434,15 +434,6 @@ def check_drawings(lines, shape, plan_path):
             "its answer) or `flowchart` (branches, queues, jobs) numbered like the list; whoever approves "
             "the plan reads the drawing first"
         )
-    elif hops:
-        drawn = "\n".join(x for b in blocks for x in b[2]).lower()
-        for i in hops:
-            for name in MARKED_MODULE_RE.findall(lines[i]):
-                if not _drawn(name, drawn):
-                    errors.append(
-                        f"L{i + 1}: `{name}` is on the path but not in its drawing - name the same modules "
-                        "in both, or the two describe different systems"
-                    )
     has_er = any(b[1] == "erDiagram" for b in blocks)
     if not has_er and not any(DATA_NONE_RE.match(x) for x in body):
         errors.append(
@@ -728,17 +719,6 @@ def check_file(path):
             if HOP_RESOLVED_RE.search(ln):
                 continue
             _warn_unresolved(warnings, i, MODULE_RE.findall(ln), land_text, "hop")
-
-        # The same rule holds inside a flowchart: a node that neither exists nor is created
-        # by a door is placement.
-        flow_lines = {i + 1 + k for i, kind, body in mermaid_blocks(raw_lines(path), shape)
-                      if kind in ("flowchart", "graph") for k in range(len(body))}
-        for i in sorted(flow_lines):
-            ln = lines[i]
-            if ER_EDGE_RE.search(ln) or not EDGE_LINE_RE.search(ln) or HOP_RESOLVED_RE.search(ln):
-                continue
-            labels = [lbl.strip() for lbl in NODE_LABEL_RE.findall(ln) if lbl.strip()]
-            _warn_unresolved(warnings, i, labels, land_text, "diagram node")
 
     return errors, warnings
 

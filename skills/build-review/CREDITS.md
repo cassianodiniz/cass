@@ -13,3 +13,5 @@ Changes from the sources: the TLC workflow was split into `spec-plan`, `implemen
 See [LICENSE](LICENSE) for attribution and license notices for both sources.
 
 Integration correction (2026-11-01): binding-source production, source differences and the screen inventory/viewport instructions are copied from tlc-spec-driven v4.1.0 at commit 5929de5cd34f8cca03f3745265571f07b80c9106. Local adaptations preserve one plan approval, independent mandatory photos at three widths, and a complete fresh review after every fix. The Lean proof selector is corrected to require the complete passing line rather than scattered words; capture/criterion identity is adapted to repeated AC numbering in User Stories and Small flat criteria, including wrapped paths. These corrections are not unchanged upstream copies.
+
+Note on file names (2026-11-14): the paragraphs above keep the names of the version they describe. `references/validate.md` is now `implementar/references/verify.md`; `spec.md` and User Stories now live in `spec-plan/references/plan.md` (plan.md and its `## Criteria`); `validation.md` is now `verification.md`; `validate_state` is now `validate_verification.py`.

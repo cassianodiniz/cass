@@ -12,7 +12,7 @@ Resolve the shared core's scripts. The builder runs `check_proofs.py <feature>`;
 
 The fresh Verifier runs the `## Gate Check Commands` table itself at the reviewed HEAD, as shared Verify requires, and records `## Test integrity` in verification.md. A focal proof run, compilation alone or unchanged count cannot stand in for the full product battery. Require a result for every suite in that table. No required check is declared passed when unavailable; distinguish inherited failures and blockers.
 
-Before planning, follow the project's documentation pointers to its glossary. Use GLOSSARY-MAP.md to locate the relevant glossary when present; otherwise read root GLOSSARY.md. If neither exists, continue. Require the Verifier and Spec reviewer to read the relevant glossary and report behavior that conflicts with its approved definitions.
+Before the review, follow the project's documentation pointers to its glossary. Use GLOSSARY-MAP.md to locate the relevant glossary when present; otherwise read root GLOSSARY.md. If neither exists, continue. Require the Verifier and Spec reviewer to read the relevant glossary and report behavior that conflicts with its approved definitions.
 
 ## Screen photos
 
@@ -69,6 +69,6 @@ After the reviewers, photos and applicable guided test return, add their results
 
 When the review stops before the reviewers run, the verdict is neither PASS nor FAIL: it is "Não deu para revisar", with what was missing and how to get it. A red test is not missing input: the reviewers still run.
 
-On PASS, with no approved fix left, mark an existing draft PR ready for review only with the user's yes. Ask one question: commit verification.md, checks/proofs evidence, the review photos and lessons files, push, and mark the PR ready. That yes covers the applicable actions. If there is no PR, omit the ready action rather than inventing a PR. A prior plan approval or local commit authorization does not authorize push, deploy or other remote actions.
+On PASS, with no approved fix left, mark an existing draft PR ready for review only with the user's yes. Ask one question: commit verification.md, checks/proofs evidence, the review photos and lessons files, push, refresh the PR body from `pr.md`, and mark the PR ready. That yes covers the applicable actions. If there is no PR, omit the ready action rather than inventing a PR. A prior plan approval or local commit authorization does not authorize push, deploy or other remote actions.
 
 Standards/Spec wording and source attribution are in [code-review.md](../../build-review/references/code-review.md).

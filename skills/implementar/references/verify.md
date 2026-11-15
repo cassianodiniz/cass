@@ -51,7 +51,7 @@ Go through checks.md:
 For each acceptance criterion in `plan.md` `## Criteria`, the Verifier re-derives the **plan-defined expected outcome** and confirms the test's actual assertion matches it:
 
 ```markdown
-### S1: [Story Title]
+### S1: [Slice title]
 
 **Acceptance Criteria**:
 
@@ -159,7 +159,7 @@ Skip this step for backend-only or infrastructure work. The Verifier runs it, no
 1. Start the app locally, already logged in with the project's own test account (from its example or seed files). If there is none, ask the user once and record it in the project.
 2. Take a photo of every screen this feature changed, at 375, 768 and 1280 px wide. Save them as `captures/review-<screen>-<width>.png`.
 3. When a criterion cites a capture (a model image), also reach that state and take its photo in a browser window at the capture's size - its pixel size over its scale - so the page lays out as the capture does; an image resized afterwards does not. Save it as `captures/review-<capture>.png` and compare it with the capture: controls, arrangement, copy, drawing and render. It matches except for what `## Differences from the source` lists.
-4. Look at every photo before showing it, and note each defect you see.
+4. Look at every photo before showing it, and note each defect you see. When the project has a design manual (the file `AGENTS.md` or `CLAUDE.md` names for screens, or a `DESIGN.md`), also measure each changed screen in the running app at 375 and 1280 px - the gap between consecutive rows of each card, the height of each row, the size and weight of each text, the size of each control - and compare each measure with the manual's rule for that piece. A measure that differs from its rule is a defect, written with both values and the manual's section. A measure that differs in a part of the screen this feature neither added nor changed (the feature's diff does not touch it) was already there: write it in the `Defects` column as `already there`, with both values, and it is neither a defect nor a `## Findings` row.
 5. Each defect goes into the fix plan (step 8) and makes the verdict FAIL, like an issue from the Interactive UAT.
 6. Show the photos to the user with the review result, every time, even when step 7 does not run.
 
