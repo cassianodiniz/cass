@@ -2,6 +2,7 @@
 
 ## Não lançado
 
+- `ask-me`: o modelo do pedido final ganha ícones em seis campos (Objetivo, Pronto quando, Fazer, NÃO fazer, A seu critério, Suposições) e o bloco passa a ser descrito como "um único bloco no chat".
 - `spec-plan`: antes de perguntar, olha as pull requests e issues abertas que tocam a área do pedido e avisa o usuário quando acha uma, para não planejar de novo o que já foi planejado.
 - `writin-skills`: voltam, como referência interna da skill, o TDD de código (`references/tdd.md`, sem cabeçalho de skill, com `writing-good-tests.md`) e os guias de Codex e Gemini da writing-skills original (superpowers); as menções a skills que o plugin não tem foram retiradas. Os arquivos ficam só dentro da `writin-skills` e não são usados pelas outras skills.
 - `writin-skills`: o botão "Abrir arquivo" fica sempre na página de mudança; o aplicativo que faz o botão funcionar é opcional (instalar e remover em `tools/abrir-projeto/README.md`) e o usuário escolhe em que pastas ele abre arquivos, listando-as em `pastas.txt`.

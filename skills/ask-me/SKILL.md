@@ -59,18 +59,18 @@ Assim que o pedido estiver delimitado e decidido o que o usuário quer fazer, ve
 Entregue, nesta ordem, na mesma mensagem:
 
 1. **Conferi o combinado:** síntese curta do resultado esperado, dos limites e das suposições restantes.
-2. **O prompt pra essa tarefa seria:** um único bloco pronto para copiar. Use os campos abaixo conforme a tarefa, omitindo os que não acrescentam informação.
+2. **O pedido para essa tarefa é:** um único bloco no chat. Use os campos abaixo conforme a tarefa, omitindo os que não acrescentam informação.
 3. As skills de execução verificadas, com uma frase sobre por que se encaixam e o que muda entre elas, seguida do menu de execução ou ajuste.
 
 ```text
-Objetivo: <resultado pretendido>
+🎯 Objetivo: <resultado pretendido>
 Contexto: <para quem, motivação e materiais relevantes>
-Pronto quando: <critérios de sucesso combinados>
-Fazer: <entregas e decisões confirmadas; ordem e dependências se necessárias>
+✅ Pronto quando: <critérios de sucesso combinados>
+🛠️ Fazer: <entregas e decisões confirmadas; ordem e dependências se necessárias>
 Preservar: <restrições, valores exatos e referências que precisam acompanhar a execução>
-NÃO fazer: <exclusões concretas estabelecidas pelo usuário>
-A seu critério: <escolhas que o executor pode resolver sem mudar o combinado>
-Suposições: <somente as ainda relevantes, identificadas como tais>
+❌ NÃO fazer: <exclusões concretas estabelecidas pelo usuário>
+📄 A seu critério: <escolhas que o executor pode resolver sem mudar o combinado>
+❓Suposições: <somente as ainda relevantes, identificadas como tais>
 Parar e perguntar: se precisar mudar o objetivo, o escopo, os limites ou os critérios combinados, ou faltar uma informação indispensável; respeitar as autorizações já dadas.
 Ao terminar: resumir a entrega e indicar o que não foi possível confirmar.
 ```
