@@ -2,6 +2,7 @@
 
 ## Não lançado
 
+- `writin-skills`: o botão "Abrir arquivo" fica sempre na página de mudança; o aplicativo que faz o botão funcionar é opcional (instalar e remover em `tools/abrir-projeto/README.md`) e o usuário escolhe em que pastas ele abre arquivos, listando-as em `pastas.txt`.
 - Sincroniza `spec-plan`, `implementar`, `build-review` e `writin-skills` com as versões de 15/11/2026 do repositório skills-cassiano.
 - `spec-plan`: o plano traz um desenho só, nas palavras do usuário (telas, pessoas, antes → depois), mostrado no pedido de sim e na PR; deixa de criar issue, e a PR em rascunho passa a ser o único item da feature (fecha a issue de origem, quando existe).
 - `spec-plan`: quando o plano mexe em tela e o projeto tem manual de design, cada tela alterada ganha um critério citando as regras do manual com os valores; peça ou medida que o manual não tem vira pergunta ao usuário, com recomendação.
