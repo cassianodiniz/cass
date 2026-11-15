@@ -2,6 +2,7 @@
 
 ## Não lançado
 
+- `writin-skills`: voltam, como referência interna da skill, o TDD de código (`references/tdd.md`, sem cabeçalho de skill, com `writing-good-tests.md`) e os guias de Codex e Gemini da writing-skills original (superpowers); as menções a skills que o plugin não tem foram retiradas. Os arquivos ficam só dentro da `writin-skills` e não são usados pelas outras skills.
 - `writin-skills`: o botão "Abrir arquivo" fica sempre na página de mudança; o aplicativo que faz o botão funcionar é opcional (instalar e remover em `tools/abrir-projeto/README.md`) e o usuário escolhe em que pastas ele abre arquivos, listando-as em `pastas.txt`.
 - Sincroniza `spec-plan`, `implementar`, `build-review` e `writin-skills` com as versões de 15/11/2026 do repositório skills-cassiano.
 - `spec-plan`: o plano traz um desenho só, nas palavras do usuário (telas, pessoas, antes → depois), mostrado no pedido de sim e na PR; deixa de criar issue, e a PR em rascunho passa a ser o único item da feature (fecha a issue de origem, quando existe).

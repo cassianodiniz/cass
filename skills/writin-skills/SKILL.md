@@ -9,9 +9,13 @@ description: Use when creating a new skill, editing a SKILL.md, fixing the descr
 
 **Writing skills IS Test-Driven Development applied to process documentation.**
 
+**Personal skills live in your runtime's skills directory** (`~/.claude/skills/` on Claude Code) — see [gemini-tools.md](references/gemini-tools.md) for the path on Gemini CLI. Codex, Copilot CLI, and Gemini CLI all also recognize `~/.agents/skills/` as a cross-runtime alias. When a skill dispatches subagents on Codex, read [codex-tools.md](references/codex-tools.md).
+
 You write test cases (pressure scenarios with subagents), watch them fail (baseline behavior), write the skill (documentation), watch tests pass (agents comply), and refactor (close loopholes).
 
 **Core principle:** If you didn't watch an agent fail without the skill, you don't know if the skill teaches the right thing.
+
+**REQUIRED BACKGROUND:** You MUST understand [references/tdd.md](references/tdd.md) before using this skill. It defines the fundamental RED-GREEN-REFACTOR cycle. This skill adapts TDD to documentation.
 
 **Official guidance:** Read [anthropic-best-practices.md](anthropic-best-practices.md) when you need Anthropic's official guidance on skill layout, workflows, feedback loops or bundled scripts. It complements the TDD-focused approach here. Where it says a description should state what the skill does, this skill's rule wins: the description says only when to use and when NOT to use (see [references/description.md](references/description.md)).
 
@@ -98,6 +102,8 @@ Edit skill without testing? Same violation.
 - Don't keep untested changes as "reference"
 - Don't "adapt" while running tests
 - Delete means delete
+
+**REQUIRED BACKGROUND:** [references/tdd.md](references/tdd.md) explains why this matters. Same principles apply to documentation.
 
 ## House Rules for Testing Skills (Cassiano)
 
