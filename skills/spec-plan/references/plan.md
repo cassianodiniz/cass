@@ -101,7 +101,7 @@ Open with one sentence on what this reuses instead of duplicating, and one on wh
 
 **The path.** One numbered line per hop: what enters, which module it crosses, what it hands on, what persists or goes out at the end. Name only modules that exist today, marked `(exists)`, or that a `Landing` door creates, marked `(door <n>)`; a new module with no door is `(new)` and its placement is the builder's. `single module - <name>` is complete.
 
-**The drawing.** The person approving the plan reads a drawing before a list, so draw the path in mermaid, in the user's words: a `flowchart` of what happens for the people involved, with screens and people as the user knows them, before → after when a screen changes, and no module, table or code names. Use only behaviors the list and the criteria already state. The list says which module does each hop; the drawing shows what the people see. Both stay true through the build.
+**The drawing.** The person approving the plan reads a drawing before a list, so draw the path in mermaid, in the user's words: a `flowchart` of what happens for the people involved, with screens and people as the user knows them, before → after when a screen changes, and no module, table or code names. Draw it top to bottom. A box is a thing (a person, a screen, an outside service the user knows by name) in at most four words; what happens goes on the arrow. Colour and line style follow the template below and nothing else is coloured. Use only behaviors the list and the criteria already state. The list says which module does each hop; the drawing shows what the people see. Both stay true through the build.
 
 **The data.** An `erDiagram` of the entities this reads or writes and how they relate, then one line, `New: <entities and relations this adds>` (`New: nothing - read only` is complete). No attribute blocks. `Data: none - <why>` when nothing stored is touched.
 
@@ -188,9 +188,23 @@ the source gives, or a note that it gives none.>
 4. out: `<response>`, and `<Module>` (exists) reads `<field>` on the next request
 
 ```mermaid
-flowchart LR
-    A["<who acts, on which screen>"] --> B["<what they see after>"]
+flowchart TD
+    A["<who acts>"] -->|"<what they do>"| B["<screen>"]
+    X[("<outside service>")] -->|"<what it sends>"| B
+    B -->|"<what happens>"| C["<what they get>"]
+    X -.->|"<path outside the main one>"| B
+
+    classDef start fill:#185FA5,stroke:#185FA5,color:#ffffff
+    classDef result fill:#0F6E56,stroke:#0F6E56,color:#ffffff
+    classDef outside fill:transparent,stroke:#BA7517,stroke-width:1.5px,stroke-dasharray:4 3
+    classDef step fill:transparent,stroke-width:1.5px
+    class A start
+    class B step
+    class C result
+    class X outside
 ```
+
+<More than five boxes: group them in one `subgraph` per place, each with `style <id> fill:transparent`. Five or fewer: no `subgraph`.>
 
 **Changes underneath**
 
