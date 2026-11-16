@@ -2,6 +2,7 @@
 
 ## Não lançado
 
+- `spec-plan`: o desenho do plano sai de cima para baixo, com caixa de até quatro palavras, a ação escrita na seta e quatro cores fixas no modelo (começo, resultado, serviço de fora, passo comum); com mais de cinco caixas, elas são agrupadas em um bloco por lugar. `build-review`: o modelo do texto da PR deixa de sugerir cor para as setas, porque o desenho já chega pronto do plano.
 - `ask-me`: quando o pedido é construir, mudar ou estudar algo num repositório de código, explora a área antes da primeira pergunta, pelo passo de exploração que a `spec-plan` já usa (`spec-plan/references/skills/improve-codebase-architecture`). A `ask-me` passa a depender desse arquivo da `spec-plan`.
 - `ask-me`: o modelo do pedido final ganha ícones em seis campos (Objetivo, Pronto quando, Fazer, NÃO fazer, A seu critério, Suposições) e o bloco passa a ser descrito como "um único bloco no chat".
 - `spec-plan`: antes de perguntar, olha as pull requests e issues abertas que tocam a área do pedido e avisa o usuário quando acha uma, para não planejar de novo o que já foi planejado.
