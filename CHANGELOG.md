@@ -2,6 +2,7 @@
 
 ## Não lançado
 
+- `auto-think`, `gpt-optimizer`, `gpt-implementar` e o confronto compartilhado passam a usar o GPT Sol 6.2 (`gpt-6.2-sol`) no lugar do `gpt-6.1-sol`. Exige Codex CLI 0.169 ou mais novo (o 0.165 recusa o modelo).
 - `spec-plan`: o desenho do plano sai de cima para baixo, com caixa de até quatro palavras, a ação escrita na seta e quatro cores fixas no modelo (começo, resultado, serviço de fora, passo comum); com mais de cinco caixas, elas são agrupadas em um bloco por lugar. `build-review`: o modelo do texto da PR deixa de sugerir cor para as setas, porque o desenho já chega pronto do plano.
 - `ask-me`: quando o pedido é construir, mudar ou estudar algo num repositório de código, explora a área antes da primeira pergunta, pelo passo de exploração que a `spec-plan` já usa (`spec-plan/references/skills/improve-codebase-architecture`). A `ask-me` passa a depender desse arquivo da `spec-plan`.
 - `ask-me`: o modelo do pedido final ganha ícones em seis campos (Objetivo, Pronto quando, Fazer, NÃO fazer, A seu critério, Suposições) e o bloco passa a ser descrito como "um único bloco no chat".

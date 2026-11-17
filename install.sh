@@ -37,7 +37,7 @@ if [ "${SKIP_PLUGIN:-0}" != "1" ] && [ "$HAS_CLAUDE" = "1" ]; then
   run "Plugin cass"      claude plugin install cass@cass -s user
 fi
 
-# ── 2. Codex CLI (o GPT: gpt-6.1-sol) ─────────────────────────────────────
+# ── 2. Codex CLI (o GPT: gpt-6.2-sol) ─────────────────────────────────────
 if command -v codex >/dev/null 2>&1; then
   ok "Codex CLI já instalado"; say ""
 elif [ "$HAS_NPM" = "1" ]; then

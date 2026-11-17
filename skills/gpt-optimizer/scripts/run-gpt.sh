@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ════════════════════════════════════════════════════════════════════════
-# run-gpt.sh — chama o Codex (gpt-6.1-sol) como revisor adversarial e grava o
+# run-gpt.sh — chama o Codex (gpt-6.2-sol) como revisor adversarial e grava o
 # parecer limpo num arquivo. Encapsula a chamada pra não errar o stdin
 # (codex exec trava esperando stdin se rodado sem redirecionar a entrada).
 #
@@ -37,7 +37,7 @@ RAW="$(mktemp)"; ERR="$(mktemp)"
 trap 'rm -f "$RAW" "$ERR"' EXIT
 
 # Uma tentativa do Codex. Devolve 0 se produziu parecer não-vazio em $OUT.
-# - sem service_tier: o gpt-6.1-sol recusa "flex" (HTTP 400 "Unsupported service_tier: flex", testado 03/10/2026; o gpt-6-sol também recusava, 22/09/2026).
+# - sem service_tier: o gpt-6.1-sol recusava "flex" (HTTP 400 "Unsupported service_tier: flex", testado 03/10/2026; o gpt-6-sol também recusava, 22/09/2026).
 # - --sandbox read-only: o revisor recebe o alvo inteiro via stdin; é uma
 #   revisão de leitura, não pode (nem precisa) escrever no workspace.
 # - -o grava a resposta final já limpa; stdin (-) carrega o pacote inteiro sem
@@ -59,9 +59,9 @@ run_codex () {
     # --model e --ignore-user-config são obrigatórios aqui: sem eles o resume lê o
     # `model` do ~/.codex/config.toml, que o app do Codex reescreve sozinho ao
     # atualizar. A sessão retomada NÃO carrega o modelo da rodada 1.
-    # Modelo padrão: gpt-6.1-sol, esforço high (29/09/2026; era gpt-6-sol, antes gpt-6-astra).
+    # Modelo padrão: gpt-6.2-sol, esforço high (17/11/2026; antes gpt-6.1-sol, gpt-6-sol e gpt-6-astra).
     codex exec resume "$TID" \
-      --model gpt-6.1-sol \
+      --model gpt-6.2-sol \
       -c model_reasoning_effort="$EFFORT" \
       -c sandbox_mode="read-only" \
       --skip-git-repo-check \
@@ -71,7 +71,7 @@ run_codex () {
     rc=$?
   else
     codex exec \
-      --model gpt-6.1-sol \
+      --model gpt-6.2-sol \
       -c model_reasoning_effort="$EFFORT" \
       --skip-git-repo-check \
       --ignore-user-config \

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="760" height="1140" viewBox="0 0 760 1140" role="img" aria-labelledby="t d">
 <title id="t">gpt-implementar · Codex constrói, Claude coordena</title>
-<desc id="d">A escolha sim, codex ou a invocação da skill inicia a construção de uma feature aprovada. Confere instalação e login; sem Codex, para e informa o erro. Claude prepara cada lote. GPT-6.1-sol executa tarefas sequencialmente, com testes, código, checagem e commit. Devolve resumo e evidências; Claude verifica os registros no git. Correções voltam à mesma sessão do Codex por até duas rodadas; falha restante exige decisão do usuário. Só depois de conferir o lote começa o próximo. Após o último, inicia build-review; correções aprovadas nessa revisão também vão ao Codex. Cada push precisa de autorização.</desc>
+<desc id="d">A escolha sim, codex ou a invocação da skill inicia a construção de uma feature aprovada. Confere instalação e login; sem Codex, para e informa o erro. Claude prepara cada lote. GPT-6.2-sol executa tarefas sequencialmente, com testes, código, checagem e commit. Devolve resumo e evidências; Claude verifica os registros no git. Correções voltam à mesma sessão do Codex por até duas rodadas; falha restante exige decisão do usuário. Só depois de conferir o lote começa o próximo. Após o último, inicia build-review; correções aprovadas nessa revisão também vão ao Codex. Cada push precisa de autorização.</desc>
 <style>svg{--tx:#1f2328;--mu:#59636e;--ln:#59636e;--ns:#d1d9e0}
 @media(prefers-color-scheme:dark){svg{--tx:#e6edf3;--mu:#a6b0bb;--ln:#9198a1;--ns:#3d444d}}
 text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;fill:var(--mu);font-size:16px}
@@ -24,7 +24,7 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <text x="380.0" y="379" class="" text-anchor="middle">Tarefas, plano, regras, glossário e provas esperadas.</text>
 <path d="M380 408 V441" class="ln" marker-end="url(#a)"/>
 <rect x="100" y="447" width="560" height="105" rx="7" class="box"/>
-<text x="380.0" y="475" class="h" text-anchor="middle">GPT-6.1-sol constrói as tarefas</text>
+<text x="380.0" y="475" class="h" text-anchor="middle">GPT-6.2-sol constrói as tarefas</text>
 <text x="380.0" y="500" class="" text-anchor="middle">Teste → falha → código → checagem → commit.</text>
 <text x="380.0" y="522" class="" text-anchor="middle">Uma tarefa por vez; lotes também seguem em sequência.</text>
 <path d="M380 552 V585" class="ln" marker-end="url(#a)"/>

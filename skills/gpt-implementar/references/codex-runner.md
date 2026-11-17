@@ -18,9 +18,9 @@ Para resposta a uma parada ou conserto, grave o contexto atualizado em outro arq
 
 ```bash
 OUT=$(mktemp)
-codex exec --model gpt-6.1-sol -c model_reasoning_effort="high" -c service_tier="fast" -c features.fast_mode=true --yolo --json -o "$OUT" - <"$P" 2>/dev/null | grep '"type":"thread.started"'
+codex exec --model gpt-6.2-sol -c model_reasoning_effort="high" -c service_tier="fast" -c features.fast_mode=true --yolo --json -o "$OUT" - <"$P" 2>/dev/null | grep '"type":"thread.started"'
 # conserto ou resposta a uma parada, na MESMA sessão do Codex:
-codex exec resume "<thread_id>" --model gpt-6.1-sol -c model_reasoning_effort="high" -c service_tier="fast" -c features.fast_mode=true --dangerously-bypass-approvals-and-sandbox --json -o "$OUT" - <"$P2" 2>/dev/null >/dev/null
+codex exec resume "<thread_id>" --model gpt-6.2-sol -c model_reasoning_effort="high" -c service_tier="fast" -c features.fast_mode=true --dangerously-bypass-approvals-and-sandbox --json -o "$OUT" - <"$P2" 2>/dev/null >/dev/null
 ```
 
 - Guarde o `thread_id` da linha `thread.started`. Nunca `--last`: pega a conversa errada, e um id errado cai na última conversa sem dar erro.
