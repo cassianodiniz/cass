@@ -65,7 +65,7 @@ pule.
 
 <details><summary>Detalhe técnico</summary>
 
-Codex `gpt-6.1-sol` esforço `high`, só leitura; a 2ª rodada audita o filtro que o Claude fez dos pontos.
+Codex `gpt-6.2-sol` esforço `high`, só leitura; a 2ª rodada audita o filtro que o Claude fez dos pontos.
 
 </details>
 
@@ -115,7 +115,7 @@ já tomada.
 
 <details><summary>Detalhe técnico</summary>
 
-Confronto adversarial com Codex `gpt-6.1-sol` em 2 rodadas; pesquisa via `search`; nomes e dados pessoais trocados por etiquetas antes de qualquer coisa sair.
+Confronto adversarial com Codex `gpt-6.2-sol` em 2 rodadas; pesquisa via `search`; nomes e dados pessoais trocados por etiquetas antes de qualquer coisa sair.
 
 </details>
 

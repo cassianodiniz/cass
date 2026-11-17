@@ -50,7 +50,7 @@ text{font-family:Arial,Helvetica,sans-serif;fill:var(--mu);font-size:16px}
 <text x="425.0" y="641" text-anchor="middle" class="">Uma tarefa por vez, checagem e commit.</text>
 <text x="1005" y="599" text-anchor="middle" class="sh">Por dentro da gpt-implementar</text>
 <rect x="850" y="617" width="310" height="79" rx="7" class="box" />
-<text x="1005.0" y="644" text-anchor="middle" class="sh">GPT-6.1-sol · lote atual</text>
+<text x="1005.0" y="644" text-anchor="middle" class="sh">GPT-6.2-sol · lote atual</text>
 <text x="1005.0" y="667" text-anchor="middle" class="small ">Teste → código → checagem → commit.</text>
 <text x="1005.0" y="689" text-anchor="middle" class="small ">Devolve resumo e evidências.</text>
 <path d="M685 640 H844" class="line" marker-end="url(#arrow)" />
