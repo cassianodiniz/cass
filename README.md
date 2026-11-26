@@ -29,6 +29,7 @@ A skill transforma o seu pedido num plano aprovado. Ela pesquisa o código antes
 as perguntas em rodadas e, quando uma tela muda, mostra um protótipo com fotos antes do seu sim.
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 420}}}%%
 flowchart TD
     A["Seu pedido<br/>você pede uma mudança no app"]
     B["1. O problema<br/>o que está errado, quem sofre e o que muda;<br/>se o pedido já diz isso, ela pula"]
@@ -77,6 +78,7 @@ A `implementar` escreve as tarefas, pede o seu sim e constrói uma tarefa por ve
 `build-review` chama três revisores novos, que não construíram nada.
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 420}}}%%
 flowchart TD
     A["Desenho técnico e tarefas<br/>segue as decisões anteriores e as peças do app;<br/>cada tarefa diz os arquivos e os testes"]
     B["Script confere as tarefas<br/>cada item tem teste, nada falta,<br/>o app funciona antes de mexer"]
