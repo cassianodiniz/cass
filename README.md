@@ -30,31 +30,31 @@ as perguntas em rodadas e, quando uma tela muda, mostra um protótipo com fotos 
 
 ```mermaid
 flowchart TD
-    A["Seu pedido<br/><small>você pede uma mudança no app</small>"]
-    B["1. O problema<br/><small>o que está errado, quem sofre e o que muda;<br/>se o pedido já diz isso, ela pula</small>"]
+    A["Seu pedido<br/>você pede uma mudança no app"]
+    B["1. O problema<br/>o que está errado, quem sofre e o que muda;<br/>se o pedido já diz isso, ela pula"]
     subgraph P["2. Pesquisa antes das perguntas — ela acha os fatos sozinha"]
         direction LR
-        P1["Lições aprendidas<br/><small>erros já confirmados antes</small>"]
-        P2["Decisões anteriores<br/><small>segue ou pede para trocar</small>"]
-        P3["Material que você mandou<br/><small>cada print, inteiro</small>"]
-        P4["Agente explorador<br/><small>um agente novo lê o código<br/>e lista o que reaproveitar</small>"]
-        P5["PRs e issues abertos<br/><small>se alguém já faz isso, avisa</small>"]
-        P6["Segurança e boas práticas<br/><small>dados sensíveis (OWASP)</small>"]
-        P7["Manual de telas<br/><small>cada elemento ganha uma peça</small>"]
-        P8["Glossário<br/><small>os nomes certos das coisas</small>"]
+        P1["Lições aprendidas<br/>erros já confirmados antes"]
+        P2["Decisões anteriores<br/>segue ou pede para trocar"]
+        P3["Material que você mandou<br/>cada print, inteiro"]
+        P4["Agente explorador<br/>um agente novo lê o código<br/>e lista o que reaproveitar"]
+        P5["PRs e issues abertos<br/>se alguém já faz isso, avisa"]
+        P6["Segurança e boas práticas<br/>dados sensíveis (OWASP)"]
+        P7["Manual de telas<br/>cada elemento ganha uma peça"]
+        P8["Glossário<br/>os nomes certos das coisas"]
     end
-    C["3. Rodadas de perguntas<br/><small>todas de uma vez, com a sugestão dela;<br/>inclui os 9 riscos que ninguém escreve</small>"]
-    D{"4. Mudança pequena?<br/><small>poucos arquivos, nada sem volta,<br/>nenhuma tela nova</small>"}
-    E["Lista do que deve funcionar<br/><small>caminho curto: sem plano</small>"]
-    F["Script confere a lista<br/><small>cada item tem o seu teste</small>"]
-    G["Plano<br/><small>o problema, o que deve funcionar<br/>e o que não tem volta</small>"]
+    C["3. Rodadas de perguntas<br/>todas de uma vez, com a sugestão dela;<br/>inclui os 9 riscos que ninguém escreve"]
+    D{"4. Mudança pequena?<br/>poucos arquivos, nada sem volta,<br/>nenhuma tela nova"}
+    E["Lista do que deve funcionar<br/>caminho curto: sem plano"]
+    F["Script confere a lista<br/>cada item tem o seu teste"]
+    G["Plano<br/>o problema, o que deve funcionar<br/>e o que não tem volta"]
     subgraph H["Protótipo, se a tela muda"]
         H1["Copia as peças do manual"] --> H2["Um quadro por estado da tela"] --> H3["Fotos: celular, tablet e PC"]
     end
-    I["Script confere o plano<br/><small>nada falta, cada regra é testável,<br/>as 3 fotos existem</small>"]
-    J["5. Caderno da investigação<br/><small>cada passo vira uma linha;<br/>linha vazia é passo a fazer</small>"]
-    K["6. Você aprova<br/><small>só quando não sobra pergunta</small>"]
-    L["7. Publica<br/><small>branch e PR rascunho no GitHub;<br/>começa a construção</small>"]
+    I["Script confere o plano<br/>nada falta, cada regra é testável,<br/>as 3 fotos existem"]
+    J["5. Caderno da investigação<br/>cada passo vira uma linha;<br/>linha vazia é passo a fazer"]
+    K["6. Você aprova<br/>só quando não sobra pergunta"]
+    L["7. Publica<br/>branch e PR rascunho no GitHub;<br/>começa a construção"]
     A --> B --> P --> C --> D
     D -- sim --> E --> F --> J
     D -- não --> G --> H --> I --> J
@@ -78,21 +78,21 @@ A `implementar` escreve as tarefas, pede o seu sim e constrói uma tarefa por ve
 
 ```mermaid
 flowchart TD
-    A["Desenho técnico e tarefas<br/><small>segue as decisões anteriores e as peças do app;<br/>cada tarefa diz os arquivos e os testes</small>"]
-    B["Script confere as tarefas<br/><small>cada item tem teste, nada falta,<br/>o app funciona antes de mexer</small>"]
+    A["Desenho técnico e tarefas<br/>segue as decisões anteriores e as peças do app;<br/>cada tarefa diz os arquivos e os testes"]
+    B["Script confere as tarefas<br/>cada item tem teste, nada falta,<br/>o app funciona antes de mexer"]
     C["Você aprova as tarefas"]
-    D["Constrói 1 tarefa por vez<br/><small>o teste falha, vem o código, o teste passa;<br/>segue as regras de código e de segurança</small>"]
-    E["Script confere o registro<br/><small>1 commit por tarefa, no formato padrão</small>"]
-    F["Script roda todos os testes<br/><small>no código final; confere se o app compila</small>"]
+    D["Constrói 1 tarefa por vez<br/>o teste falha, vem o código, o teste passa;<br/>segue as regras de código e de segurança"]
+    E["Script confere o registro<br/>1 commit por tarefa, no formato padrão"]
+    F["Script roda todos os testes<br/>no código final; confere se o app compila"]
     subgraph R["Três revisores novos"]
         direction LR
-        R1["Revisor principal<br/><small>roda todos os testes<br/>acha cada regra no código<br/>põe um erro: o teste pega?<br/>compara tela e protótipo<br/>dá o veredito</small>"]
-        R2["Revisor de padrões<br/><small>segue as regras do projeto?<br/>nome ruim, código repetido<br/>só aponta</small>"]
-        R3["Revisor do plano<br/><small>faz o que o plano pede?<br/>respeita o que você aprovou<br/>só aponta</small>"]
+        R1["Revisor principal<br/>roda todos os testes<br/>acha cada regra no código<br/>põe um erro: o teste pega?<br/>compara tela e protótipo<br/>dá o veredito"]
+        R2["Revisor de padrões<br/>segue as regras do projeto?<br/>nome ruim, código repetido<br/>só aponta"]
+        R3["Revisor do plano<br/>faz o que o plano pede?<br/>respeita o que você aprovou<br/>só aponta"]
     end
-    G["Script confere o fim<br/><small>todos os testes passaram;<br/>cada problema corrigido ou recusado</small>"]
-    H["Passou<br/><small>você dá o sim final e mergeia o PR</small>"]
-    I["Falhou<br/><small>você aprova cada conserto;<br/>volta à construção, até 3 vezes</small>"]
+    G["Script confere o fim<br/>todos os testes passaram;<br/>cada problema corrigido ou recusado"]
+    H["Passou<br/>você dá o sim final e mergeia o PR"]
+    I["Falhou<br/>você aprova cada conserto;<br/>volta à construção, até 3 vezes"]
     A --> B --> C --> D --> E
     E -- próxima tarefa --> D
     E -- última tarefa --> F --> R --> G
