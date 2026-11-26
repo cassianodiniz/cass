@@ -1,202 +1,155 @@
 # cass — pensar antes de fazer, construir com prova, conferir antes de confiar
 
-Treze skills pra trabalhar com IA no Claude Code sem cair nas armadilhas de sempre: a IA que
-sai construindo antes de entender o pedido, que diz "pronto" sem ter testado, que inventa
-número de pesquisa. Cada skill resolve um desses momentos e pode ser chamada sozinha.
+Quinze skills para trabalhar com IA no Claude Code e no Codex. Cada skill resolve um momento em que
+a IA costuma errar: ela começa a construir antes de entender o pedido, diz "pronto" sem testar ou
+inventa um número de pesquisa. Você pode chamar cada skill sozinha.
 
-O fluxo de código usa o contrato aprovado: Lean para planos nativos; compatibilidade
-com `spec.md` e `tasks.md` para features antigas. Veja as entradas abaixo.
+## Por onde começar
 
-## Como eu uso no dia a dia
+| A sua situação | Caminho |
+|---|---|
+| Você sabe o que quer mudar | `/cass:spec-plan` |
+| Você ainda não sabe o que pedir | `/cass:ask-me` → `/cass:spec-plan` |
+| Você precisa de dados com fonte | `/cass:ask-me` → `/cass:search` → `/cass:spec-plan` |
+| Você tem um problema difícil, sem resposta clara | `/cass:auto-think` → `/cass:spec-plan` |
 
-Começo pela situação, não pelo nome da skill ([como instalar](#instalar)):
+O fluxo de código é `/cass:spec-plan` → `/cass:implementar` → `/cass:build-review`. Uma feature
+inteira vai num PR só. Cada skill chama a próxima sozinha depois do seu sim.
 
-- 🔧 **Mudança a esclarecer:** direto na `/cass:spec-plan`.
-- 🔎 **Pesquisar ideias:** `/cass:ask-me` → `/cass:search` → `/cass:spec-plan`.
-- 🌱 **Feature nova:** `/cass:ask-me` → `/cass:auto-think` → `/cass:spec-plan`.
-
-O fluxo atual é `/cass:spec-plan` → `/cass:implementar` → `/cass:build-review`:
-uma feature inteira numa PR. A construção e a revisão começam automaticamente nas passagens
-entre essas skills. Se quiser um ataque extra a uma decisão grande antes de aprová-la,
-chame a `gpt-optimizer`. Conversa ficou longa? `/cass:handoff`. Sessão terminou e a IA
-tropeçou? `/cass:aprender-com-a-sessao`.
+Nos desenhos, as caixas roxas são scripts ou agentes que conferem o trabalho, e as caixas verdes
+são as paradas para o seu sim.
 
 ---
 
-## As skills
+## O fluxo de código
 
-Na ordem em que entram no trabalho. Nos desenhos, verde marca onde a skill para e espera você.
+### 1. Planejar — `/cass:spec-plan`
 
-### `/cass:ask-me` — antes de mandar uma tarefa
+A skill transforma o seu pedido num plano aprovado. Ela pesquisa o código antes de perguntar, faz
+as perguntas em rodadas e, quando uma tela muda, mostra um protótipo com fotos antes do seu sim.
 
-Te entrevista até o pedido ficar claro e entrega um pedido pronto pro agente: o que fazer, o
-que não fazer e quando parar e perguntar. Serve pra qualquer tarefa, não só código.
-No fechamento, mostra o combinado e o prompt antes de uma única confirmação: executar aqui,
-ajustar algo ou acionar outra skill.
+```mermaid
+flowchart TD
+    A["Seu pedido<br/><small>você pede uma mudança no app</small>"]
+    B["1. O problema<br/><small>o que está errado, quem sofre e o que muda;<br/>se o pedido já diz isso, ela pula</small>"]
+    subgraph P["2. Pesquisa antes das perguntas — ela acha os fatos sozinha"]
+        direction LR
+        P1["Lições aprendidas<br/><small>erros já confirmados antes</small>"]
+        P2["Decisões anteriores<br/><small>segue ou pede para trocar</small>"]
+        P3["Material que você mandou<br/><small>cada print, inteiro</small>"]
+        P4["Agente explorador<br/><small>um agente novo lê o código<br/>e lista o que reaproveitar</small>"]
+        P5["PRs e issues abertos<br/><small>se alguém já faz isso, avisa</small>"]
+        P6["Segurança e boas práticas<br/><small>dados sensíveis (OWASP)</small>"]
+        P7["Manual de telas<br/><small>cada elemento ganha uma peça</small>"]
+        P8["Glossário<br/><small>os nomes certos das coisas</small>"]
+    end
+    C["3. Rodadas de perguntas<br/><small>todas de uma vez, com a sugestão dela;<br/>inclui os 9 riscos que ninguém escreve</small>"]
+    D{"4. Mudança pequena?<br/><small>poucos arquivos, nada sem volta,<br/>nenhuma tela nova</small>"}
+    E["Lista do que deve funcionar<br/><small>caminho curto: sem plano</small>"]
+    F["Script confere a lista<br/><small>cada item tem o seu teste</small>"]
+    G["Plano<br/><small>o problema, o que deve funcionar<br/>e o que não tem volta</small>"]
+    subgraph H["Protótipo, se a tela muda"]
+        H1["Copia as peças do manual"] --> H2["Um quadro por estado da tela"] --> H3["Fotos: celular, tablet e PC"]
+    end
+    I["Script confere o plano<br/><small>nada falta, cada regra é testável,<br/>as 3 fotos existem</small>"]
+    J["5. Caderno da investigação<br/><small>cada passo vira uma linha;<br/>linha vazia é passo a fazer</small>"]
+    K["6. Você aprova<br/><small>só quando não sobra pergunta</small>"]
+    L["7. Publica<br/><small>branch e PR rascunho no GitHub;<br/>começa a construção</small>"]
+    A --> B --> P --> C --> D
+    D -- sim --> E --> F --> J
+    D -- não --> G --> H --> I --> J
+    J --> K --> L
+    classDef script fill:#534AB7,stroke:#534AB7,color:#FFFFFF
+    classDef sim fill:#0F6E56,stroke:#0F6E56,color:#FFFFFF
+    class F,I,P4 script
+    class K sim
+```
 
-<p align="center"><img src="docs/skill-ask-me.svg" width="520" alt="A ask-me busca os fatos sozinha, faz rodadas de até 4 perguntas com a resposta recomendada, espera você responder e confere cada resposta com os limites que você já deu; enquanto houver decisão em aberto, faz nova rodada. No fechamento, apresenta o combinado e o prompt em caixa de código na mesma mensagem, e faz uma única pergunta para executar, ajustar ou escolher outra skill."></p>
-
-<details><summary>Detalhe técnico</summary>
-
-Árvore de decisões resolvida por fronteira, no máximo 4 perguntas por rodada; fatos do ambiente ela busca sozinha; pedido final com Objetivo / Pronto quando / Fazer / NÃO fazer / Parar e perguntar.
-
-</details>
-
-### `/cass:spec-plan` — transformar uma ideia em plano aprovado
-
-Esclarece o pedido em rodadas e usa o vocabulário do projeto. No fluxo Lean, registra o
-plano em `plan.md` e os critérios verificáveis em `checks.md`. A mensagem final explica
-as ações autorizadas pelo seu sim: registrar a aprovação, publicar a branch, criar a issue
-e abrir a PR em rascunho. “Sim, codex” escolhe a `gpt-implementar`.
-
-Antes da primeira pergunta, explora o código em volta do pedido com um agente auxiliar. Usa
-três guias de arquitetura de Matt Pocock (desenho de módulos, exploração e vocabulário do
-domínio), que acompanham a skill com os validadores.
+O protótipo não é feito quando a mudança só troca um texto ou uma cor, esconde algo ou conserta
+um defeito visual. Com o protótipo, as fotos aprovadas viram o modelo que a construção e a
+revisão seguem.
 
 [Instruções](skills/spec-plan/SKILL.md)
 
-### `/cass:gpt-optimizer` — revisão opcional de um plano grande
+### 2. Construir e revisar — `/cass:implementar` e `/cass:build-review`
 
-O GPT tenta derrubar um plano ou uma decisão que você já tomou e volta com Seguir, Ajustar ou
-Bloquear, só com os furos que procedem. Vale em plano grande e complexo; em mudança simples,
-pule.
+A `implementar` escreve as tarefas, pede o seu sim e constrói uma tarefa por vez. No fim, a
+`build-review` chama três revisores novos, que não construíram nada.
 
-<p align="center"><img src="docs/skill-gpt-optimizer.svg" width="520" alt="A gpt-optimizer monta o alvo com a decisão, o porquê e o estado do código; o GPT tenta derrubar; o Claude filtra cada ponto com prova. Só se o Claude descartou algum ponto, o GPT audita esse filtro numa segunda rodada, e nunca há terceira. Sai Seguir, Ajustar ou Bloquear; se Seguir, oferece levar pra construção com o seu sim."></p>
+```mermaid
+flowchart TD
+    A["Desenho técnico e tarefas<br/><small>segue as decisões anteriores e as peças do app;<br/>cada tarefa diz os arquivos e os testes</small>"]
+    B["Script confere as tarefas<br/><small>cada item tem teste, nada falta,<br/>o app funciona antes de mexer</small>"]
+    C["Você aprova as tarefas"]
+    D["Constrói 1 tarefa por vez<br/><small>o teste falha, vem o código, o teste passa;<br/>segue as regras de código e de segurança</small>"]
+    E["Script confere o registro<br/><small>1 commit por tarefa, no formato padrão</small>"]
+    F["Script roda todos os testes<br/><small>no código final; confere se o app compila</small>"]
+    subgraph R["Três revisores novos"]
+        direction LR
+        R1["Revisor principal<br/><small>roda todos os testes<br/>acha cada regra no código<br/>põe um erro: o teste pega?<br/>compara tela e protótipo<br/>dá o veredito</small>"]
+        R2["Revisor de padrões<br/><small>segue as regras do projeto?<br/>nome ruim, código repetido<br/>só aponta</small>"]
+        R3["Revisor do plano<br/><small>faz o que o plano pede?<br/>respeita o que você aprovou<br/>só aponta</small>"]
+    end
+    G["Script confere o fim<br/><small>todos os testes passaram;<br/>cada problema corrigido ou recusado</small>"]
+    H["Passou<br/><small>você dá o sim final e mergeia o PR</small>"]
+    I["Falhou<br/><small>você aprova cada conserto;<br/>volta à construção, até 3 vezes</small>"]
+    A --> B --> C --> D --> E
+    E -- próxima tarefa --> D
+    E -- última tarefa --> F --> R --> G
+    G --> H
+    G --> I
+    I -.-> D
+    classDef script fill:#534AB7,stroke:#534AB7,color:#FFFFFF
+    classDef sim fill:#0F6E56,stroke:#0F6E56,color:#FFFFFF
+    class B,E,F,G script
+    class C,H,I sim
+```
 
-<details><summary>Detalhe técnico</summary>
+No caminho curto (só a lista), não há desenho técnico nem tarefas: a construção começa direto.
 
-Codex `gpt-6.2-sol` esforço `high`, só leitura; a 2ª rodada audita o filtro que o Claude fez dos pontos.
+[Instruções da implementar](skills/implementar/SKILL.md) · [Instruções da build-review](skills/build-review/SKILL.md)
 
-</details>
+### O que cada script confere
 
-### `/cass:implementar` — construir a feature aprovada
+Os scripts leem os arquivos da feature. Eles não julgam o código. Se um script falha, o agente
+para e corrige antes de continuar.
 
-Escolhe o contrato aprovado pela `spec-plan`. No Lean, constrói uma fatia por vez,
-com testes e evidências; atualiza os checks antes do commit e inclui tudo no mesmo commit.
-Segue para a próxima fatia sem pedir outro sim. A bateria completa de testes roda só na
-revisão final. Na delegação, prepara o contexto e confere
-as evidências devolvidas. Quando a feature está pronta para verificação, inicia `build-review`.
+| Script | Quando roda | O que confere |
+|---|---|---|
+| `validate_plan.py` | antes de mostrar o plano | cada critério pode ser testado, nenhuma seção falta, cada tela tem a linha do protótipo e as 3 fotos |
+| `validate_checks.py` | antes de qualquer código | cada item de uma lista tem a sua prova; com `--execute`, roda o build e confere o seu sim |
+| `validate_tasks.py` | antes de mostrar as tarefas | cada tarefa diz os arquivos, os testes e quando fica pronta; nenhuma depende de uma tarefa posterior |
+| `check_commit.py` | antes de cada commit | a mensagem segue o formato padrão (`feat:`, `fix:`...) |
+| `check_proofs.py` | antes dos revisores e depois de cada conserto | roda cada teste no commit atual, mais o build, os tipos e o lint |
+| `validate_verification.py` | antes de dizer "pronto" | todas as provas passaram no último commit e cada achado foi corrigido ou recusado por você |
 
-[Instruções](skills/implementar/SKILL.md)
+O limite deles: eles não pegam um teste que passa pelo motivo errado. Quem pega é o revisor
+principal.
 
-### `/cass:gpt-implementar` — construir com o Codex
+### Construir com o Codex — `/cass:gpt-implementar`
 
-Segue o contrato da `implementar`, com o Codex escrevendo o código e o coordenador
-conferindo as evidências. O contexto enviado usa os arquivos nativos do contrato escolhido.
-O operador Codex e as regras de delegação acompanham o pacote. Depois da construção,
-o coordenador inicia `build-review`.
+Faz o mesmo trabalho da `implementar`, mas o Codex escreve o código e o Claude confere as provas.
+No sim do plano, a resposta "Sim, com skill gpt-implementar" escolhe este caminho.
 
 [Instruções](skills/gpt-implementar/SKILL.md) · [Operador Codex](skills/gpt-implementar/references/codex-runner.md)
 
-### `/cass:build-review` — conferir a feature inteira
+---
 
-No Lean, reúne Verifier, Standards e Spec em contextos independentes. Usa os relatórios
-nativos, capturas e teste guiado quando aplicável; pede a decisão sobre cada correção e
-o sim final. As correções aprovadas voltam ao executor escolhido. O Verifier roda a bateria
-completa e vai até o fim mesmo quando um teste falha.
+## As outras skills
 
-[Instruções](skills/build-review/SKILL.md)
-
-### `/cass:design-critique` — avaliar uma tela ou proposta visual
-
-Recebe uma captura ou descrição, o contexto e o estágio do design. Aponta o que funciona,
-os problemas de usabilidade, hierarquia, consistência e acessibilidade, com gravidade,
-recomendações e prioridades. O foco pode ser uma tela, navegação ou fluxo específico.
-
-[Instruções](skills/design-critique/SKILL.md)
-
-### `/cass:auto-think` — quando você ainda não sabe a resposta
-
-Estuda um problema difícil e volta com a opção recomendada e as alternativas, cada uma com o
-porquê. Não executa nada. Leva bem mais tempo que a `gpt-optimizer`, que só testa uma decisão
-já tomada.
-
-<p align="center"><img src="docs/skill-auto-think.svg" width="520" alt="A auto-think confirma o alvo com você e, daí em diante, não interrompe: enquadra o problema, estuda por vários ângulos, manda o GPT tentar derrubar as candidatas, passa cada uma por um portão de 4 perguntas e cava de novo só o que muda a decisão. O GPT confronta os finalistas numa segunda rodada e ela entrega a recomendada e as alternativas, sem executar nada."></p>
-
-<details><summary>Detalhe técnico</summary>
-
-Confronto adversarial com Codex `gpt-6.2-sol` em 2 rodadas; pesquisa via `search`; nomes e dados pessoais trocados por etiquetas antes de qualquer coisa sair.
-
-</details>
-
-### `/cass:search` — pesquisa com a fonte de cada número
-
-Cada dado volta com a página, a frase exata e a data; o que não achar, ela diz que não achou.
-Também serve pra atacar um plano: peça "ataca o plano com /search".
-
-<p align="center"><img src="docs/skill-search.svg" width="520" alt="A search mede o tamanho da pergunta e só pergunta a profundidade quando ela é ambígua. Subagentes buscam em paralelo no Exa; ela confere o relato de cada um antes de confiar e faz nova passada se faltou cobertura. Cada número sai com página, frase e data, tudo fica guardado em search-findings e a resposta traz a fonte de cada dado."></p>
-
-<details><summary>Detalhe técnico</summary>
-
-Orquestrador Exa com subagentes; registro de procedência por número; arquivo em `search-findings/`. Precisa de conta Exa (tem plano grátis).
-
-</details>
-
-### `/cass:handoff` — continuar numa conversa nova
-
-Escreve um documento de passagem, com o que foi decidido e o que falta, e te dá um texto
-pronto pra colar na sessão nova. Se houver mudanças deste trabalho, oferece commit: com
-seu sim, commita antes; com seu não, entrega o handoff sem commit.
-
-<p align="center"><img src="docs/skill-handoff.svg" width="520" alt="A handoff oferece commit das mudanças deste trabalho e respeita a resposta. Registra branch, HEAD e mudanças locais pendentes, preserva decisões e motivos da conversa, referencia arquivos existentes, salva em .claude/handoffs e entrega uma frase com o caminho completo para retomar."></p>
-
-<details><summary>Detalhe técnico</summary>
-
-Registra branch e HEAD conferidos, distinguindo as mudanças locais fora desse commit. Se
-o commit falhar, registra a falha e entrega o handoff com as pendências. Preserva trabalho
-de outra frente, inclusive o que já estava staged. Usa apenas as seções necessárias e
-uma frase colável com o caminho absoluto do documento. Sem Git ou sem primeiro commit,
-informa a ausência de âncora.
-
-</details>
-
-### `/cass:aprender-com-a-sessao` — depois de uma sessão de código
-
-Revê como a IA trabalhou numa sessão que terminou e sugere ajustes no projeto e nas instruções
-pra ela errar menos da próxima vez. Não mexe no código; você decide o que aplicar. Cada revisão fica
-guardada em `docs/aprendizados/` do repositório, e `/cass:aprender-com-a-sessao revisar` retoma o que
-ficou pendente. Só roda quando você chama.
-
-<p align="center"><img src="docs/skill-aprender-com-a-sessao.svg" width="520" alt="A aprender-com-a-sessao entra quando uma sessão de código terminou. Lê o manual de escrita que vem dentro dela e o registro da sessão, o caminho inteiro e não só o resultado. Procura onde o ambiente falhou: achar arquivos, checagens automáticas, regras do revisor, CLAUDE.md inchado, ferramenta cara, frase inútil e falta de informação. Guarda a lista, do mais grave ao menos grave, em docs/aprendizados/ do repositório, e você decide o que resolver agora; o resto fica pendente pra revisar depois."></p>
-
-<details><summary>Detalhe técnico</summary>
-
-Sete frentes: navegação, checagens automáticas (lint, tipos, testes, trava antes do commit ou no GitHub), regras do revisor (erro mecânico vira checagem; julgamento vira `CODING_STANDARDS.md`), `CLAUDE.md`/`AGENTS.md` inchado, ferramenta cara, instrução que não muda nada e falta de informação. Depois de compactar, rode numa conversa nova apontando a sessão: o registro completo continua salvo no computador. Criada por Matt Pocock (`retro`); aqui o nome foi traduzido e o guia `writing-for-agents` vai junto (veja [Créditos](#créditos)).
-
-</details>
-
-### `/cass:otimizar-arquitetura` — quando o código precisa de uma estrutura melhor
-
-Dá ao agente um vocabulário único e poucas regras pra reorganizar código: juntar peças que só
-repassam chamada num módulo que esconde o trabalho atrás de uma porta pequena, mais fácil de
-testar e de mexer. Se você pedir, desenha essa porta de três jeitos diferentes e recomenda um.
-
-<p align="center"><img src="docs/skill-otimizar-arquitetura.svg" width="520" alt="A otimizar-arquitetura entra quando o código vai ser desenhado ou reorganizado. Fixa um vocabulário único, faz o teste da deleção em cada módulo, classifica as dependências em quatro tipos e só cria uma costura quando há dois adaptadores de verdade. Se você quiser ver alternativas, subagentes desenham a interface de três ou mais jeitos bem diferentes e ela compara e recomenda um; senão, segue direto. No fim, os testes passam a morar na interface e os antigos dos módulos rasos saem."></p>
-
-<details><summary>Detalhe técnico</summary>
-
-Módulos fundos (Ousterhout) e costuras (Feathers); 4 categorias de dependência (em processo, substituível local, remota própria com portas e adaptadores, externa com mock); "Design It Twice" com 3+ subagentes em paralelo. Criada por Matt Pocock; aqui só o nome foi traduzido (veja [Créditos](#créditos)).
-
-</details>
-
-### `/cass:writin-skills` — criar, ajustar e testar skills
-
-Ajuda a transformar um processo em skill, acertar quando ela deve ser chamada e testar
-se o agente segue suas instruções. Para ajustar uma skill que já existe, segue um roteiro
-com testes em dois níveis, começando pela leitura. Traz as referências e ferramentas da versão local.
-É uma ferramenta para cuidar das próprias skills; fica fora do mapa principal de trabalho.
-
-<p align="center"><img src="docs/skill-writin-skills.svg" width="650" alt="A writin-skills entende uso, gatilhos, limites e resultado esperado. Mudanças mecânicas recebem verificação objetiva. Para nova skill ou mudança de comportamento, define cenários, critérios, repetições e limite de correções e congela a versão. RED demonstra uma falha sem a skill ou uma contradição comprovada em skill existente. Escreve ou ajusta, congela a candidata e testa. Falhas voltam ao ajuste dentro do limite; se ele chegar, relata pendências sem aprovar. Depois dos critérios passarem, uma revisão independente confere a candidata; achados procedentes voltam ao ajuste e aos testes afetados. A entrega registra arquivos, resultados e limites."></p>
-
-<details><summary>Detalhe técnico</summary>
-
-RED–GREEN–REFACTOR aplicado a instruções: cenários sem a skill e com ela, versões congeladas
-e testes de pressão. Referências de entrevista, formato, descrição e testes acompanham a
-skill. Mudanças mecânicas usam verificações objetivas; mudanças de comportamento passam
-por testes com critérios e limite de rodadas definidos, mais uma revisão independente.
-O renderizador opcional de fluxogramas usa Node.js e Graphviz (`dot`).
-
-</details>
+| Skill | Para quê |
+|---|---|
+| `/cass:ask-me` | Faz uma entrevista até o seu pedido ficar claro e entrega um pedido pronto para o agente: o que fazer, o que não fazer e quando parar. |
+| `/cass:auto-think` | Estuda um problema difícil e volta com a opção recomendada e as alternativas. Não executa nada. |
+| `/cass:search` | Pesquisa em que cada número volta com a página, a frase e a data. O que ela não acha, ela diz que não achou. |
+| `/cass:gpt-optimizer` | O GPT tenta derrubar uma decisão já tomada. Volta com Seguir, Ajustar ou Bloquear. |
+| `/cass:design-critique` | Avalia uma tela: usabilidade, hierarquia, consistência e acessibilidade, com a gravidade de cada problema. |
+| `/cass:issue` | Salva um trabalho para depois como issue no GitHub, com contexto suficiente para outra pessoa assumir. Também quebra um plano em tarefas. |
+| `/cass:oq` | "O quê?": quando você não entende a última resposta, pede para a IA reformular em palavras simples, sem acrescentar conselhos. |
+| `/cass:handoff` | Escreve um documento de passagem e um texto para colar numa conversa nova. |
+| `/cass:aprender-com-a-sessao` | Depois de uma sessão de código, mostra onde o ambiente fez a IA errar e sugere ajustes. Você decide o que aplicar. |
+| `/cass:otimizar-arquitetura` | Dá um vocabulário único para reorganizar o código em módulos mais fáceis de testar. |
+| `/cass:writin-skills` | Cria, ajusta e testa skills: primeiro mostra a falha sem a mudança, depois prova a correção. |
 
 ---
 
@@ -209,52 +162,46 @@ O renderizador opcional de fluxogramas usa Node.js e Graphviz (`dot`).
 /plugin install cass@cass
 ```
 
-Reinicie o Claude Code. As skills aparecem como `/cass:ask-me`, `/cass:spec-plan` etc.
+Reinicie o Claude Code. As skills aparecem como `/cass:spec-plan`, `/cass:ask-me` etc.
 
-**2. As ferramentas que algumas skills usam por fora.** Um comando no terminal instala o que
-dá automático (Mac/Linux; no Windows, pelo Git Bash):
+**2. As ferramentas de fora.** Um comando no terminal instala o que é automático (Mac e Linux;
+no Windows, pelo Git Bash):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/cassianodiniz/cass/main/install.sh | SKIP_PLUGIN=1 bash
 ```
 
-Fica manual só o que depende de conta sua: o **`codex login`** (as skills que usam o GPT) e a
-conta no **Exa** (a `search`). Detalhe item a item no **[INSTALL.md](INSTALL.md)**.
+Duas coisas ficam com você, porque dependem de conta: o `codex login` e a conta no Exa. Detalhes
+no [INSTALL.md](INSTALL.md).
 
 ### Do que cada skill depende
 
-- **Claude Code** — onde as skills rodam.
-- **Codex CLI** (≥ 0.156, com `codex login`) — `gpt-implementar`, `gpt-optimizer` e `auto-think`. Sem ele, a `gpt-implementar` para e avisa; a `gpt-optimizer` e a `auto-think` avisam e seguem sem o olhar do GPT, com garantia menor.
-- **Exa** — a `search` (e a pesquisa de quem chama a `search`).
-- **git** — `implementar`, `gpt-implementar` e `build-review` trabalham num repositório git; o `handoff` se ancora nele quando existe.
-- **Python 3** — executa os validadores e o registro de aprendizados de `spec-plan`, `implementar` e `build-review`.
-- **GitHub CLI (`gh`, logado)** — a `spec-plan` publica a pasta da feature na branch, cria sua issue e abre a PR em rascunho; a `build-review` marca essa PR pronta com sua autorização.
+| Ferramenta | Quem usa |
+|---|---|
+| Claude Code | todas |
+| Codex CLI 0.169 ou mais novo, com `codex login` | `gpt-implementar`, `gpt-optimizer`, `auto-think` e a revisão da `writin-skills` |
+| Exa | `search` |
+| git | `implementar`, `gpt-implementar`, `build-review` e `handoff` |
+| Python 3 | os scripts de `spec-plan`, `implementar` e `build-review` |
+| GitHub CLI (`gh`, logado) | `spec-plan` (branch e PR rascunho), `build-review` e `issue` |
+| Um navegador que o agente controla | as fotos do protótipo e da revisão |
 
 ---
 
-📚 Estas skills nasceram de estudo, não de palpite: o
-**[comparativo de modelos de IA](https://claude.ai/artifact/UeTaqkfwazmmBcgRvtFAiM)** que eu uso
-pra decidir qual modelo serve pra quê.
+## Autoria e créditos
 
-**Autoria:** Cassiano Diniz · **Co-autoria:** Tech Club, que forneceu insumos para as skills de
-revisão e de implementação (`build-review`, `implementar` e `gpt-implementar`). Histórico de
-versões em [CHANGELOG.md](CHANGELOG.md).
+**Autoria:** Cassiano Diniz. **Co-autoria:** Tech Club, que deu insumos para as skills de
+construção e de revisão. Histórico em [CHANGELOG.md](CHANGELOG.md). Auditoria desta versão em
+[docs/auditoria-plugin.md](docs/auditoria-plugin.md).
 
-## Créditos
-
-A **`otimizar-arquitetura`** é a skill `codebase-design` de **[Matt Pocock](https://github.com/mattpocock/skills)**.
-Aqui só o nome foi traduzido. O conteúdo é o original, sob a licença MIT dele
-([licença](skills/otimizar-arquitetura/LICENSE) · [créditos](skills/otimizar-arquitetura/CREDITOS.md)).
-
-A **`aprender-com-a-sessao`** é a skill `retro` de **[Matt Pocock](https://github.com/mattpocock/skills)**,
-com o guia `writing-for-agents` dele nas referências. Aqui o nome foi traduzido e a skill lê o guia
-de dentro da própria pasta. O resto é o original, sob a licença MIT dele
-([licença](skills/aprender-com-a-sessao/LICENSE) · [créditos](skills/aprender-com-a-sessao/CREDITOS.md)).
-
-Auditoria anterior do plugin: [achados, verificações e sugestões](docs/auditoria-plugin.md).
-
-A **`spec-plan`**, a **`implementar`** e a **`build-review`** adaptam o fluxo
-`tlc-spec-driven v3.3.0` e o núcleo `tlc-spec-lean` de **Felipe Rodrigues (Tech Leads Club)**, sob CC BY 4.0,
-e incorporam material de **Matt Pocock**, sob MIT. Créditos e licenças acompanham cada
-pasta: [spec-plan](skills/spec-plan/LICENSE), [implementar](skills/implementar/LICENSE)
-e [build-review](skills/build-review/LICENSE).
+- `spec-plan`, `implementar` e `build-review` adaptam o fluxo `tlc-spec-driven` e o núcleo
+  `tlc-spec-lean` de **Felipe Rodrigues (Tech Leads Club)**, sob CC BY 4.0, e usam material de
+  **Matt Pocock**, sob MIT. Créditos em cada pasta: [spec-plan](skills/spec-plan/CREDITS.md),
+  [implementar](skills/implementar/CREDITS.md), [build-review](skills/build-review/CREDITS.md).
+- `otimizar-arquitetura` é a skill `codebase-design` de **[Matt Pocock](https://github.com/mattpocock/skills)**,
+  sob MIT ([licença](skills/otimizar-arquitetura/LICENSE)).
+- `aprender-com-a-sessao` é a skill `retro` de **Matt Pocock**, com o guia `writing-for-agents`,
+  sob MIT ([licença](skills/aprender-com-a-sessao/LICENSE)).
+- `issue` adapta material de **Matt Pocock**, sob MIT ([licença](skills/issue/LICENSE)).
+- As regras de segurança da `spec-plan` usam a **OWASP ASVS 5.0**
+  ([referência](skills/spec-plan/references/skills/owasp-asvs)).

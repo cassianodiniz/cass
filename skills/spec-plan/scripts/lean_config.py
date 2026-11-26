@@ -10,6 +10,7 @@ one gate demands what the other does not.
 Every function takes lines already stripped of fenced blocks.
 """
 
+import os
 import re
 
 RUN_RE = re.compile(r"^\**\s*Run\s+([\w-]+)\s*\**\s*:\s*(.+)$", re.IGNORECASE)
@@ -23,6 +24,29 @@ CRITERION_RE = re.compile(r"^\s*\d+\.\s+(.*)$")
 APPROVED_RE = re.compile(
     r"^\**\s*Approved\s*\**\s*:\s*\**\s*\d{4}-\d{2}-\d{2}\b.*\buser\s*:\s*[\"“][^\"”]*\S[^\"”]*[\"”]",
     re.IGNORECASE)
+
+
+APPROVED_FILES = ("plan.md", "tasks.md")
+
+
+def unapproved(fdir):
+    """plan.md and tasks.md each owe `**Approved**: <date> - user: "<their words>"`. The approval is
+    the user's, so it carries their words; the chat that held it does not survive a compaction."""
+    missing = []
+    for name in APPROVED_FILES:
+        path = os.path.join(fdir, name)
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding="utf-8", errors="replace") as f:
+            lines, in_fence = [], False
+            for ln in f.read().splitlines():
+                if ln.strip().startswith("```"):
+                    in_fence = not in_fence
+                elif not in_fence:
+                    lines.append(ln.strip())
+        if not any(APPROVED_RE.match(ln) for ln in lines):
+            missing.append(name)
+    return missing
 
 
 def plan_approved(plan_lines):
@@ -73,6 +97,14 @@ def plan_has_screen(plan_lines, checks_lines=()):
     for text in plan_criteria(plan_lines):
         if CAPTURE_RE.search(text) or SCREEN_CRITERION_RE.search(text):
             return True
+    return any(PROOF_RE.match(s.strip()) for s in checks_lines)
+
+
+def plan_owes_pictures(plan_lines, checks_lines=()):
+    """True when the feature owes running pictures: a criterion cites a capture, or a check is
+    proven in the browser. A screen state no capture draws is proven by a test or a walk."""
+    if any(CAPTURE_RE.search(text) for text in plan_criteria(plan_lines)):
+        return True
     return any(PROOF_RE.match(s.strip()) for s in checks_lines)
 
 

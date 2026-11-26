@@ -15,5 +15,6 @@ Preserve both fresh Matt contexts beside the Verifier, the Verifier's photos, ap
 **PR body.** In every review round, including a failed or incomplete one, read [PR.md](references/PR.md) and update `pr.md` from the results: progress, the change table, the drawing, before/after evidence, route taken, what remains and merge risk. Publishing follows the existing authorization points.
 
 This entry does not fix code. Approved corrections return to the same selected executor.
+Before sending those corrections, read [coding principles](../spec-plan/references/coding-principles.md). When a correction is delegated, to a sub-agent or to the Codex session, read [Delegation](../implementar/references/delegation.md) completely before dispatch and write the dispatch prompt by its instructions.
 
 Keep the user's language in the conversation.

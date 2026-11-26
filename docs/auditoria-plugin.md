@@ -1,80 +1,52 @@
-# Auditoria do plugin cass — 2026-10-08
+# Auditoria do plugin cass — 26/11/2026
 
-## Escopo e origem
+## Escopo
 
-Auditoria do pacote `cassianodiniz/cass`, branch `codex/atualizar-skills-auditar-plugin`, a partir de `d4a163b9d42a981dc6dd3a4611fb2d2fbaeb194f`.
-As fontes de `implementar` e `writin-skills` são as pastas locais de `/Users/cassianodiniz/Skills`, no HEAD `1f7bd31a2fc9985d45f00c042bceeb5d64ed0605`, sem alterações locais nessas duas pastas no momento da cópia.
+Pacote `cassianodiniz/cass`, branch `sync/skills-2026-11-26-readme`, a partir de `4c16bfd`
+(`main`). Fonte das skills: o repositório skills-cassiano na `main` de 26/11/2026 (`de1e073cf` e
+o commit seguinte, só de arquivo de revisões).
 
-Foram inspecionados os manifestos, README, instalação, changelog, as 12 skills com suas referências/scripts e os 12 SVGs de `docs/`. Pastas, identidade, versões publicadas, créditos e referências originais foram preservados. A atualização consta como **Não lançado**; não houve instalação, release ou merge.
+O README, o mapa de skills e os desenhos de `docs/` estavam obsoletos. Eles foram apagados e
+refeitos. Esta auditoria não testou o comportamento das skills com agentes; ela confere o pacote.
 
-## Claims
+## O que estava obsoleto
 
-1. As duas skills distribuídas correspondem às versões locais, incluindo arquivos auxiliares.
-2. O pacote tem 12 skills, seus comandos documentados existem e seus links locais resolvem.
-3. O mapa mantém o fluxo central e inclui os três cartões aprovados, sem a skill de autoria.
-4. O guia auxiliar removido não existe mais no pacote nem deixa menções.
-5. As verificações de formato e sintaxe passam; o comportamento das skills não é apresentado como testado nesta auditoria.
-
-Risco baixo: cópia de instruções existentes, metadados e artefatos; sem execução dos instaladores ou das rotinas operacionais das skills.
-
-## Ajustes realizados
-
-| Encontrado | Ajuste |
+| Encontrado | O que mudou |
 |---|---|
-| `implementar` sem a regra local mais recente | Cópia idêntica dos 8 arquivos; decisões do usuário no chat são registradas em `Sources`. |
-| `writin-skills` ausente | Inclusão dos 10 arquivos da versão local, sem reescrever suas regras ou reorganizar suas referências. Arquivos `.DS_Store` excluídos. |
-| README com 11 skills e catálogo com 10 | Ambos passam a refletir as 12 skills. A skill nova tem seção textual, sem entrar no primeiro infográfico. |
-| Handoff e retrospectiva em notas de rodapé; arquitetura ausente do mapa | Handoff e arquitetura em cartões laterais; retrospectiva abaixo de “pode publicar”, ligada por seta. Momentos de uso, cores e tipografia preservados. |
-| Desenho das construtoras atribuía sempre a checklist ao Claude | Texto passa a dizer agente coordenador, conforme a `implementar` permite. |
-| Borda do cartão final de `auto-think` começava fora do SVG | Ajuste de três unidades na posição e seis na largura; fluxo e textos preservados. |
-| Instalação dizia que o Claude assumiria o trabalho sem Codex | Documentação e aviso do instalador alinhados ao contrato atual: a `gpt-implementar` para e informa o erro. |
-| Instalação tratava conta Exa como obrigatória | Texto esclarece o acesso anônimo limitado já previsto na `search`. |
-| Referência original de revisão mandava chamar uma skill não empacotada | Resolução local em `build-review/SKILL.md`: usar a configuração do rastreador do projeto ou pedir a informação faltante. O texto original atribuído a Matt foi preservado. |
-| Guia auxiliar fora do escopo atual | Arquivo removido e menção histórica de divulgação retirada. |
+| 12 das 13 skills estavam atrás da fonte. A `spec-plan` tinha 29 arquivos diferentes, sem protótipo, sem `tasks.md`, sem `validate_tasks.py` e sem as regras de segurança. | As skills foram copiadas da fonte. Pastas de teste (`evals/`), caches e notas pessoais (`NOTAS.md`) ficaram de fora. |
+| As skills `issue` e `oq` não estavam no plugin. | Entraram. O plugin passa a ter 15 skills. |
+| O README descrevia o fluxo antigo (só `plan.md` e `checks.md`, sem protótipo, sem tarefas). | README refeito do zero, com 2 fluxogramas em Mermaid e a tabela dos scripts. |
+| 15 desenhos SVG em `docs/` mostravam fluxos antigos. | Os desenhos saíram. Os fluxogramas novos estão no README, em Mermaid, e o GitHub os desenha. |
+| O `INSTALL.md` pedia o Codex CLI 0.156. O `gpt-6.2-sol` exige o 0.169. | O mínimo passou a 0.169. |
+| Os manifestos falavam de 13 skills. | Falam de 15. |
 
-## Skills e comandos que parecem ausentes
+## Ficou de fora, de propósito
 
-- Os comandos `/cass:<nome>` da documentação correspondem a pastas presentes.
-- A chamada a `/setup-matt-pocock-skills` na referência original não deve ser executada: a resolução local no maestro acompanha o briefing dos revisores. Outras menções a esse nome identificam a origem de citações, não uma dependência operacional.
-- `code-review`, `implement-spec`, `to-tickets`, `retro` e `writing-for-agents` aparecem como origem de conteúdo ou nomes históricos. O conteúdo necessário usado pelo fluxo está nas referências empacotadas. Não são comandos adicionais do catálogo.
-- `/gpt-builder` continua na descrição de `gpt-implementar` como nome antigo. Não há pasta ou comando independente com esse nome. A lista pública usa `/cass:gpt-implementar`; retirar a compatibilidade semântica da descrição alteraria a ativação da skill e fica pendente.
-- Os nomes `superpowers:*`, os arquivos fictícios dos exemplos de organização de skills e `[url]` são exemplos em blocos de código. Não foram tratados como dependências ou links de navegação reais.
-- O changelog mantém nomes de skills e arquivos retirados em versões anteriores: é registro histórico, não catálogo de comandos atuais.
-
-## Descrição do GitHub
-
-A descrição consultada no GitHub ainda informa **9 skills**. Esse campo é configuração do repositório e não faz parte do diff; não foi alterado diretamente.
-
-Texto proposto para aplicar após o merge:
-
-> Plugin de Claude Code com 12 skills para planejar, pesquisar, construir com provas, revisar código e criar skills. Por Cassiano Diniz.
-
-A descrição do manifesto foi atualizada na PR para incluir `writin-skills`.
+| Item | Motivo |
+|---|---|
+| A versão nova da `search` | A versão local usa a rotação das chaves de pesquisa pessoais e uma pasta pessoal do Google Drive. O plugin é público. A `search` fica na versão anterior. |
+| `spec-plan/references/skills/tanstack-query-best-practices` | É escrita para um projeto privado e cita a estrutura interna dele. Os 2 links para ela (`spec-plan/references/investigate.md` e `implementar/references/build.md`) ficam sem destino no plugin. Esses links só valem quando o projeto usa TanStack Query. |
+| `spec-plan/references/skills/cloudflare-atlas`, `supabase`, `supabase-postgres-best-practices` e `references/tlc-spec-lean` | Nenhuma instrução das skills cita essas pastas (2,9 MB a menos). |
 
 ## Verificação
 
-| Claim ou check | Método | Status | Resultado |
-|---|---|---|---|
-| Cópias completas | Comparação byte a byte de cada arquivo, incluindo inventário | ✓ passed | `implementar`: 8/8; `writin-skills`: 10/10. |
-| Manifestos do pacote | `claude plugin validate --json .` | ✓ passed | Exit 0, sem erros. Aviso preexistente: `contributors` é ignorado pelo Claude Code; preservado para manter autoria. |
-| Frontmatter | Ruby `YAML.safe_load`, nome igual ao diretório e descrição presente | ✓ passed | 12/12 arquivos válidos; exit 0. |
-| Links e imagens locais | Scanner Python de Markdown/HTML, excluindo exemplos em blocos de código, links externos e placeholders | ✓ passed | 61 referências locais válidas antes de adicionar este relatório; nenhuma quebrada. |
-| SVGs | Parser XML em todos os SVGs | ✓ passed | 12/12 válidos; exit 0. |
-| Infográfico principal | Renderização offline com Sharp, temas claro e escuro, seguida de inspeção visual | ✓ passed | Cartões e textos sem cortes; fluxo central preservado. Renderizações temporárias fora do pacote. |
-| Comandos do catálogo | Comparação de cada `/cass:<nome>` documentado com as pastas de skills | ✓ passed | Todos os comandos públicos resolvem. |
-| Guia retirado | Ausência do arquivo e busca textual no pacote, excluindo `.git` | ✓ passed | Arquivo e menções ausentes. |
-| Bash | `bash -n install.sh skills/_shared/scripts/verify-selo.sh skills/gpt-optimizer/scripts/run-gpt.sh` | ✓ passed | Exit 0; os scripts não foram executados. |
-| JavaScript | `node --check skills/writin-skills/render-graphs.js` | ✓ passed | Exit 0. |
-| Integridade do diff | `git diff --check` | ✓ passed | Exit 0. |
-| Funcionamento das skills com agentes | Cenários de pressão/execução real | ? not verified | Não executados; esta entrega sincroniza conteúdo existente e audita o pacote. Não afirma aprovação comportamental ou revisão independente. |
-| Serviços externos e instalação | Codex, Exa, GitHub de um projeto-alvo, instalação em sessão limpa | ? not verified | Não executados. Links externos não tiveram varredura de disponibilidade. |
+| Conferência | Método | Resultado |
+|---|---|---|
+| Manifestos | `claude plugin validate --json .` | ✓ sem erro. Avisos antigos: o campo `contributors` é ignorado, e o plugin não tem ícone. |
+| Cabeçalho das skills | `name` igual à pasta e `description` presente | ✓ 15 de 15 |
+| Comandos do README | cada `/cass:<nome>` tem pasta, e cada pasta tem comando | ✓ sem diferença |
+| Scripts da `spec-plan` | `selftest.py` | ✓ `143 killed, 0 survived, controls ok, tooling ok, baseline clean` |
+| Shell | `bash -n` no instalador e nos scripts | ✓ |
+| Links locais | busca em todo `.md`, fora dos blocos de código | 2 links da TanStack (acima) sem destino. Os outros 2 avisos são exemplos: `url` na `search` e uma imagem citada no exemplo de plano. |
+| Dados pessoais | busca por e-mail, caminhos da máquina e nome do projeto privado | ✓ nada novo. O e-mail do autor nos manifestos já era público. |
+| Comportamento das skills com agentes | — | não verificado nesta auditoria. A `spec-plan` nova foi testada na fonte (planejador 15 de 15 na decisão do protótipo). |
 
-O validador do Claude Code valida o manifesto; chamar esse comando sobre uma pasta de skills retorna inventário vazio, portanto essa saída não foi usada como prova de frontmatter. A inspeção visual foi offline: abrir o SVG por `file://` no navegador foi bloqueado pela política do navegador. Não houve contorno do bloqueio.
+## Pendências
 
-## Sugestões pendentes
-
-1. Criar uma checagem automática de contagem, links e frontmatter no CI, para impedir que README e catálogo fiquem diferentes de novo.
-2. Resolver explicitamente a relação entre `otimizar-arquitetura` (substituir testes antigos de módulos rasos) e `implementar` (não apagar/enfraquecer testes sem renegociar). As duas regras permanecem como estão; usar ambas exige autorização clara sobre testes substituídos.
-3. Decidir se o nome antigo `/gpt-builder` deve continuar reconhecido na descrição de `gpt-implementar`.
-4. Avaliar o papel de `build-review/references/PR.md`, que já constava como não consumido no changelog. Mantido como artefato; conectá-lo ao fluxo é mudança de funcionamento.
-5. Depois do merge, escolher a próxima versão do plugin e atualizar a descrição do GitHub. A versão `4.7.0` do manifesto foi preservada, embora o changelog já tenha `4.7.1`; essa discrepância é preexistente e não foi convertida em release por esta PR.
+1. Decidir se a referência da TanStack entra no plugin numa versão sem o projeto privado, ou se
+   os 2 links saem das instruções.
+2. Decidir se a `search` ganha uma versão pública, sem as chaves e as pastas pessoais.
+3. `writin-skills/references/independent-review.md` ainda cita `gpt-6.1-sol` como padrão do
+   script. O script usa `gpt-6.2-sol`. O texto vem da fonte; corrigir lá e sincronizar.
+4. Escolher a próxima versão do plugin e atualizar a descrição do repositório no GitHub depois
+   do merge.

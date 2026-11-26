@@ -2,6 +2,12 @@
 
 ## Não lançado
 
+- Sincroniza `spec-plan`, `implementar`, `build-review`, `gpt-implementar`, `ask-me`, `auto-think`, `gpt-optimizer`, `writin-skills`, `otimizar-arquitetura` e `aprender-com-a-sessao` com as versões de 26/11/2026 do repositório skills-cassiano. Na `spec-plan`: protótipo HTML com fotos a 375, 768 e 1280 px antes do 1º sim (sem protótipo para troca de texto ou cor, esconder algo ou conserto visual); tarefas (`tasks.md`) com 2º sim; regras de segurança pela OWASP ASVS 5.0; novo script `validate_tasks.py`.
+- Adiciona `issue` (salva trabalho para depois como issue e quebra planos em tarefas) e `oq` (reformula a última resposta em palavras simples). O plugin passa a ter 15 skills.
+- README refeito do zero, com o fluxograma da `spec-plan` e o da construção e revisão (Mermaid, que o GitHub desenha) e a tabela do que cada script confere. Os desenhos antigos de `docs/*.svg` saem.
+- `INSTALL.md`: o Codex CLI mínimo passa a 0.169 (o 0.165 recusa o `gpt-6.2-sol`).
+- `search` fica na versão anterior: a versão local usa chaves e pastas pessoais. Ver `docs/auditoria-plugin.md`.
+
 - `auto-think`, `gpt-optimizer`, `gpt-implementar` e o confronto compartilhado passam a usar o GPT Sol 6.2 (`gpt-6.2-sol`) no lugar do `gpt-6.1-sol`. Exige Codex CLI 0.169 ou mais novo (o 0.165 recusa o modelo).
 - `spec-plan`: o desenho do plano sai de cima para baixo, com caixa de até quatro palavras, a ação escrita na seta e quatro cores fixas no modelo (começo, resultado, serviço de fora, passo comum); com mais de cinco caixas, elas são agrupadas em um bloco por lugar. `build-review`: o modelo do texto da PR deixa de sugerir cor para as setas, porque o desenho já chega pronto do plano.
 - `ask-me`: quando o pedido é construir, mudar ou estudar algo num repositório de código, explora a área antes da primeira pergunta, pelo passo de exploração que a `spec-plan` já usa (`spec-plan/references/skills/improve-codebase-architecture`). A `ask-me` passa a depender desse arquivo da `spec-plan`.

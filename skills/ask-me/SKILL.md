@@ -63,7 +63,6 @@ Entregue, nesta ordem, na mesma mensagem:
 2. **O pedido para essa tarefa é:** um único bloco no chat. Use os campos abaixo conforme a tarefa, omitindo os que não acrescentam informação.
 3. As skills de execução verificadas, com uma frase sobre por que se encaixam e o que muda entre elas, seguida do menu de execução ou ajuste.
 
-```text
 🎯 Objetivo: <resultado pretendido>
 Contexto: <para quem, motivação e materiais relevantes>
 ✅ Pronto quando: <critérios de sucesso combinados>
@@ -74,18 +73,18 @@ Preservar: <restrições, valores exatos e referências que precisam acompanhar 
 ❓Suposições: <somente as ainda relevantes, identificadas como tais>
 Parar e perguntar: se precisar mudar o objetivo, o escopo, os limites ou os critérios combinados, ou faltar uma informação indispensável; respeitar as autorizações já dadas.
 Ao terminar: resumir a entrega e indicar o que não foi possível confirmar.
-```
+ 
 
 Antes de mostrar o prompt, confira cobertura do combinado, consistência e ambiguidades importantes. Preserve nomes, números, fontes e limites com precisão. Considere situações comuns da tarefa que possam frustrar o objetivo; não invente novas exigências. Corrija o que já estiver resolvido no contexto e pergunte apenas pelas lacunas importantes. O prompt deve carregar as decisões necessárias, sem repetir a conversa inteira ou antecipar toda a execução.
 
 Com uma skill adequada, o menu final é:
 
-```text
 📝 Como quer seguir?
  a) Executar este prompt com a skill <nome verificado>
  b) Executar com outra skill — diga qual
  c) Ajustar o prompt — diga o que quer mudar
-```
+
+
 
 Se houver mais de uma adequada, dê uma letra a cada candidata, seguida de "Executar com outra skill — diga qual" e "Ajustar o prompt — diga o que quer mudar". Recomende com base na compatibilidade verificada; não preencha opções com skills que só tangenciam o pedido.
 

@@ -49,8 +49,33 @@ def shipped(script):
     """The plan and implement skills ship part of these scripts; a case for one they lack is skipped."""
     return os.path.isfile(globals()["script"](script))
 
+def two_phases(s):
+    return s.replace("T1 → T2 → T3 → T4", "T1 → T2\n```\n\n### Phase 2: Core\n\n```\nT3 → T4", 1)
+
 # (validator, artifact, description, mutation, expected exit, expected message fragment)
 CASES = [
+    ("validate_tasks", "tasks.md", "a task whose Where names no file",
+     lambda s: s.replace("**Where**: `app/billing/status_map.rb`", "**Where**: billing", 1),
+     1, "T2: `Where` names no file"),
+    ("validate_tasks", "tasks.md", "a task with no Reuses line",
+     lambda s: s.replace("**Reuses**: `app/billing/subscription.rb` status constants\n", "", 1),
+     1, "T2: missing `Reuses`"),
+    ("validate_tasks", "tasks.md", "a Reuses that names no file",
+     lambda s: s.replace("**Reuses**: `app/billing/subscription.rb` status constants", "**Reuses**: existing patterns", 1),
+     1, "T2: `Reuses` names no file"),
+    ("validate_tasks", "tasks.md", "a Done when with no item",
+     lambda s: s.replace("- [ ] Every provider status maps once; an unknown one records `billing.status_unmapped`\n"
+                         "- [ ] Gate check passes: `bin/rails test test/billing`\n", "", 1),
+     1, "T2: `Done when` has no `- [ ]` item"),
+    ("validate_tasks", "tasks.md", "a task depends on a task of a later phase",
+     lambda s: two_phases(s).replace("**Depends on**: None", "**Depends on**: T3", 1),
+     1, "T1 (phase 1) depends on T3 (phase 2)"),
+    ("validate_tasks", "tasks.md", "a task with no Gate line",
+     lambda s: s.replace("**Tests**: unit\n**Gate**: quick\n", "**Tests**: unit\n", 1),
+     1, "missing `Gate` field"),
+    ("validate_tasks", "tasks.md", "missing Test Coverage Matrix",
+     lambda s: s.replace("## Test Coverage Matrix", "## Coverage", 1),
+     1, "missing required section: ## Test Coverage Matrix"),
     ("validate_checks", "checks.md", "no Build line",
      lambda s: s.replace("Build: `bin/rubocop app/billing`\n", "", 1),
      1, "no `Build:` line"),
@@ -163,6 +188,15 @@ CASES = [
     ("validate_plan", "plan.md", "assumption with no rationale",
      lambda s: s.replace("| the provider already retried 3 times before it reports a failure |", "|  |"),
      1, "empty 'Rationale'"),
+    ("validate_plan", "plan.md", "empty Investigation line",
+     lambda s: s.replace("| 9 observability | n/a - existing billing log covers it |", "| 9 observability | |", 1),
+     1, "Investigation line '9 observability' is empty"),
+    ("validate_plan", "plan.md", "Investigation line with a value outside the three",
+     lambda s: s.replace("| Glossary | done - GLOSSARY.md, no new term |", "| Glossary | parcial |", 1),
+     1, "Investigation line 'Glossary' is empty"),
+    ("validate_plan", "plan.md", "no Investigation section",
+     lambda s: s.replace("## Investigation" + chr(10), "## Notes on steps" + chr(10), 1),
+     1, "missing required section: ## Investigation"),
     ("validate_plan", "plan.md", "missing required section",
      lambda s: s.replace("## Assumptions", "## Open Decisions"),
      1, "missing required section: ## Assumptions"),
@@ -181,7 +215,7 @@ CASES = [
      lambda s: s.replace("New: `WebhookDelivery` and its link to `Subscription`. ", ""),
      1, "has no `New:` line"),
     ("validate_plan", "plan.md", "a capture the plan does not show as an image",
-     lambda s: s.replace("![card form](captures/billing--card-form.png) ", ""),
+     lambda s: with_binding(s).replace("![card form](captures/billing--card-form.png) ", ""),
      1, "is not shown in the plan"),
     ("validate_plan", "plan.md", "a single-module path owes no drawing",
      lambda s: re.sub(r"```mermaid\nsequenceDiagram\n.*?```\n", "single module - `Billing::Subscription`\n", s, flags=re.S),
@@ -191,9 +225,49 @@ CASES = [
                          "**Open questions:** what happens on a chargeback?"),
      0, "do not read as resolved"),
 
+    ("validate_plan", "plan.md", "a plan that shows a screen capture and has no Screen states",
+     lambda s: re.sub(r"## Screen states\n.*?(?=## Investigation)", "", with_binding(s), flags=re.S),
+     1, "no `## Screen states`"),
+    ("validate_plan", "plan.md", "a screen with no Prototype line",
+     lambda s: s.replace("**Prototype:** none - the card form's text edited in place\n", ""),
+     1, "no `**Prototype:**` line"),
+    ("validate_plan", "plan.md", "a Prototype none that names no in-place edit",
+     lambda s: s.replace("**Prototype:** none - the card form's text edited in place", "**Prototype:** none - n/a"),
+     1, "`**Prototype:**` names"),
+    ("validate_plan", "plan.md", "a Prototype path outside prototype/",
+     lambda s: s.replace("**Prototype:** none - the card form's text edited in place", "**Prototype:** ../billing.txt"),
+     1, "`**Prototype:**` names"),
+    ("validate_plan", "plan.md", "a prototype file that does not exist",
+     lambda s: s.replace("**Prototype:** none - the card form's text edited in place", "**Prototype:** prototype/billing.html"),
+     1, "the prototype `prototype/billing.html` does not exist"),
+    ("validate_plan", "plan.md", "a screen with no Pieces line",
+     lambda s: re.sub(r"^\*\*Pieces:\*\*[^\n]*\n", "", s, flags=re.M),
+     1, "no `**Pieces:**` line"),
+    ("validate_plan", "plan.md", "a Pieces line still the template placeholder",
+     lambda s: re.sub(r"^\*\*Pieces:\*\*[^\n]*", "**Pieces:** <element> - `<piece> <variant>` (<manual>:<line>)", s, flags=re.M),
+     1, "no `**Pieces:**` line"),
+    ("validate_plan", "plan.md", "a screen with no state rows",
+     lambda s: re.sub(r"^\| (charge failed|never charged) \|[^\n]*\n", "", s, flags=re.M),
+     1, "has no state rows"),
+    ("validate_plan", "plan.md", "a state row that names no criterion",
+     lambda s: s.replace("375 and 1280 | 1 |", "375 and 1280 |  |"),
+     1, "names no criterion"),
+    ("validate_plan", "plan.md", "a nothing-to-decide row with no reason",
+     lambda s: s.replace("nothing to decide - the screen shows no charge state", "nothing to decide"),
+     1, "names no criterion"),
+    ("validate_plan", "plan.md", "Screen states with no screen heading",
+     lambda s: s.replace("### Billing\n\n**Pieces:**", "**Pieces:**"),
+     1, "no `### <screen>`"),
+
     ("validate_verification", "verification.md", "self-verified report (warn)",
      lambda s: s.replace("independent sub-agent (author != verifier)", "self-verified (degraded - no sub-agent)"),
      0, "self-verified"),
+    ("validate_verification", "verification.md", "a screen-state row with no photo or test",
+     lambda s: re.sub(r"^\| `captures/review-billing-row2\.png`[^\n]*\n", "", s, flags=re.M),
+     1, "row 2"),
+    ("validate_verification", "verification.md", "a row written as not reached under PASS",
+     lambda s: s.replace("| row 2, 375 | none |", "| row 2 | not reached - no seed account |"),
+     1, "not reached"),
 ]
 
 LAST_AC = "7. IF a delivery carries no valid provider signature THEN the system SHALL return `401` and persist nothing\n"
@@ -223,8 +297,9 @@ def with_screen(s):
 
 
 def with_binding_bare(s):
-    return s.replace("- provider webhook reference - the 9 statuses",
-                     "- design `03` - **binding for the interface** - the 9 statuses")
+    return (s.replace("- provider webhook reference - the 9 statuses",
+                      "- design `03` - **binding for the interface** - the 9 statuses")
+            .replace("- TLC-412 - ", "- ![card form](captures/billing--card-form.png) - binding - the card form\n- TLC-412 - ", 1))
 
 
 # The capture sits in the feature folder, where the scaffold always writes it.
@@ -245,6 +320,37 @@ SCREEN_CHECK = (f"\n**C99** - A member opening Billing sees the screen in `{CAPT
                 "Proof: `bin/rails test test/system/billing_test.rb -n \"/billing screen matches capture/\"`\n")
 
 
+WIDTHS = (375, 768, 1280)
+PROTO_AC = ("8. WHEN a member opens Billing THEN the system SHALL show "
+            + ", ".join(f"`.specs/features/billing/captures/billing-row1-{w}.png`" for w in WIDTHS) + "\n")
+PROTO_FILES = {"prototype/billing.html": lambda s: "<html></html>\n",
+               **{f"captures/billing-row1-{w}.png": (lambda s: b"") for w in WIDTHS}}
+SCREEN_AC_WRAPPED = ("8. WHEN a member opens Billing THEN the system SHALL show the screen in\n"
+                     f"    `{CAPTURE}`\n")
+
+
+def with_prototype(s):
+    s = s.replace("**Prototype:** none - the card form's text edited in place", "**Prototype:** prototype/billing.html")
+    s = s.replace(LAST_AC, LAST_AC + PROTO_AC, 1)
+    lines = "".join(f"- ![billing row 1, {w}](captures/billing-row1-{w}.png) - binding - prototype\n" for w in WIDTHS)
+    return s.replace("## Sources\n\n", "## Differences from the source\n\nNone - the product matches the source\n\n"
+                     "## Sources\n\n" + lines, 1)
+
+
+PIECE_FILE = {"../../../app/components/card.rb": lambda s: "class Card; end\n"}
+
+
+def screen_task(reuses, deps=None):
+    """T1 builds the prototype's screen: its Done when cites the photo, its Reuses is given."""
+    def edit(s):
+        s = s.replace("- [ ] Migration runs and rolls back",
+                      "- [ ] Migration runs and rolls back\n"
+                      "- [ ] Billing matches `.specs/features/billing/captures/billing-row1-375.png` (Billing row 1)", 1)
+        s = s.replace("**Reuses**: `db/migrate/20260301_add_trialing_status.rb` pattern", f"**Reuses**: {reuses}", 1)
+        return s
+    return edit
+
+
 def with_screen_check(s):
     return s.replace("\n## Coverage", SCREEN_CHECK + "\n## Coverage", 1)
 
@@ -258,9 +364,29 @@ def with_diff(old, new):
     return lambda s: with_binding(s).replace(old, new)
 
 
-def with_browser_proof(s):
-    """A browser proof as the Verifier reads it now: it takes the photo itself, so none is named."""
-    return s.replace("\n## Coverage", "\nProof: browser - open Billing and compare it with the capture\n\n## Coverage", 1)
+def png(width, height):
+    """The header of a PNG of that size - all the size gate reads."""
+    return (b"\x89PNG\r\n\x1a\n" + b"\x00\x00\x00\rIHDR"
+            + width.to_bytes(4, "big") + height.to_bytes(4, "big") + b"\x08\x02\x00\x00\x00")
+
+
+RUNNING = "screens/billing.running.png"
+
+
+def screens_md(verdict, capture=False):
+    row = (f"| `captures/billing--card-form.running.png` | `captures/billing--card-form.png` | {verdict} | - |\n"
+           if capture else "")
+    return lambda s: (
+        "# Billing screens\n\n**Verifier**: independent sub-agent (author != verifier)\n\n"
+        "| Screen | Compared with | Verdict | Finding |\n| --- | --- | --- | --- |\n"
+        f"| `{RUNNING}` | AC 9 | {verdict} | - |\n" + row)
+
+
+def with_browser_shot(rel):
+    return lambda s: s.replace("\n## Coverage", f"\nProof: browser {rel}\n\n## Coverage", 1)
+
+
+with_browser_proof = with_browser_shot("captures/billing--card-form.running.png")
 
 
 def with_photo_finding(closed):
@@ -270,9 +396,11 @@ def with_photo_finding(closed):
         f"Billing next to `{CAPTURE}` | move the card form above the plans | {closed} |\n")
 
 
-# A binding capture a criterion cites and a browser proof, with no screens.md and no picture
-# saved by the author: the Verifier photographs the screen itself.
-CAPTURE_BROWSER = {"plan.md": lambda s: with_screen(with_binding(s)), "checks.md": with_browser_proof}
+# A binding capture a criterion cites, a browser proof naming its picture, the picture the
+# Verifier saved over the builder's, and screens.md judging it.
+CAPTURE_BROWSER = {"plan.md": lambda s: with_screen(with_binding(s)), "checks.md": with_browser_proof,
+                   "screens.md": screens_md("matches", capture=True),
+                   "captures/billing--card-form.running.png": lambda s: "png"}
 
 
 def with_walk_proof(s):
@@ -290,6 +418,32 @@ def with_refused_sensor(s, label="wrong value", closed='Refused - user: "do not 
     rows = faults if faults is not None else "| wrong value | approved proof | no |"
     return s + ("\n## Discrimination sensor\n\n| Fault | Verification | Killed? |\n"
                 "| --- | --- | --- |\n" + rows + "\n")
+
+
+def with_second_screen(s):
+    return s.replace("## Investigation" + chr(10), "### Profile" + chr(10) + chr(10)
+                     + "| State | Account, data and width | Criterion |" + chr(10) + "| --- | --- | --- |" + chr(10)
+                     + "| profile empty | member with no profile yet, 375 | 1 |" + chr(10) + chr(10)
+                     + "## Investigation" + chr(10), 1)
+
+
+# The three screen headings of the E1 run (25/11/2026, diet-sharing-dialog): every word of the last
+# one sits in another heading, and two carry accents.
+E1_SCREENS = ["Compartilhar dieta na ficha", "Padrão e exceção da Área do paciente", "Dieta na Área do paciente"]
+
+
+def with_e1_screens(s):
+    tables = "".join("### " + screen + chr(10) + chr(10) + "| State | Account, data and width | Criterion |" + chr(10)
+                     + "| --- | --- | --- |" + chr(10) + "| opened | owner, 375 | 1 |" + chr(10) + chr(10)
+                     for screen in E1_SCREENS)
+    return s.replace("## Investigation" + chr(10), tables + "## Investigation" + chr(10), 1)
+
+
+def with_e1_rows(*screens):
+    lines = "".join(chr(10) + "| `captures/review-e1-" + str(i) + ".png` | " + screen + " row 1, 375 | none |"
+                    for i, screen in enumerate(screens))
+    return lambda s: s.replace("| `captures/review-billing-row2.png` | row 2, 375 | none |",
+                               "| `captures/review-billing-row2.png` | row 2, 375 | none |" + lines, 1)
 
 
 # Mutants that need more than one artifact edited: the screen rules read plan.md and judge
@@ -318,6 +472,61 @@ MULTI_CASES = [
          {"faults": "| wrong value | proof1 | no |\n| wrong bound | proof2 | no |"}),
         ("a fix commit does not negate an actual survivor", {"closed": "e4f5a6b C1"}),
     ]],
+    ("validate_verification", "two screens numbered from 1, evidence for one only",
+     {"plan.md": with_second_screen},
+     1, "'Profile' row 1 has no photo or test"),
+    ("validate_verification", "two screens numbered from 1, evidence for both (control)",
+     {"plan.md": with_second_screen,
+      "verification.md": lambda s: s.replace("| `captures/review-billing-row2.png` | row 2, 375 | none |",
+          "| `captures/review-billing-row2.png` | row 2, 375 | none |" + chr(10)
+          + "| `captures/review-profile-row1.png` | row 1, 375 | none |", 1)},
+     0, ""),
+    ("validate_verification", "E1 screens: a heading whose words all sit in other headings, evidence for all (control)",
+     {"plan.md": with_e1_screens, "verification.md": with_e1_rows(*E1_SCREENS)},
+     0, ""),
+    ("validate_verification", "E1 screens: no evidence for the heading whose words sit in other headings",
+     {"plan.md": with_e1_screens, "verification.md": with_e1_rows(*E1_SCREENS[:2])},
+     1, "'Dieta na Área do paciente' row 1 has no photo or test"),
+    ("validate_verification", "E1 screens: a row line that also names a longer heading after the row number (control)",
+     {"plan.md": with_e1_screens, "verification.md": lambda s: with_e1_rows(*E1_SCREENS)(s).replace(
+         "Dieta na Área do paciente row 1, 375 | none |",
+         "Dieta na Área do paciente row 1, 375; padrão, exceção e conta da Área do paciente | none |", 1)},
+     0, ""),
+    ("validate_verification", "a browser proof and no screens.md",
+     {"plan.md": with_screen, "checks.md": with_browser_shot(RUNNING), RUNNING: lambda s: "png"},
+     1, "no `screens.md`"),
+    ("validate_verification", "a screen that diverges in screens.md next to PASS",
+     {"plan.md": with_screen, "screens.md": screens_md("diverges - the card form sits below the plan list"),
+      "checks.md": with_browser_shot(RUNNING), RUNNING: lambda s: "png"},
+     1, "reads 'diverges"),
+    ("validate_verification", "a plan citing a capture and no running screenshot",
+     {"plan.md": lambda s: with_screen(with_binding(s)), "screens.md": screens_md("matches")},
+     1, "no `*.running.png`"),
+    ("validate_verification", "a cited capture with no running screenshot beside it",
+     {"plan.md": lambda s: with_screen(with_binding(s)), "screens.md": screens_md("matches"),
+      "screens/other.running.png": lambda s: "png"},
+     1, "has no `billing--card-form.running.png`"),
+    ("validate_verification", "a browser proof names a screenshot that is not on disk",
+     {"plan.md": with_screen, "screens.md": screens_md("matches"),
+      "checks.md": with_browser_shot("screens/missing.running.png"), RUNNING: lambda s: "png"},
+     1, "which is not under the feature folder"),
+    ("validate_verification", "a browser proof names no screenshot",
+     {"plan.md": with_screen, "screens.md": screens_md("matches"),
+      "checks.md": lambda s: s.replace("\n## Coverage", "\nProof: browser - click the button\n\n## Coverage", 1),
+      RUNNING: lambda s: "png"},
+     1, "names no `.running.png`"),
+    ("validate_verification", "a browser proof alone makes a screen, and there is no screens.md",
+     {"checks.md": with_browser_shot(RUNNING), RUNNING: lambda s: "png"},
+     1, "no `screens.md`"),
+    ("validate_verification", "a picture taken at another size than its capture",
+     {"plan.md": lambda s: with_screen(with_binding(s)), "screens.md": screens_md("matches"),
+      "captures/billing--card-form.png": lambda s: png(1024, 839),
+      "captures/billing--card-form.running.png": lambda s: png(1440, 1200)},
+     1, "take the picture at the capture's size"),
+    ("validate_verification", "a .jpg capture with no running picture beside it",
+     {"plan.md": lambda s: with_screen(with_binding(s)).replace("billing--card-form.png", "billing--card-form.jpg"),
+      "captures/billing--card-form.jpg": lambda s: "jpg", "screens.md": screens_md("matches")},
+     1, "has no `billing--card-form.running.png`"),
     ("validate_verification", "a photo defect the Verifier found left open in Findings",
      {**CAPTURE_BROWSER, "verification.md": with_photo_finding("")},
      1, "is not closed"),
@@ -440,13 +649,45 @@ MULTI_CASES = [
     ("validate_plan", "a capture under captures/ that no criterion cites",
      {"plan.md": lambda s: with_binding(s).replace(SCREEN_AC, "")},
      1, "no criterion cites the capture"),
-    ("validate_plan", "a capture the planner made non-binding without the user's words",
-     {"plan.md": lambda s: s.replace(' - user: "only the tone, the layout is ours"', "")},
-     1, "no line quotes the user"),
+    ("validate_plan", "a print the user sent, left in captures/ as non-binding with their words",
+     {"plan.md": lambda s: with_binding(s).replace(
+         "- binding - the card form", '- non-binding - user: "only the tone, the layout is ours" - the card form')},
+     1, "is not marked binding"),
     ("validate_plan", "a capture in captures/ that Sources never mentions and nothing binds",
-     {"plan.md": lambda s: s.replace(
-         '- ![card form](captures/billing--card-form.png) `captures/billing--card-form.png` - non-binding - user: "only the tone, the layout is ours" - the card form\'s wording\n', "")},
-     1, "no line quotes the user"),
+     {"captures/billing--card-form.png": lambda s: b""},
+     1, "is not marked binding"),
+    ("validate_plan", "a prototype with only the 375 photo",
+     {"plan.md": with_prototype, "prototype/billing.html": lambda s: "<html></html>\n",
+      "captures/billing-row1-375.png": lambda s: b""},
+     1, "no `captures/billing-row1-768.png`"),
+    ("validate_checks", "a screen criterion whose capture sits on its second line and no check cites it",
+     {"plan.md": lambda s: with_binding(s).replace(SCREEN_AC, SCREEN_AC_WRAPPED)},
+     1, "no check proving AC 8 does"),
+    ("validate_tasks", "a piece of the prototype's screen in no Reuses of the tasks that build it",
+     {"plan.md": with_prototype, **PROTO_FILES, **PIECE_FILE,
+      "tasks.md": screen_task("`db/migrate/20260301_add_trialing_status.rb` pattern")},
+     1, "is in no `Reuses` of the tasks that build that screen"),
+    ("validate_tasks", "the right piece file with the wrong variant",
+     {"plan.md": with_prototype, **PROTO_FILES, **PIECE_FILE,
+      "tasks.md": screen_task("`Card compact` (`app/components/card.rb`)")},
+     1, "is in no `Reuses` of the tasks that build that screen"),
+    ("validate_tasks", "a prototype no task builds",
+     {"plan.md": with_prototype, **PROTO_FILES, **PIECE_FILE,
+      "tasks.md": lambda s: s.replace("**Reuses**: `db/migrate/20260301_add_trialing_status.rb` pattern",
+                                      "**Reuses**: `Card default` (`app/components/card.rb`)", 1)},
+     1, "no task's `Done when` cites `captures/billing-row"),
+    ("validate_tasks", "a screen with a new piece whose tasks depend on nothing",
+     {"plan.md": lambda s: with_prototype(s).replace(
+         "(`app/components/card.rb`)\n", "(`app/components/card.rb`); banner - new piece - billing row 1\n", 1),
+      **PROTO_FILES, **PIECE_FILE,
+      "tasks.md": screen_task("`Card default` (`app/components/card.rb`)")},
+     1, "has a new or changed piece"),
+    ("validate_verification", "a cited capture screens.md never judges",
+     {"plan.md": lambda s: with_screen(with_binding(s)), "screens.md": screens_md("matches"),
+      "captures/billing--card-form.png": lambda s: png(1024, 839),
+      "captures/billing--card-form.running.png": lambda s: png(1024, 839),
+      RUNNING: lambda s: png(1024, 839)},
+     1, "has no row in screens.md"),
     ("validate_checks", "a screen criterion cites a capture and no check cites it",
      {"plan.md": with_binding},
      1, "no check proving AC 8 does"),
@@ -455,6 +696,13 @@ MULTI_CASES = [
 # Negative controls: a gate that fires where it should not is the same bug as one that never
 # fires - it just fails loudly instead of silently.
 NEGATIVE_CONTROLS = [
+    ("validate_tasks", "a dependency on an earlier phase needs no arrow",
+     {"tasks.md": two_phases},
+     "Depends on"),
+    ("validate_tasks", "a Reuses of `none - <why>` is an answer",
+     {"tasks.md": lambda s: s.replace("**Reuses**: `app/billing/subscription.rb` status constants",
+                                      "**Reuses**: none - first status map in the repo", 1)},
+     "Reuses"),
     ("validate_verification", "one exact individually refused survivor is accepted",
      {"verification.md": with_refused_sensor}),
     ("validate_verification", "paired curly quotation is a valid refusal",
@@ -472,21 +720,46 @@ NEGATIVE_CONTROLS = [
      {"checks.md": lambda s: s.replace("Build: `bin/rubocop", "Mutations: 3\nBuild: `bin/rubocop")}),
     ("validate_plan", "a binding source with confirmed differences is accepted",
      {"plan.md": with_binding}),
+    ("validate_plan", "a fixed visual defect needs no prototype",
+     {"plan.md": lambda s: s.replace("**Prototype:** none - the card form's text edited in place",
+                                     "**Prototype:** none - the card form's spacing defect fixed")}),
+    ("validate_plan", "the Verifier's review photos in captures/ are not plan captures",
+     {"plan.md": with_binding, "captures/review-billing-375.png": lambda s: b"",
+      "captures/review-billing-row1.png": lambda s: b""}),
     ("validate_plan", "a binding source that matches with no differences is accepted",
      {"plan.md": lambda s: with_binding(s).replace(
          DIFFERENCES, "## Differences from the source\n\nNone - the product matches the source\n\n")}),
-    ("validate_plan", "a capture the Sources line binds needs no quote",
-     {"plan.md": lambda s: with_binding(s).replace(
-         '- ![card form](captures/billing--card-form.png) `captures/billing--card-form.png` - non-binding - user: "only the tone, the layout is ours" - the card form\'s wording',
-         "- ![card form](captures/billing--card-form.png) `captures/billing--card-form.png` - binding - the card form")}),
+    ("validate_tasks", "the screen's piece, variant and file in the Reuses of the task that builds it",
+     {"plan.md": with_prototype, **PROTO_FILES, **PIECE_FILE,
+      "tasks.md": screen_task("`Card default` (`app/components/card.rb`)")}),
+    ("validate_tasks", "a piece path with parentheses is read",
+     {"plan.md": lambda s: with_prototype(s).replace("app/components/card.rb", "app/(staff)/card.rb"),
+      **PROTO_FILES, "../../../app/(staff)/card.rb": lambda s: "class Card; end\n",
+      "tasks.md": screen_task("`Card default` (`app/(staff)/card.rb`)")}),
+    ("validate_plan", "a prototype with its photos at 375, 768 and 1280 is accepted",
+     {"plan.md": with_prototype, **PROTO_FILES}),
     ("validate_plan", "a Surface route anyone may call owes no refusal status",
      {"plan.md": lambda s: s.replace(
          "| `200`, `401`, `409`, `422` | the provider, with a valid signature; anything else gets `401` |",
          "| `200`, `409`, `422` | anyone |")}),
     ("validate_checks", "a screen check citing the criterion's capture is accepted",
      {"plan.md": with_binding, "checks.md": with_screen_check}),
-    ("validate_verification", "a cited capture and a browser proof with no screens.md and no picture are accepted",
+    ("validate_verification", "a cited capture, its picture and screens.md that matches are accepted",
      CAPTURE_BROWSER, "screens.md", ".running.png"),
+    ("validate_verification", "a plan with a binding source and matching pictures is accepted",
+     {"plan.md": with_binding,
+      "screens.md": screens_md("matches", capture=True),
+      "captures/billing--card-form.running.png": lambda s: "png"}),
+    ("validate_verification", "a picture at twice its capture's size is the same layout",
+     {"plan.md": lambda s: with_screen(with_binding(s)), "screens.md": screens_md("matches", capture=True),
+      "captures/billing--card-form.png": lambda s: png(1024, 839),
+      "captures/billing--card-form.running.png": lambda s: png(2048, 1678),
+      RUNNING: lambda s: png(1024, 839)}),
+    ("validate_verification", "a browser proof whose screenshot exists is accepted",
+     {"plan.md": with_screen, "screens.md": screens_md("matches"),
+      "checks.md": with_browser_shot(RUNNING), RUNNING: lambda s: "png"}),
+    ("validate_verification", "a screen judged in screens.md is accepted",
+     {"plan.md": with_screen, "screens.md": screens_md("matches"), RUNNING: lambda s: "png"}),
     ("validate_verification", "a photo defect the Verifier found and closed by a commit is accepted",
      {**CAPTURE_BROWSER, "verification.md": with_photo_finding("e4f5a6b C99")}),
     ("validate_verification", "a screen no capture draws owes no picture and no screens.md",
@@ -513,18 +786,24 @@ def scaffold():
     root = tempfile.mkdtemp(prefix="tlc-selftest-")
     fdir = os.path.join(root, ".specs", "features", FEATURE)
     os.makedirs(fdir)
-    for name in ("plan.md", "checks.md", "verification.md", "proofs.md"):
+    for name in ("plan.md", "checks.md", "verification.md", "proofs.md", "tasks.md"):
         if os.path.isfile(os.path.join(FIXTURES, name)):
             shutil.copyfile(os.path.join(FIXTURES, name), os.path.join(fdir, name))
-    # A capture the binding cases cite; the gates check that it exists, never its format.
-    os.makedirs(os.path.join(fdir, "captures"))
-    open(os.path.join(fdir, "captures", "billing--card-form.png"), "wb").close()
+    # The print the user sent is a reference; it binds nothing.
+    os.makedirs(os.path.join(fdir, "references"))
+    open(os.path.join(fdir, "references", "billing--card-form.png"), "wb").close()
     with open(os.path.join(root, ".specs", "STATE.md"), "w", encoding="utf-8") as f:
         f.write(STATE)
     return root
 
 
 def run(validator, root):
+    # A capture the binding cases cite; the gates check that it exists, never its format.
+    fdir = os.path.join(root, ".specs", "features", FEATURE)
+    cap = os.path.join(fdir, "captures", "billing--card-form.png")
+    if "captures/billing--card-form.png" in read_artifact(os.path.join(fdir, "plan.md")) and not os.path.exists(cap):
+        os.makedirs(os.path.dirname(cap), exist_ok=True)
+        open(cap, "wb").close()
     p = subprocess.run(
         [sys.executable, script(validator), FEATURE, "--root", root],
         capture_output=True, encoding="utf-8", errors="replace",
@@ -600,18 +879,30 @@ def run_tooling():
         shutil.rmtree(root, ignore_errors=True)
 
     # Before building, the Build line runs once: a command red before any change is not the gate.
-    for desc, build, argv, want_code, want_frag in [] if not shipped("validate_checks") else [
-        ("--execute passes a green Build line", "exit 0", ["--execute"], 0, "0 error"),
-        ("--execute fails a Build line red before building", "exit 3", ["--execute"], 1,
+    # The Build waits for both yeses: a draft or missing tasks.md stops it before any command runs.
+    for desc, build, argv, tasks, want_code, want_frag in [] if not shipped("validate_checks") else [
+        ("--execute passes a green Build line", "exit 0", ["--execute"], "approved", 0, "0 error"),
+        ("--execute fails a Build line red before building", "exit 3", ["--execute"], "approved", 1,
          "Build is red before building: `exit 3` exit 3"),
-        ("without --execute the Build line is not run", "exit 3", [], 0, "0 error"),
+        ("without --execute the Build line is not run", "exit 3", [], "approved", 0, "0 error"),
+        ("--execute does not build tasks the user has not approved", "exit 3", ["--execute"], "draft", 1,
+         "tasks.md has no `**Approved**:` line"),
+        ("--execute does not build with no tasks.md", "exit 3", ["--execute"], "missing", 1,
+         "tasks.md is missing"),
     ]:
         root = scaffold()
-        path = os.path.join(root, ".specs", "features", FEATURE, "checks.md")
+        fdir = os.path.join(root, ".specs", "features", FEATURE)
+        path = os.path.join(fdir, "checks.md")
         write_artifact(path, read_artifact(path).replace("Build: `bin/rubocop app/billing`", f"Build: `{build}`", 1))
+        tasks_path = os.path.join(fdir, "tasks.md")
+        if tasks == "approved":
+            write_artifact(tasks_path, read_artifact(tasks_path) + '\n**Approved**: 2026-11-24 - user: "sim"\n')
+        elif tasks == "missing":
+            os.remove(tasks_path)
         code, out = run_script("validate_checks.py", FEATURE, "--root", root, *argv)
         shutil.rmtree(root, ignore_errors=True)
-        if code == want_code and want_frag in out:
+        built = "Build is red" in out
+        if code == want_code and want_frag in out and (tasks == "approved" or not built):
             print(f"  ok      validate_checks.py: {desc}")
         else:
             ok = False
@@ -908,7 +1199,7 @@ def main(argv=None):
     base = scaffold()
     print("baseline - a clean artifact set must pass every gate")
     baseline_ok = True
-    for validator in [v for v in ("validate_plan", "validate_checks", "validate_verification") if shipped(v)]:
+    for validator in [v for v in ("validate_plan", "validate_checks", "validate_verification", "validate_tasks") if shipped(v)]:
         code, out = run(validator, base)
         if code != 0:
             baseline_ok = False

@@ -53,17 +53,17 @@ Every set a proof must cover gets a row, and every member is written as its own 
 Walk it from the sets, not from the checks: the doors in `Landing`, the decision tables in the code, the input space behind a claim, anything enumerated in prose.
 
 - **Every route in `Surface` owes a row**, and its members are the statuses.
-- **A binding source's controls are a set.** Its members are the controls each capture draws, minus what `## Differences from the source` removes, each beside a check whose proof performs the gesture. The capture says how it looks; the proof says it works.
+- **A binding source's controls are a set.** Its members are the controls each capture draws that this feature adds or changes, minus what `## Differences from the source` removes, each beside a check whose proof performs the gesture. The capture says how it looks; the proof says it works.
 - **A backend rule is one check, and its examples are the members**, the plan's strong case included.
 - **Startup configuration is a set of places.** Each assembly that boots the app - the entry point, the test harness, every app that mounts the module - is a member. Prefer one shared assembly both paths use.
 
 Write the count and its denominator; `-` in `Unproven` is earned by the row beside it.
 
-**A screen criterion's check cites the same capture files**, never a list of the screen's labels. Its proof is the comparison, not a test:
+**A screen criterion's check cites the same capture files**, never a list of the screen's labels. Its proof is its picture, not a test:
 
 ```markdown
 **C40** - The Administrator view matches `.specs/features/<f>/captures/admin.png` (AC 49)
-Proof: browser - the Verifier reaches the state, photographs it at the capture's size and compares
+Proof: browser captures/admin.running.png
 ```
 
 Checks that end in the same captured state name the same file. A state no capture draws gets no capture comparison: its proof is a test, or `walk` when only a visit shows it. So does an existing screen the feature does not change, reached through the nav: the author's `**Walked:**` line names the visit. [core.md](core.md) rule 9.
@@ -162,4 +162,4 @@ With no plan.md, add `## Out of scope` with the excluded capabilities and why.
 
 ## Gate, then keep going
 
-Before code, record actual approval in plan.md, or checks.md when there is no plan. If approval has not been given, present that document and stop for it; never create the user's reply. Run `python3 <spec-plan>/scripts/validate_checks.py <feature> --execute`; it checks approval and structure and runs the `Build:` line once, and whether each proof is the right one stays yours. A `Build:` command red before any change is not the repo's gate: name the repo's own commands, and when those are red, tell the user and stop. Then continue into [build.md](../../implementar/references/build.md) without waiting. Stop only for scope the sweep raised, a derivation that contradicts the approved plan, or a writability gap asking did not resolve.
+Before code, record actual approval in plan.md, or checks.md when there is no plan. If approval has not been given, present that document and stop for it; never create the user's reply. Run `python3 <spec-plan>/scripts/validate_checks.py <feature>`; it checks approval and structure, and whether each proof is the right one stays yours. Then continue into [tasks.md](tasks.md) without waiting; it ends in the user's yes for the tasks. Stop only for scope the sweep raised, a derivation that contradicts the approved plan, or a writability gap asking did not resolve.

@@ -8,26 +8,29 @@ Rode `codex --version` (precisa ser ≥ 0.156) e `codex login status`. Se o Code
 
 ## Contexto de cada envio
 
-Escreva num arquivo temporário (`P=$(mktemp)`) caminhos absolutos para o core.md do núcleo e suas referências Checks/Build, a feature, o plano realmente aprovado (ou o Intent aprovado), checks.md, o intervalo Git e as instruções pertinentes do projeto/ambiente/glossário. No conserto, inclua verification.md, os relatórios separados de cada fonte, os achados aprovados com problema/arquivo/prova esperada e as decisões reais do usuário. Preserve a origem e o HEAD revisado de cada achado; o executor não faz a própria revisão independente. O Codex segue esses arquivos, registra o Handoff e devolve o que Build pede em “Then stop”: checks fechados, commits, provas e desvios. Não traduza em tasks.md, validation.md ou uma nova lista de tarefas. Resolva check_commit.py em `<implementar>/scripts/`. Leia [o contrato comum de delegação](../../implementar/references/delegation.md). Inclua no arquivo realmente enviado ao Codex o brief e a exigência de retorno desse contrato, com seus caminhos absolutos, inclusive glossário (ou ausência), baseline e decisões aplicáveis. Aponte o Codex a esse contrato e à /implementar; pedir só o resumo de Build não substitui esses campos. Na volta, o coordenador aplica a conferência do mesmo contrato antes de aceitar a entrega.
+Escreva num arquivo temporário (`P=$(mktemp)`) caminhos absolutos para o core.md do núcleo e suas referências Checks/Build, a feature, o plano realmente aprovado (ou o Intent aprovado), design.md, o tasks.md aprovado, checks.md, o intervalo Git e as instruções pertinentes do projeto/ambiente/glossário. No conserto, inclua verification.md, os relatórios separados de cada fonte, os achados aprovados com problema/arquivo/prova esperada e as decisões reais do usuário. Preserve a origem e o HEAD revisado de cada achado; o executor não faz a própria revisão independente. O Codex segue esses arquivos, registra o Handoff e devolve o que Build pede em “Then stop”: checks fechados, commits, provas e desvios. Não crie validation.md nem outra lista de tarefas: o Codex segue o tasks.md aprovado, uma tarefa por commit. Resolva check_commit.py em `<implementar>/scripts/`. Leia [o contrato comum de delegação](../../implementar/references/delegation.md). Inclua no arquivo realmente enviado ao Codex o brief e a exigência de retorno desse contrato, com seus caminhos absolutos, inclusive glossário (ou ausência), baseline e decisões aplicáveis. Aponte o Codex a esse contrato e à /implementar; pedir só o resumo de Build não substitui esses campos. Na volta, o coordenador aplica a conferência do mesmo contrato antes de aceitar a entrega.
 
 **Parada vira relato.** O Codex não fala com o usuário. Quando a `/implementar` manda parar e perguntar, o Codex para e relata no resumo; você leva a pergunta ao usuário no formato de [Context before asking for a decision](../../implementar/SKILL.md#context-before-asking-for-a-decision) e, com a resposta, retoma a mesma sessão do Codex.
 
-Para resposta a uma parada ou conserto, grave o contexto atualizado em outro arquivo temporário (`P2=$(mktemp)`) antes do resume da mesma sessão.
+Para resposta a uma parada ou conserto, grave o contexto atualizado, com o brief inteiro do contrato de delegação, em outro arquivo temporário (`P2=$(mktemp)`) antes do resume da mesma sessão.
 
 ## Comandos (não mude)
 
 ```bash
-OUT=$(mktemp)
-codex exec --model gpt-6.2-sol -c model_reasoning_effort="high" -c service_tier="fast" -c features.fast_mode=true --yolo --json -o "$OUT" - <"$P" 2>/dev/null | grep '"type":"thread.started"'
+OUT=$(mktemp); ERR=$(mktemp)
+codex exec --model gpt-6.2-sol -c model_reasoning_effort="high" -c service_tier="fast" -c features.fast_mode=true --yolo --json -o "$OUT" - 2>"$ERR" <"$P" | grep '"type":"thread.started"'; RC=${PIPESTATUS[0]}
 # conserto ou resposta a uma parada, na MESMA sessão do Codex:
-codex exec resume "<thread_id>" --model gpt-6.2-sol -c model_reasoning_effort="high" -c service_tier="fast" -c features.fast_mode=true --dangerously-bypass-approvals-and-sandbox --json -o "$OUT" - <"$P2" 2>/dev/null >/dev/null
+OUT=$(mktemp); ERR=$(mktemp)
+codex exec resume "<thread_id>" --model gpt-6.2-sol -c model_reasoning_effort="high" -c service_tier="fast" -c features.fast_mode=true --dangerously-bypass-approvals-and-sandbox --json -o "$OUT" - 2>"$ERR" <"$P2" >/dev/null; RC=$?
 ```
+
+Print aprovado: anexe com `-i "<caminho>"` antes do `--model`, no `exec` e no `resume` (um `-i` por imagem).
 
 - Guarde o `thread_id` da linha `thread.started`. Nunca `--last`: pega a conversa errada, e um id errado cai na última conversa sem dar erro.
 - O pedido vai por `-` (arquivo na entrada); sem isso o Codex trava esperando. A resposta dele é o arquivo `$OUT`.
 - Modelo, esforço e modo rápido (`service_tier="fast"` + `features.fast_mode=true`, nomes da documentação oficial do Codex) sempre explícitos: sem eles o Codex usa o `~/.codex/config.toml`, que o app reescreve sozinho (lá pode aparecer `"priority"`, que a OpenAI trata como o mesmo modo rápido). Variantes `-codex` dão erro 400 em conta ChatGPT.
 - Rode da raiz do repo. No Bash, `timeout: 600000`; lote grande → `run_in_background: true`, e quando terminar a primeira linha pro usuário é `🔔 CODEX TERMINOU — verificando`.
-- Sem linha `thread.started` ou sem `$OUT`, ou permissão recusada → pare e conte ao usuário citando o erro. Não troque flags nem construa você.
+- `RC` diferente de 0, sem linha `thread.started` (no envio), `$OUT` vazio ou permissão recusada → pare e conte ao usuário citando o fim de `$ERR`. Não troque flags nem construa você.
 
 ## Conserto: no máximo 2 rodadas
 

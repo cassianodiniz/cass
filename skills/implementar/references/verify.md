@@ -11,6 +11,7 @@ A safety net that raises the work, not an audit of it. A script settles what can
 **What the Verifier receives:**
 - `plan.md` for the feature (`## Criteria` = source of truth)
 - `checks.md` and `proofs.md`
+- `design.md` and `tasks.md`, when they exist
 - The git diff surface for the feature (scoped to the feature branch or commit range)
 - The test files in scope
 - This file as its operating checklist
@@ -133,7 +134,7 @@ For a survivor the user explicitly refuses, copy its complete `Fault` cell uncha
 
 ### 6. Code Quality Check (MANDATORY)
 
-For each changed file, verify against the shared coding principles:
+For each changed file, verify against the shared [coding principles](../../spec-plan/references/coding-principles.md):
 
 | Check                                | Pass? |
 | ------------------------------------ | ----- |
@@ -157,13 +158,48 @@ For each changed file, verify against the shared coding principles:
 Skip this step for backend-only or infrastructure work. The Verifier runs it, not the author, only after the gate check and the sensor (steps 4 and 5) finish, never at the same time: both use the running app.
 
 1. Start the app locally, already logged in with the project's own test account (from its example or seed files). If there is none, ask the user once and record it in the project.
-2. Take a photo of every screen this feature changed, at 375, 768 and 1280 px wide. Save them as `captures/review-<screen>-<width>.png`.
-3. When a criterion cites a capture (a model image), also reach that state and take its photo in a browser window at the capture's size - its pixel size over its scale - so the page lays out as the capture does; an image resized afterwards does not. Save it as `captures/review-<capture>.png` and compare it with the capture: controls, arrangement, copy, drawing and render. It matches except for what `## Differences from the source` lists.
-4. Look at every photo before showing it, and note each defect you see. When the project has a design manual (the file `AGENTS.md` or `CLAUDE.md` names for screens, or a `DESIGN.md`), also measure each changed screen in the running app at 375 and 1280 px - the gap between consecutive rows of each card, the height of each row, the size and weight of each text, the size of each control - and compare each measure with the manual's rule for that piece. A measure that differs from its rule is a defect, written with both values and the manual's section. A measure that differs in a part of the screen this feature neither added nor changed (the feature's diff does not touch it) was already there: write it in the `Defects` column as `already there`, with both values, and it is neither a defect nor a `## Findings` row.
+2. Take a photo of every screen this feature changed, at 375, 768 and 1280 px wide. Save them as `captures/review-<screen>-<width>.png`. Then reach every row of the plan's `## Screen states` table with the account, the data and the width the row names, and photograph or test it; save the photo as `captures/review-<screen>-row<N>.png`, N being the row's number in the table. With more than one screen, a row reached by a test is written with its screen: `<screen> row <N>` on the line that names the test. The other accounts come from the project's seed files. A row about an account is reached by signing in as that account, in its own browser session, with the data the row names really in the database: a stubbed response cannot show what an account is allowed to see. A state the data does not hold is set up in a throwaway copy of the database; a stubbed response in the browser stands in only for a failure or a slow response. Say which you used in the report. A row you could not reach is written as such, never as passed, and the verdict is not PASS while one is open: tell the user which rows and why.
+3. When a criterion cites a capture (a model image), also reach that state and take its photo in a browser window at the capture's size - its pixel size over its scale - so the page lays out as the capture does; an image resized afterwards does not. The builder's picture is the builder's claim: save yours as `captures/<capture>.running.png` over it, and judge your own picture as [Screen inventory](#screen-inventory) says.
+4. Look at every photo before showing it, and note each defect you see. When the project has a design manual (the file `AGENTS.md` or `CLAUDE.md` names for screens, or a `DESIGN.md`), also measure each changed screen in the running app at 375 and 1280 px - the gap between consecutive rows of each card, the height of each row, the size and weight of each text, the size of each control - and compare each measure with the manual's rule for that piece. First check that each element uses the piece the plan's `**Pieces:**` line names: an element built by hand where the line names a piece is a defect, written with the element, the piece and the manual's line, and so is the right piece with a variant the manual gives for another place (such as the size for inside a card, a list or a table used on the page) or with its look overridden in the screen. A measure that differs from its rule on an element that uses its piece, with the variant the manual names for that place, is a note in the `Defects` column, with both values and the manual's section, and not a defect. A measure that differs in a part of the screen this feature neither added nor changed (the feature's diff does not touch it) was already there: write it in the `Defects` column as `already there`, with both values, and it is neither a defect nor a `## Findings` row.
 5. Each defect goes into the fix plan (step 8) and makes the verdict FAIL, like an issue from the Interactive UAT.
 6. Show the photos to the user with the review result, every time, even when step 7 does not run.
 
 If the app does not open, the result is "Não deu para revisar as telas", with the reason, and the PR is not marked ready until the user decides.
+
+#### Screen inventory
+
+Judge that one state. A fact that lives in another state is not a gap in this picture. A click that is not itself in the picture is not a gap when the resulting state is.
+
+Open the capture and its picture together. First write the capture's inventory: one row per thing it draws - each region, control, label and sentence, chip, state mark, line, legend entry, and the arrangement of each region. Then mark every row `same` or `differs`, applying what `## Differences from the source` lists, and for `differs` say what the picture draws instead. The fix covers what the rows name and nothing else, so the inventory is the whole judgement: a thing no row names is never checked.
+
+What counts as `differs`:
+
+- **controls** - a control the capture shows missing, or one it does not show
+- **arrangement** - not the same regions in the same places, with the same nesting
+- **copy** - visible text the capture fixes, wrong; a date that follows the day the picture was taken is not wrong
+- **drawing** - an element drawn differently: a line, a border, a badge, the shape of a bar, the layout of a meter or a form
+- **render** - overlapping, cut off, scrolled off the window, unreadable, or a component the rest of the app does not use
+
+Exact spacing and shade are a note on a `same` row. Type weight and size are drawing: bold where the capture is regular, or the reverse, or a size one step away, is `differs`. A picture with one `differs` row `diverges`; otherwise it `matches`. Each `differs` row is a defect (item 5).
+
+Write `.specs/features/<feature>/screens.md`: the verdict table, then one inventory per picture.
+
+```markdown
+# <Feature> screens
+
+**Verifier**: independent sub-agent (author != verifier)
+
+| Screen | Compared with | Verdict | Finding |
+| --- | --- | --- | --- |
+| `captures/billing--card-form.running.png` | `captures/billing--card-form.png` | diverges | 2 rows differ |
+
+### `captures/billing--card-form.running.png`
+
+| Element | Result | Picture draws |
+| --- | --- | --- |
+| header: title `Billing`, close `×` on the right | same | |
+| card form: number, expiry and CVC on one row | differs | expiry and CVC on a second row |
+```
 
 ### 7. Interactive UAT (if user-facing feature)
 
@@ -205,6 +241,12 @@ For each issue found during UAT, in the photos (step 6b), by the Verifier, or in
    - Where: File paths
    - Verify: How to prove the fix works
    - Done when: Acceptance criteria for the fix
+   - Choices: every choice the fix needs that is the user's and the plan does not settle (two readings, a case with no rule, sources in conflict), each with a recommendation
+   - Evidence (the `Evidence` cell), per core.md rule 12:
+     - Steps: from where a user starts (route, account, data). A screen defect is shown on the page a user reaches, not on a component rendered alone.
+     - Source, with its line: the plan criterion with amendments (it wins over a capture on text and labels), the approved capture (layout and color), a DESIGN.md section, the glossary, AGENTS.md/PROCESS.md, a permission rule (data visible to someone without permission is a defect), or a universal rule (text cut or overlapping, content off screen, lost data, English text, broken screen).
+     - Proof, made by you: a photo (its `captures/` path), a sensor fault (its `## Discrimination Sensor` label), quoted code (`file:line` at the reviewed HEAD), or a throwaway test or probe (pasted under `## Finding proofs`, headed by the finding number, with the failing output lines). When the finding says two things differ, prove each side.
+     - An item you cannot prove: drop it, or write it as a question with your recommendation. An answered question that changes nothing closes as `Refused - user: "<their words>"`.
 3. **Present fix plan** - Show all fix items to user for approval
 
 Fix items are executed by the selected executor (`/implementar`, or the Codex session of `/gpt-implementar`), which fills `Closed`.
@@ -300,7 +342,7 @@ The Verifier returns this block to the orchestrator after completing all checks:
 | Photo | Width / compared with | Defects |
 | ----- | --------------------- | ------- |
 | `captures/review-billing-375.png` | 375 | none |
-| `captures/review-billing--card-form.png` | `captures/billing--card-form.png` | expiry and CVC on a second row |
+| `captures/billing--card-form.running.png` | `captures/billing--card-form.png` | expiry and CVC on a second row |
 
 ---
 
@@ -354,8 +396,19 @@ The Verifier returns this block to the orchestrator after completing all checks:
 
 | Finding | Evidence | Fix | Closed |
 | ------- | -------- | --- | ------ |
-| Removed side-effect call to `notify()` | survived the sensor - no test asserts the notification | What / Where / Verify / Done when - source: Verifier - severity: Major | |
-| Expiry and CVC on a second row | `captures/review-billing--card-form.png` against `captures/billing--card-form.png` | ... - source: photos - severity: Cosmetic | |
+| Removed side-effect call to `notify()` | sensor fault "Removed side-effect call to notify()" survived (see ## Discrimination Sensor) - source: criterion 4 requires the notification | What / Where / Verify / Done when - source: Verifier - severity: Major | |
+| Expiry and CVC on a second row | `/billing`, account with a saved card, 390 px - source: criterion 7 binds `captures/billing--card-form.png` - proof: `captures/billing--card-form.running.png` | ... - source: photos - severity: Cosmetic | |
+
+## Finding proofs
+
+### 3
+~~~ts
+// throwaway test, scratch worktree at the reviewed HEAD
+expect(portionLabel({ grams: 1500 })).toBe('1500 g')
+~~~
+~~~
+FAIL  portion.test.ts > 1500 g  Expected: "1500 g"  Received: "1,5 g"
+~~~
 
 ---
 

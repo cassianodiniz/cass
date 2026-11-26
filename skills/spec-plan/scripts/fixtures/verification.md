@@ -23,6 +23,13 @@
 | C11 | `test/billing/dunning_test.rb` `test_provider_timeout_is_inert` | yes |
 | C12 | `test/webhooks/ingest_test.rb` `test_unsigned_delivery_is_401` | yes |
 
+## Screen Photos
+
+| Photo | Width / compared with | Defects |
+| --- | --- | --- |
+| `captures/review-billing-row1.png` | row 1, 375 | none |
+| `captures/review-billing-row2.png` | row 2, 375 | none |
+
 ## Findings
 
 | Finding | Evidence | Fix | Closed |

@@ -54,7 +54,7 @@ Depois as skills ficam disponíveis como `/cass:ask-me`, `/cass:gpt-implementar`
 
 | Ferramenta | Quem usa | Como instalar |
 |---|---|---|
-| **Codex CLI** ≥ 0.156 (constrói + revisor `gpt-6.2-sol`) | `gpt-implementar` (constrói a partir da spec), `gpt-optimizer` e `auto-think` (confronto) | Instalar o Codex CLI da OpenAI e logar. Sem ele, a `gpt-implementar` para e informa o erro; não troca o construtor automaticamente. |
+| **Codex CLI** ≥ 0.169 (constrói + revisor `gpt-6.2-sol`) | `gpt-implementar` (constrói a partir da spec), `gpt-optimizer` e `auto-think` (confronto) | Instalar o Codex CLI da OpenAI e logar. Sem ele, a `gpt-implementar` para e informa o erro; não troca o construtor automaticamente. |
 | **Exa** (busca web com procedência) | `search` (pesquisa profunda) | Conta Exa: OAuth no MCP do Exa, ou variável `EXA_API_KEY` (chave grátis em https://dashboard.exa.ai/api-keys). Acesso anônimo também funciona, com limite de chamadas. Erro de autenticação ou limite é informado; não há troca automática por outra busca. |
 
 ---

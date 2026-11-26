@@ -44,6 +44,7 @@ What it checks:
   WARN   - a Coverage row that declares no set size
   WARN   - a swept landing that is neither a check, `existing`, `n/a`, nor `Unresolved`
   WARN   - a blocking unresolved question still open
+  ERROR  - with --execute: tasks.md is missing, or plan.md or tasks.md has no `**Approved**:` line
   ERROR  - with --execute, when nothing else failed: a `Build:` command is red before building
 
 Usage:
@@ -64,7 +65,7 @@ import os
 import re
 import sys
 
-from lean_config import RUN_PROOF_RE, gate_commands_errors, plan_approved, plan_marks_binding, read_runs
+from lean_config import RUN_PROOF_RE, gate_commands_errors, plan_approved, plan_marks_binding, read_runs, unapproved
 
 REQUIRED_SECTIONS = ["Checks", "Coverage", "Swept"]
 
@@ -264,14 +265,21 @@ def plan_screen_captures(checks_path):
     crit = section_bounds(lines, "Criteria")
     if not crit:
         return {}
+    current = None
     for i in range(*crit):
         m = re.match(r"^\s*(\d+)\.\s+(.*)$", lines[i])
-        if not m:
+        if m:
+            current, text = int(m.group(1)), m.group(2)
+        elif current is not None and lines[i][:1] in (" ", "\t") and lines[i].strip():
+            text = lines[i]
+        else:
+            if lines[i].lstrip().startswith("#"):
+                current = None
             continue
-        cited = sorted({os.path.basename(p).split(".")[0] for p in CAPTURE_RE.findall(m.group(2))
-                        if "://" not in p and not p.endswith(".running.png")})
+        cited = {os.path.basename(p).split(".")[0] for p in CAPTURE_RE.findall(text)
+                 if "://" not in p and not p.endswith(".running.png")}
         if cited:
-            out[int(m.group(1))] = cited
+            out[current] = sorted(set(out.get(current, [])) | cited)
     return out
 
 
@@ -488,6 +496,12 @@ def main(argv=None):
         return 2
 
     errors, warnings = check_file(path)
+    if args.execute:
+        fdir = os.path.dirname(os.path.abspath(path))
+        if not os.path.isfile(os.path.join(fdir, "tasks.md")):
+            errors.append("tasks.md is missing - the Build waits for the approved tasks")
+        for name in unapproved(fdir):
+            errors.append(f"{name} has no `**Approved**:` line - the Build waits for the user's yes")
     if args.execute and not errors:
         errors += red_build(path, os.path.abspath(args.root))
     for w in warnings:

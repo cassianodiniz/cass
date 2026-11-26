@@ -20,13 +20,13 @@ During clarification, compare domain terms with the glossary and code, as [domai
 
 ## Plan
 
-Read the shared [core.md](references/core.md) and follow [Plan](references/plan.md). Use plan.md and checks.md; do not create spec, design or tasks files.
+Read the shared [core.md](references/core.md) and follow [Plan](references/plan.md). Use plan.md; do not create spec.md. Design and tasks come after the plan's yes, in `/implementar`.
 
 **Conversation.** Ask in rounds, as in [investigate.md](references/investigate.md): the whole frontier of open questions in one round, each with your recommended answer.
 
 **Language.** Write every message to the user in portuguese, in plain words; put each technical question in lay terms, with your recommendation and why.
 
-**The one yes.** Ask for it with [approval-message.md](references/approval-message.md).
+**The plan's yes.** Ask for it with [approval-message.md](references/approval-message.md).
 
 **Publishing on the yes.** On the yes, record `**Approved**: <YYYY-MM-DD> - user: "<their words>"` in plan.md (checks.md when there is no plan), using the actual reply, then publish. Its approval message names every action below, so that yes is the explicit go-ahead for them. In this order:
 1. If the feature started from an existing issue, read it with [issue-tracker-github.md](references/issue-tracker-github.md) and keep its number.

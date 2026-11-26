@@ -1,0 +1,5 @@
+interface:
+  display_name: "Issue"
+  short_description: "Save follow-ups as issues"
+policy:
+  allow_implicit_invocation: false

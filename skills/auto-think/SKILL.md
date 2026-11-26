@@ -1,6 +1,6 @@
 ---
 name: auto-think
-description: "Use quando o usuário invocar /auto-think, ou pedir uma recomendação com veredito sobre um problema difícil, uma decisão que pesa ou uma escolha entre caminhos possíveis — inclusive qual solução a documentação oficial e a prática de mercado sustentam — e aceitar que o estudo leve tempo. Não executa nada. Não use pra parecer rápido sobre uma decisão já tomada (/gpt-optimizer), pra buscar um fato ou número com fonte (/search) nem pra construir (/implementar ou /gpt-implementar)."
+description: "Use quando o usuário invocar /auto-think, ou pedir uma recomendação com veredito sobre um problema difícil, uma decisão que pesa ou uma escolha entre caminhos possíveis — inclusive qual solução a documentação oficial e a prática de mercado sustentam — e aceitar que o estudo leve tempo. Não executa nada. Não use pra parecer rápido sobre uma decisão já tomada (/gpt-optimizer), pra buscar um fato ou número com fonte (/search), pra desenhar produto novo do zero (/planejar-v9) nem pra construir (/implementar ou /gpt-implementar)."
 ---
 
 # auto-think
@@ -9,7 +9,7 @@ Modo de trabalho pro usuário **largar um problema difícil e sumir** — e volt
 pronta pra decidir. O auto-think não executa nada: ele **estuda a fundo**. Pesquisa, ataca o
 problema por vários lados ao mesmo tempo, levanta um leque de candidatas, confronta cada uma
 até sobrar só o que aguenta porrada, e entrega as soluções viáveis **com veredito** (a
-recomendada + as alternativas reais). Quem executa a escolhida depois é o `/gpt-implementar` —
+recomendada + as alternativas reais). Quem executa a escolhida depois é o `/implementar` ou o `/gpt-implementar` —
 esta skill só pensa.
 
 Repo-agnóstica: serve pra problema técnico ("qual a melhor forma de fazer X no sistema"),
@@ -17,6 +17,7 @@ de decisão ("vale a pena trocar Y por Z"), de investigação ("por que isso aco
 resolve"), ou de pesquisa pura ("o que o mundo já resolveu sobre isto").
 
 **A fronteira que define tudo:**
+- `/planejar-v9` = desenhar um PRODUTO novo do zero antes de codar.
 - `/spec-plan` = a solução já foi escolhida e precisa virar um plano construível (spec + tarefas).
 - `/implementar` ou `/gpt-implementar` = EXECUTAR uma tarefa e entregar feito.
 - `auto-think` = ESTUDAR um problema a fundo e entregar solução(ões) recomendada(s). Não executa.
@@ -36,7 +37,7 @@ raso não é estudar.
 
 **É sempre fundo — não tem mais "modo rápido".** Antes existia um modo leve quando você pedia
 "rápido/só o essencial"; ele saiu. O motivo: quando o que você quer é uma resposta rápida sobre
-uma decisão que você JÁ tem em mente, o caminho é a `/cass:gpt-optimizer` (confronto avulso e
+uma decisão que você JÁ tem em mente, o caminho é a `/gpt-optimizer` (confronto avulso e
 direto) — não o auto-think. Aqui, se foi chamado, **vai fundo**. A skill nunca decide sozinha
 "acho que isso é simples, vou de raso" — na dúvida entre raso e fundo, vai fundo, porque foi
 pra isso que foi chamada.
@@ -62,7 +63,7 @@ confrontos") — mas não é desculpa pra entregar menos. O usuário escolheu es
   ver passo 5), não enquanto "achar coisa nova".
 
 **Quer rápido? Use a outra skill.** O atalho pra "me dá um parecer rápido sobre isto" deixou de
-morar aqui — ele é a `/cass:gpt-optimizer`, que confronta uma decisão pronta sem o estudo de
+morar aqui — ele é a `/gpt-optimizer`, que confronta uma decisão pronta sem o estudo de
 vários ângulos. O auto-think é a ferramenta de **estudar a fundo**; pedir pra ele ser raso é
 pedir a coisa errada.
 
@@ -76,8 +77,8 @@ parte fácil; qualquer um junta links. O valor está em **atacar os próprios ac
 só o que se sustenta. Por isso o confronto é em mais de uma rodada, e a honestidade ("prova ou
 silêncio") vale igual aqui, mesmo sem dado real em risco.
 
-O contrato de honestidade e segurança é o mesmo do `/gpt-implementar`:
-`../_shared/protocolo.md`. Leia antes de começar. O resumo operacional do que
+O contrato de honestidade e segurança mora no motor compartilhado:
+`<SKILLS_DIR>/.shared/confronto/protocolo.md`. Leia antes de começar. O resumo operacional do que
 mais importa pro auto-think está abaixo.
 
 ---
@@ -94,13 +95,13 @@ síntese, re-cava — fica na **sessão atual (Anthropic)**, que também é quem
 > (nome, CPF, telefone, email, endereço) e qualquer credencial (token, senha, chave).**
 > Vai o RACIOCÍNIO do problema; não vai a identidade de quem quer que seja.
 
-**Risco aceito conscientemente (decisão do autor, revisada 12/09/2026):**
+**Risco aceito conscientemente (decisão Cassiano, revisada 12/09/2026):**
 o confronto (`codex exec --sandbox read-only`) roda com leitura do diretório de trabalho
 real, não só do prompt mascarado — em tese o Codex poderia ler outro arquivo sensível da pasta
-além do que foi mandado no prompt. O autor decidiu NÃO isolar em diretório redigido: o
+além do que foi mandado no prompt. Cassiano decidiu NÃO isolar em diretório redigido: o
 `/auto-think` normalmente roda sobre um problema/decisão pontual, não de dentro de pasta cheia
-de dado de aluno/paciente. Se um dia isso rodar de uma pasta com dado sensível solto (ex.: pasta
-de clientes), reavaliar — a trava de mascarar o PROMPT continua obrigatória de qualquer forma.
+de dado de aluno/paciente. Se um dia isso rodar de uma pasta com dado sensível solto (ex.: Drive
+da Mentoria), reavaliar — a trava de mascarar o PROMPT continua obrigatória de qualquer forma.
 
 Como mascarar sem perder o sentido: troca por etiqueta estável (`PACIENTE_1`, `ALUNO_A`,
 `TELEFONE_X`, `TOKEN_***`), preservando a estrutura pra o estudo ainda fazer sentido. Se o
@@ -115,7 +116,7 @@ enunciado genérico ("como resolver X nesse tipo de sistema"), nunca um dado int
 
 Fora isso, o auto-think é leitura: não escreve em banco, não envia mensagem, não mexe em
 arquivo do usuário — a única escrita própria é o `.md` de detalhe da entrega (item 6, abaixo),
-salvo em `docs/auto-think/`. Nenhuma trava dura de execução se
+salvo em `<SKILLS_DIR>/_aposentadas/mia/references/pesquisas/auto-think/`. Nenhuma trava dura de execução se
 aplica, porque ele nunca executa — só na borda de "mandar dado pra fora" é que ele para.
 
 **Leitura de dado sensível também é graduada** (do protocolo): consulta mínima e agregada,
@@ -174,7 +175,7 @@ espelhando o pedido antes de cavar:
   critério de sucesso). Como o alvo já foi confirmado acima, agora é larga-e-some: não volta a perguntar.
 - **A profundidade é sempre fundo** (ver a Calibragem) — não há mais modo leve. **Nunca encolhe
   por chute** ("acho que isso é simples"): isso é o que fazia a skill trabalhar pouco. Se for um
-  parecer rápido sobre uma decisão pronta, o caminho é a `/cass:gpt-optimizer`, não esta skill.
+  parecer rápido sobre uma decisão pronta, o caminho é a `/gpt-optimizer`, não esta skill.
 - **Escape do trivial (única exceção ao fundo-por-padrão):** se ao enquadrar o problema ele se
   revelar trivial ou JÁ resolvido — e isso for **provável com evidência colada**, não com
   palpite — diz isso direto e não gasta o ciclo. "Já tem resposta pronta aqui: <prova>" é uma
@@ -423,7 +424,7 @@ errar". O padrão é desenhado pra entregar isso nos primeiros 5 segundos de lei
 ### A ordem fixa da entrega (6 blocos, nesta ordem)
 
 Curto é regra: o CHAT recebe só o enxuto; o aprofundamento vai pra um ARQUIVO que ele abre se
-quiser. Nada de manchete subjetiva tipo "em que pé ficou" —
+quiser (igual o claudex faz com o plano). Nada de manchete subjetiva tipo "em que pé ficou" —
 abre com o diagnóstico concreto. A ordem abaixo é fixa: o usuário decora o mapa uma vez.
 
 **1. 🧠 DIAGNÓSTICO — o que é, com prova.** Diz CLARAMENTE o que o estudo achou e de que TIPO é.
@@ -458,7 +459,7 @@ opção domina, "as outras eram piores, nem listo" — não fingir empate (falsa
 
 **6. ▸ DETALHE COMPLETO EM `<arquivo>`.** O fundo do estudo — as correções do confronto, o mapa
 completo, o que o GPT matou, raciocínio longo — vai pra um `.md` salvo em
-`docs/auto-think/auto-think-[tema-slug]-[YYYY-MM-DD].md`; o chat
+`<SKILLS_DIR>/_aposentadas/mia/references/pesquisas/auto-think/auto-think-[tema-slug]-[YYYY-MM-DD].md`; o chat
 mostra só a linha apontando pro caminho. O usuário abre se quiser cavar. É isso que mantém o
 chat enxuto sem perder nada.
 

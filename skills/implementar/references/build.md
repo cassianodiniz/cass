@@ -1,35 +1,49 @@
 # Build
 
-**Goal**: Implement ONE slice at a time. Surgical changes. Verify. Commit. Repeat.
+**Goal**: Implement ONE task at a time. Surgical changes. Verify. Commit. Repeat.
 
-This is where code gets written. Every slice follows the same cycle: plan → implement → verify → commit. Verification is built into every slice, not a separate phase.
+This is where code gets written. Every task follows the same cycle: plan → implement → verify → commit. Verification is built into every task, not a separate phase.
 
-Deliver what the user asked for, at the quality you would sign. The checks are the floor and the evidence, not the target; the route is yours. No task list. The bar is [core.md](../../spec-plan/references/core.md) rules 2, 3 and 6.
+Deliver what the user asked for, at the quality you would sign. The checks are the floor and the evidence, not the target; the route is the approved tasks.md. The bar is [core.md](../../spec-plan/references/core.md) rules 2, 3 and 6.
 
 ## Build against the source
 
-Before code, read the actual `**Approved**:` authorization in plan.md, or checks.md when there is no plan, and run `validate_checks.py <feature>` for its structural gate. If authorization is missing, present the plan or checks and stop; do not ask again for authorization already given.
+Before code, read the actual `**Approved**:` authorization in plan.md, or checks.md when there is no plan, and run `validate_tasks.py <feature> --execute` first: it refuses tasks the user has not approved. Then run `validate_checks.py <feature> --execute`: it checks both approvals and the structure, and only then runs the `Build:` line once. A `Build:` command red before any change is not the repo's gate: name the repo's own commands, and when those are red, tell the user and stop. If authorization is missing, present the plan, checks or tasks and stop; do not ask again for authorization already given.
 
 When the plan marks a source binding, the source is the reference, not the plan's description of it. Where a check or a criterion disagrees with the source, ask before building that part.
 
+**Build against the binding source.** When a criterion cites a capture, open it before the first line of that screen and compare as you build: start the app and photograph each state at the capture's size, as [verify.md](verify.md) step 6b items 1 and 3 say, and put each photo next to its capture. A difference gets fixed; one the plan does not allow gets asked. When the capture is a prototype photo, take each element's piece and variant from the screen's `**Pieces:**` line, and its place from the prototype the `**Prototype:**` line names. Build each element with the piece itself, never by copying the prototype's classes.
+
+Before each task, read [seguranca.md](../../spec-plan/references/seguranca.md) and follow its `Na construção` section. A task touches sensitive data when it reads, stores, shows or deletes the data the plan's `Sensitive data:` line names, or personal data the feature only shows. When the task reads or changes data a screen shows and the project uses TanStack Query, read [tanstack-query-best-practices](../../spec-plan/references/skills/tanstack-query-best-practices/SKILL.md).
+
+## Before each task
+
+From tasks.md, pick the next task whose `Depends on` are done. Read [coding-principles.md](../../spec-plan/references/coding-principles.md) and state:
+
+1. **Assumptions** - What am I assuming? Any uncertainty?
+2. **Files to touch** - List ONLY files this task requires
+3. **Success criteria** - How will I verify this works?
+
+⚠️ **Do not proceed without stating these explicitly.**
+
 ## Complete test battery
 
-The battery is the approved `## Gate Check Commands` table in plan.md (checks.md when there is no plan): every suite and script it lists, each with its command, starting what each row needs running. The independent Verifier runs it, in the review (skill build-review); while building, run only each slice's gate below. A focal Proof command or compilation alone does not establish this battery. Record each run under `## Test runs` in checks.md: suite, command, HEAD, actual output (or an output path), total, passed, failed and each skip with its justification. Separate inherited failures and environment blockers; never invent counts a runner did not report. A listed suite without its required environment or permission remains unverified; it is not non-applicable.
+The battery is the approved `## Gate Check Commands` table in plan.md (checks.md when there is no plan): every suite and script it lists, each with its command, starting what each row needs running. The independent Verifier runs it, in the review (skill build-review); while building, run only each task's gate below. A focal Proof command or compilation alone does not establish this battery. Record each run under `## Test runs` in checks.md: suite, command, HEAD, actual output (or an output path), total, passed, failed and each skip with its justification. Separate inherited failures and environment blockers; never invent counts a runner did not report. A listed suite without its required environment or permission remains unverified; it is not non-applicable.
 
 The coordinator reconciles these records on delegated returns; the independent Verifier runs the whole table at the reviewed HEAD ([verify.md](verify.md)) and records its integrity judgement under `## Test integrity` in verification.md. This is not another task list, nor a full-battery rerun just because a return arrived without code changing.
 
 ## Gate failure recovery
 
-Run the gate check commands for the slice's checks and its gate level. This is MANDATORY - not "if applicable."
+Run the gate check commands for the task's checks and its `Gate` level. This is MANDATORY - not "if applicable."
 
-1. Look up the commands for the slice's Proofs and, for the slice's Gate level (quick/full/build), the suites in the `## Gate Check Commands` table, then run them
-2. Non-zero exit code: do not commit. Fixing the failure and re-running is part of the slice, not a stop. If the gate is still red after 3 fix attempts, stop and report it. A failure caused by the environment rather than by the code (a service that is down, a timeout while the machine is under load) is re-run once unchanged; if it fails again, stop and report it.
+1. Look up the commands for the task's Proofs and, for the task's Gate level (quick/full/build), the suites in the `## Gate Check Commands` table, then run them
+2. Non-zero exit code: do not commit. Fixing the failure and re-running is part of the task, not a stop. If the gate is still red after 3 fix attempts, stop and report it. A failure caused by the environment rather than by the code (a service that is down, a timeout while the machine is under load) is re-run once unchanged; if it fails again, stop and report it.
 3. Confirm the test count matches expectations (no tests were silently deleted or skipped)
-4. For the checks this slice settles, keep Proof selectors aligned with the tests actually run; copy the real passing line for a Run proof. Record check IDs with the existing gate evidence. A changed selector does not authorize changing a claim or weakening a test.
+4. For the checks this task settles, keep Proof selectors aligned with the tests actually run; copy the real passing line for a Run proof. Record check IDs with the existing gate evidence. A changed selector does not authorize changing a claim or weakening a test.
 
 **Tiered gates (from the `## Gate Check Commands` table):**
 
-| Slice includes                   | Gate level | What runs                    |
+| Task includes                    | Gate level | What runs                    |
 | -------------------------------- | ---------- | ---------------------------- |
 | Unit tests only                  | Quick      | Suites marked quick          |
 | E2E or integration tests         | Full       | Suites marked quick and full |
@@ -55,7 +69,7 @@ After the gate check passes:
 
 4. **Test Adequacy Review (MANDATORY - hard gate).**
 
-   A slice cannot be committed or marked done until all four checks below pass. Tests must be both **necessary** (every test traces to a requirement) and **sufficient** (every requirement is covered). The scope boundary is the approved plan - do not test beyond it.
+   A task cannot be committed or marked done until all four checks below pass. Tests must be both **necessary** (every test traces to a requirement) and **sufficient** (every requirement is covered). The scope boundary is the approved plan - do not test beyond it.
 
    **Check A - Sufficient coverage (per-layer depth).** Build and output this table:
 
@@ -63,14 +77,14 @@ After the gate check passes:
    | ------------------------------------------------- | ---------------------------------- | -------------------- | -------- |
    | [criterion from task or spec] | `path/to/test.ts:42` - `expect(result.field).toBe(expected)` | [expected value from spec] | ✅ Yes / ❌ No / ⚠️ Spec-precision gap |
 
-   **Evidence-or-zero rule:** Each covered cell MUST cite the exact `file:line` where the assertion lives AND reproduce the assertion expression (not just the `describe`/`it` name). A criterion with no located `file:line` evidence counts as **NOT covered**; the slice cannot be marked done. Do not declare a criterion absent without first searching the test files - show the search before concluding it is missing (mirror: evidence or zero, never a guess).
+   **Evidence-or-zero rule:** Each covered cell MUST cite the exact `file:line` where the assertion lives AND reproduce the assertion expression (not just the `describe`/`it` name). A criterion with no located `file:line` evidence counts as **NOT covered**; the task cannot be marked done. Do not declare a criterion absent without first searching the test files - show the search before concluding it is missing (mirror: evidence or zero, never a guess).
 
-   **Spec-anchored outcome check:** For each covered criterion, derive the expected outcome from `plan.md` (or the slice's checks in `checks.md`) and confirm the test's asserted value matches it - not just that an assertion exists. Where the spec defines a precise outcome (e.g., a specific status code, a specific field value, a specific error message), the test assertion MUST target that exact outcome. Where the spec does not define a precise outcome, mark the cell as **⚠️ Spec-precision gap** and add a note; do NOT silently pass a vague assertion as if it were covered.
+   **Spec-anchored outcome check:** For each covered criterion, derive the expected outcome from `plan.md` (or the task's checks in `checks.md`) and confirm the test's asserted value matches it - not just that an assertion exists. Where the spec defines a precise outcome (e.g., a specific status code, a specific field value, a specific error message), the test assertion MUST target that exact outcome. Where the spec does not define a precise outcome, mark the cell as **⚠️ Spec-precision gap** and add a note; do NOT silently pass a vague assertion as if it were covered.
 
-   Every check, every plan.md criterion, and every listed edge case that applies to this slice must map to at least one concrete test assertion. Enforce this per-layer depth:
+   Every check, every plan.md criterion, and every listed edge case that applies to this task must map to at least one concrete test assertion. Enforce this per-layer depth:
 
    - Domain / service layer: assertions map 1:1 to spec ACs; every listed edge case has a dedicated test.
-   - Route / controller / e2e layer: every route the slice adds or modifies must have a happy-path test, a test for each listed edge case, and a test for each documented error/failure path.
+   - Route / controller / e2e layer: every route the task adds or modifies must have a happy-path test, a test for each listed edge case, and a test for each documented error/failure path.
 
    No criterion left unverified.
 
@@ -78,7 +92,7 @@ After the gate check passes:
    - Assertion-free tests or `expect(true)` / `expect(1).toBe(1)` style tautologies
    - "No error thrown" as the only assertion - unless not-throwing IS the specified behavior
    - Asserting only on mock call counts when the actual output/state is what the criterion demands
-   - Happy-path only when the slice's checks or plan.md list edge cases
+   - Happy-path only when the task's checks or plan.md list edge cases
 
    **Payload/conjunction rule.** For each named field in an emitted event, returned object, or persisted record, apply a separate check:
    1. Open the constructed object at its `file:line` and confirm the field is present in the assertion.
@@ -98,7 +112,7 @@ After the gate check passes:
 
    Any test that maps to nothing → remove it. A test with no requirement is scope creep - it proves nothing about the feature and expands scope beyond the spec. Do not write speculative "what if" tests, do not test framework or library behavior, and do not duplicate an assertion that is already covered at another layer for the same scenario.
 
-   **Check D - Guideline conformance.** If project quality/testing guidelines were listed under "Guidelines found" in the plan's `## Gate Check Commands`, verify this slice's tests conform to them (naming conventions, file locations, coverage thresholds, etc.). Note the guideline file followed.
+   **Check D - Guideline conformance.** If project quality/testing guidelines were listed under "Guidelines found" in the plan's `## Gate Check Commands`, verify this task's tests conform to them (naming conventions, file locations, coverage thresholds, etc.). Note the guideline file followed.
 
    **Bound:** Tests prove the work; they do not expand it. Thoroughness is scoped to the feature + plan. Repo depth is a floor (never less thorough than existing tests for the same layer); the plan is the ceiling. Do not invent requirements or tests that have no plan anchor.
 
@@ -119,13 +133,13 @@ After the gate check passes:
 
    *Honest caveat:* This is an inspection-based review (model judgment), complementary to - not a replacement for - the deterministic gate. The gate confirms the test suite runs; the Verifier's discrimination sensor confirms the tests can detect regressions. This review confirms the suite is meaningful and bounded.
 
-   Add the two mapping tables and a one-line adequacy verdict under that slice in checks.md.
+   Add the two mapping tables and a one-line adequacy verdict under the task's slice in checks.md.
 
 ## What is fixed and what is yours
 
 Fixed: the checks and the proofs each check names. Changing them is renegotiation with the user.
 
-Yours: order, decomposition, where files go, naming, error shapes, helpers. The repo's conventions answer most of it.
+Fixed too: the approved tasks - order, decomposition and where files go. Yours: naming, error shapes, helpers inside a task's files. The repo's conventions answer most of it.
 
 In `plan.md`, `Landing`, `Surface` and the stored shape are additive: a door found mid-build gets a row, and a row the user approved is not rewritten. The path and `Changes underneath` in `Shape` are kept true: take a different path and change the hop in that commit. A fifth module in a feature scoped to two means the boundary was wrong; say so.
 
@@ -147,7 +161,7 @@ So: when an existing test fails because the approved `plan.md` changed the behav
 
 ## A door found mid-build
 
-Decide it yourself, then append the row to `Landing` with its literal shape and the rejected alternative before the code that closes it, in that code's commit. Written afterwards, it becomes a justification. A new door that contradicts nothing approved does not stop the build.
+Stop and ask the user, as [Context before asking for a decision](../SKILL.md#context-before-asking-for-a-decision) says. With the answer, append the row to `Landing` with its literal shape and the rejected alternative before the code that closes it, in that code's commit. Written afterwards, it becomes a justification.
 
 ## Commit
 
@@ -157,13 +171,14 @@ Follow the repo's commit convention. Where it has none, use [Conventional Commit
 python3 <implementar>/scripts/check_commit.py --message "feat(billing): suspend on failed charge"
 ```
 
-When a slice's proofs are green, mark its checks complete in `checks.md`, and commit `.specs/` with the slice when the repo tracks it. No Co-Authored-By, Made-with or other agent trailer unless the repo asks for one.
+When a task's gate is green, mark the task complete in `tasks.md` and its checks in `checks.md`, and commit `.specs/` with the task when the repo tracks it. No Co-Authored-By, Made-with or other agent trailer unless the repo asks for one.
 
-Each slice gets its own commit immediately after verification. Never batch multiple slices into one commit.
+Each task gets its own commit immediately after verification. Never batch multiple tasks into one commit.
 
 ## How to write the code
 
-Surgical: do not improve adjacent code or formatting, and remove only what your change orphaned.
+Surgical: touch ONLY the files the task lists, do not improve adjacent code or formatting, and remove only what your change orphaned.
+Follow [coding principles](../../spec-plan/references/coding-principles.md).
 
 ## Scope
 
@@ -173,7 +188,7 @@ Outside the plan's scope, do not touch it: surface a bug, note an improvement. I
 
 Green proofs do not show that a person can do what the plan promised, or that the screen looks like what was asked for. Open the running app and do what the plan promises as the user would, screens that share the state you changed included. If you cannot reach the app, hand the steps to the user.
 
-A state a capture draws must match the capture except for what `## Differences from the source` lists; the Verifier photographs and judges it ([verify.md](verify.md), step 6b). A `walk` check is a visit you name in the `**Walked:**` line, which also says how the user reaches each state.
+A state a capture draws must match the capture except for what `## Differences from the source` lists. Save each state a capture draws beside it as `captures/<capture>.running.png`, taken at the capture's size as [verify.md](verify.md) step 6b item 3 says. A state no capture draws gets no picture. The Verifier takes it again over yours and judges its own. A `walk` check is a visit you name in the `**Walked:**` line, which also says how the user reaches each state. Leave the dev database with data the user can open those states on.
 
 Something broken that a check covers is a red proof you missed: fix it. Something broken that no check covers is a missing obligation: append a check with its proof, say so, then fix it. A difference from a capture is fixed, not turned into a check.
 

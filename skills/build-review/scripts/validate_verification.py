@@ -14,6 +14,12 @@ What it checks:
   ERROR  - no `## Checks` table in verification.md, a check with no row in it, or a row with no test
   ERROR  - no `## Findings` section in verification.md, or a finding with no commit in `Closed`
   ERROR  - a `walk` proof and no `**Walked:**` line in the Handoff
+  ERROR  - a row of plan.md's `## Screen states` with no `row<N>` photo or test in verification.md,
+           or a row written as `not reached` under a PASS verdict
+  ERROR  - a feature with a screen and no screens.md, or a row in it that does not read `matches`,
+           a cited capture with no `<capture>.running.png`, or a picture at another size than its
+           capture (1x, 2x, 3x pass)
+  ERROR  - a browser proof that names no `.running.png`, or one that is not on disk
   ERROR  - plan.md (or checks.md without a plan) with no actual `**Approved**:` authorization
   ERROR  - verification.md names no reviewed HEAD, code changed since it, or Fixes is not 0..3
   WARN   - the report says self-verified (author == verifier: a degraded gate)
@@ -33,7 +39,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "spec-plan", "scripts"))
-from lean_config import _section, plan_approved
+from lean_config import CAPTURE_RE, _section, plan_approved, plan_owes_pictures
 
 PROOF_RE = re.compile(r"^\**\s*Proof\s*\**\s*:\s*(.+)$", re.IGNORECASE)
 JUDGED_HEAD_RE = re.compile(r"^\**\s*HEAD\s*\**\s*:\s*\**\s*`?([0-9a-f]{7,40})", re.IGNORECASE)
@@ -46,6 +52,9 @@ SURVIVED_RE = re.compile(r"\b(no|survived|alive|not killed)\b", re.IGNORECASE)
 VERDICT_LINE_RE = re.compile(r"^\**verdict\**\s*:", re.IGNORECASE)
 WALK_PROOF_RE = re.compile(r"^`?walk\b", re.IGNORECASE)
 WALKED_RE = re.compile(r"^\s*[-*]?\s*\**walked\**\s*:", re.IGNORECASE)
+RUNNING_SUFFIX = ".running.png"
+BROWSER_PROOF_RE = re.compile(r"^`?browser\b", re.IGNORECASE)
+SHOT_RE = re.compile(r"[\w./-]+\.running\.png")
 
 
 def _feature_dirs(root):
@@ -285,6 +294,206 @@ def _check_with_proofs(fdir, name, lines, checks_lines):
     return errors, warnings
 
 
+ROW_CITED_RE = re.compile(r"\brow\s*-?\s*(\d+)\b", re.IGNORECASE)
+NOT_REACHED_RE = re.compile(r"\bnot reached\b", re.IGNORECASE)
+
+
+def _screen_rows(plan):
+    """[(screen, number of state rows)] from the plan's `## Screen states` tables."""
+    screens, current = [], None
+    for ln in _section(plan, "Screen states"):
+        if re.match(r"^###\s+\S", ln):
+            current = [ln.lstrip("#").strip(), []]
+            screens.append(current)
+        elif current is not None:
+            current[1].append(ln)
+    out = []
+    for screen, body in screens:
+        n = 0
+        for header, rows in find_tables(body):
+            if column(header, "state") is not None:
+                n = len([r for r in rows if r and r[0] and not r[0].startswith(("<", "["))])
+                break
+        out.append((screen, n))
+    return out
+
+
+def _screen_states_reached(plan, lines, name):
+    """Every state row of the plan has its photo or test in the report, and none is left open."""
+    errors = []
+    rows = _screen_rows(plan)
+    if not rows:
+        return errors
+    body = "\n".join(lines)
+    # Each screen numbers its rows from 1, so with more than one screen a row counts only on a
+    # line that names its screen: the text before the first row number holds every word of the
+    # heading, and no longer heading is held whole there; without such a heading there, the whole
+    # line is read the same way. A line that holds no heading whole falls back to a word of the
+    # heading no other screen's heading has.
+    def _words(text):
+        return set(re.findall(r"[^\W_]{3,}", text.lower()))
+
+    words = [_words(screen) for screen, _ in rows]
+
+    def _owner(ln):
+        first = ROW_CITED_RE.search(ln)
+        for text in (ln[:first.start()] if first else "", ln):
+            held = [i for i, w in enumerate(words) if w and w <= _words(text)]
+            if held:
+                return max(held, key=lambda i: len(words[i]))
+        return None
+
+    for i, (screen, n) in enumerate(rows):
+        own = words[i] - set().union(*(w for j, w in enumerate(words) if j != i)) if len(rows) > 1 else None
+        cited = set()
+        for ln in lines:
+            owner = _owner(ln) if own is not None else None
+            if own is None or owner == i or (owner is None and own & _words(ln)):
+                cited |= {int(k) for k in ROW_CITED_RE.findall(ln)}
+        for k in range(1, n + 1):
+            if k not in cited:
+                errors.append(f"{name}: plan.md Screen states '{screen[:40]}' row {k} has no photo or test in "
+                              f"verification.md - write `captures/review-<screen>-row{k}.png`, or that it was not reached")
+    if NOT_REACHED_RE.search(body) and _verdict(lines) == "pass":
+        errors.append(f"{name}: a Screen states row is written as not reached - the verdict is not PASS while "
+                      "one is open; tell the user which rows and why")
+    return errors
+
+
+def _image_size(path):
+    """(width, height) of a PNG or JPEG file, or None when the header is not one of those."""
+    try:
+        with open(path, "rb") as f:
+            data = f.read(65536)
+    except OSError:
+        return None
+    if data[:8] == b"\x89PNG\r\n\x1a\n" and len(data) >= 24:
+        return int.from_bytes(data[16:20], "big"), int.from_bytes(data[20:24], "big")
+    if data[:2] == b"\xff\xd8":
+        i = 2
+        while i + 9 < len(data):
+            if data[i] != 0xFF:
+                i += 1
+                continue
+            marker = data[i + 1]
+            if 0xC0 <= marker <= 0xCF and marker not in (0xC4, 0xC8, 0xCC):
+                return int.from_bytes(data[i + 7:i + 9], "big"), int.from_bytes(data[i + 5:i + 7], "big")
+            i += 2 + int.from_bytes(data[i + 2:i + 4], "big")
+    return None
+
+
+def _same_layout(picture, capture):
+    """A picture matches a capture's size at 1x, 2x or 3x - the same layout at another pixel ratio."""
+    return any(picture == (capture[0] * k, capture[1] * k) for k in (1, 2, 3))
+
+
+def _picture_sizes(fdir, root, cited, name):
+    """A picture judged against a capture is taken at the capture's size: a wider window lays the
+    page out differently, so the judge compares a layout the capture never drew."""
+    errors = []
+    for cap in cited:
+        path = os.path.join(root, cap)
+        twin = os.path.splitext(path)[0] + RUNNING_SUFFIX
+        c, r = _image_size(path), _image_size(twin)
+        if c and r and not _same_layout(r, c):
+            errors.append(
+                f"{name}: `{os.path.basename(twin)}` is {r[0]}x{r[1]} and its capture is {c[0]}x{c[1]} - take "
+                f"the picture at the capture's size"
+            )
+    return errors
+
+
+def _screen_evidence(fdir, plan, name):
+    """The builder's comparison left files behind: a running screenshot per capture.
+
+    This judges nothing about the screens - the Verifier's `screens.md` does that. It only
+    makes "the screen was saved" something a file shows, so a build that skipped the UI cannot pass.
+    """
+    errors = []
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(fdir))))
+    running = set()
+    for dirpath, _, files in os.walk(fdir):
+        running |= {f for f in files if f.endswith(RUNNING_SUFFIX)}
+    if not running:
+        errors.append(
+            f"{name}: the feature has a screen but no `*{RUNNING_SUFFIX}` sits under the feature folder - "
+            f"the builder saves a screenshot of each screen it compared"
+        )
+    cited = sorted({c for ln in plan for c in CAPTURE_RE.findall(ln) if not c.endswith(RUNNING_SUFFIX)})
+    for cap in cited:
+        path = os.path.join(root, cap)
+        if not os.path.isfile(path):
+            continue
+        twin = os.path.splitext(os.path.basename(cap))[0] + RUNNING_SUFFIX
+        if not os.path.isfile(os.path.splitext(path)[0] + RUNNING_SUFFIX) and twin not in running:
+            errors.append(
+                f"{name}: the capture `{cap}` has no `{twin}` beside it - the running screen was "
+                f"never set next to the picture it has to match"
+            )
+    errors += _picture_sizes(fdir, root, cited, name)
+    errors += _browser_shots(fdir, name, running)
+    return errors
+
+
+def _screens_verdicts(fdir, name, plan=()):
+    """screens.md is the Verifier's verdict per picture; a PASS cannot stand beside a screen that diverges."""
+    path = os.path.join(fdir, "screens.md")
+    tables = []
+    if os.path.exists(path):
+        tables = [(h, rows) for h, rows in find_tables(strip_fences(_read(path)))
+                  if column(h, "verdict") is not None and column(h, "screen") is not None]
+    if not tables:
+        return [
+            f"{name}: the feature has a screen but there is no `screens.md` with a Screens table - each "
+            f"picture is judged by the Verifier on controls, arrangement, copy, drawing and render "
+            f"(verify.md, Screen inventory)"
+        ]
+    errors = []
+    judged = " ".join(" ".join(r) for _, rows in tables for r in rows)
+    for cap in sorted({c for ln in plan for c in CAPTURE_RE.findall(ln) if not c.endswith(RUNNING_SUFFIX)}):
+        stem = os.path.splitext(os.path.basename(cap))[0]
+        if stem not in judged:
+            errors.append(f"{name}: the capture `{cap}` has no row in screens.md - the Verifier judges "
+                          f"each capture the plan cites, at each width")
+    for header, rows in tables:
+        verdict_col = column(header, "verdict")
+        for r in rows:
+            if verdict_col < len(r) and not r[verdict_col].lower().startswith("match"):
+                errors.append(
+                    f"{name}: PASS but the screen '{r[0][:40]}' reads '{r[verdict_col][:40]}' in screens.md - "
+                    f"a missing control, another arrangement, wrong copy or an element drawn differently "
+                    f"fails like a red proof"
+                )
+    return errors
+
+
+def _browser_shots(fdir, name, running):
+    """Every browser proof names a screenshot that exists. The Verifier judges that picture."""
+    errors = []
+    cpath = os.path.join(fdir, "checks.md")
+    if not os.path.exists(cpath):
+        return errors
+    lines = strip_fences(_read(cpath))
+    for ln in lines:
+        match = PROOF_RE.match(ln.strip())
+        if not match or not BROWSER_PROOF_RE.match(match.group(1).strip()):
+            continue
+        shots = SHOT_RE.findall(match.group(1))
+        if not shots:
+            errors.append(
+                f"{name}: a browser proof names no `.running.png` - the Verifier judges the saved "
+                f"picture, and a check with no picture is unproven"
+            )
+            continue
+        for rel in shots:
+            saved = os.path.isfile(os.path.join(fdir, rel)) or os.path.basename(rel) in running
+            if not saved:
+                errors.append(
+                    f"{name}: browser proof names `{rel}`, which is not under the feature folder"
+                )
+    return errors
+
+
 def _check_feature(fdir, name):
     errors, warnings = [], []
     if not os.path.exists(os.path.join(fdir, "verification.md")):
@@ -332,7 +541,11 @@ def _check_feature(fdir, name):
         document = "plan.md" if os.path.isfile(os.path.join(fdir, "plan.md")) else "checks.md"
         errors.append(f"{name}: {document} has no `**Approved**: <YYYY-MM-DD> - user: \"<their words>\"` line - "
                       "record the user's actual authorization before code")
+    if plan_owes_pictures(plan, checks_lines):
+        errors += _screens_verdicts(fdir, name, plan)
+        errors += _screen_evidence(fdir, plan, name)
     errors += _walk_logged(checks_lines, name)
+    errors += _screen_states_reached(plan, lines, name)
     return errors, warnings
 
 

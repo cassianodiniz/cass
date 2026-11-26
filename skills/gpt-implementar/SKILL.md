@@ -7,7 +7,7 @@ description: "Use when the user invokes /gpt-implementar (old name /gpt-builder)
 
 Read only [Feature contract](../spec-plan/SKILL.md#feature-contract) to choose the approved contract; this does not start planning.
 
-Follow `/implementar` with Codex writing the code. Read the shared [core.md](../spec-plan/references/core.md) and its Checks/Build references.
+Follow `/implementar` with Codex writing the code. Read the shared [core.md](../spec-plan/references/core.md) and its Design, Checks, Tasks and Build references. You write design.md, checks.md and tasks.md and ask the user's yes for the tasks; Codex writes the code.
 
 **If you coordinate:** use the existing [Codex operator](references/codex-runner.md); only the context sent to it points to the feature files. Start `/build-review` when the feature reaches verification.
 

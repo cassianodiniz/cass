@@ -2,17 +2,9 @@
 
 The one artifact a human reads to understand the work and object to it, before any claim carries a test selector. Two halves: what must be true, then what is being built. They share a file because they are one review: deriving the checks in the same pass that decides the shape produces checks that ratify whatever was already assumed.
 
-Skip this file when the change is under roughly three files with no one-way door; write the intent paragraph straight into `checks.md`.
+Skip this file when the change is under roughly three files, with no one-way door and no prototype ([prototype.md](prototype.md)); write the intent paragraph straight into `checks.md`.
 
-## Before asking anything
-
-- Load confirmed lessons: `python3 <spec-plan>/scripts/lessons.py --root <project> list --status confirmed` (add `--scope` or `--query` for the area). Confirmed only. No store yet: skip.
-- Read `.specs/STATE.md` `## Decisions`. Every `active` `AD-NNN` constrains the shape: conform, or append an entry that supersedes it and say why.
-- Open every binding source in full - every capture, frame and state - before the first criterion.
-- If this session has not yet explored the code around this request, explore it as the Explore step of [improve-codebase-architecture](skills/improve-codebase-architecture/SKILL.md) describes, with the request as the direction. Its sub-agent runs on Haiku model.
-- Check the open pull requests and issues for work that touches this request's area. When one does, tell the user before the first round of questions.
-
-Facts you look up; decisions you ask. Ask only what is the user's: scope, priority, product behaviour, a trade-off.
+Every question to the user - what comes before the first one, when to ask and when to stop - follows [investigate.md](investigate.md). This file is what the plan holds.
 
 An open architectural bet (job or request cycle, which of two architectures) is settled first in an ADR, RFC or spike and linked. This file records the shape that won.
 
@@ -24,27 +16,15 @@ Write the problem in the present tense with no solution inside it: what is true 
 
 Close the section with what is different for a user when this ships. That line is the goal the checks are held against.
 
-## How to ask
-
-A gray area is a decision that is the user's, has more than one defensible answer, and is not settled by the code. Anything else is an assumption you state and move on from.
-
-Ask every gray area before presenting the plan, until the requirements leave no product decision to the builder. A gray area does not become an `Assumptions` row to save a question.
-
-- "You decide" is an answer: record it in `Assumptions` with `Confirmed? y` and rationale `user delegated`. Write `user delegated` only when the user said it in the conversation.
-- Asking clarifies how, not whether to add a capability. A new capability that surfaces goes in `Out of scope` with its reason.
-- Removing, renaming or changing something a binding source draws is the user's call. Ask it as a `blocks` question with your recommendation, even when the system lacks the concept. It is never resolved by an `Out of scope` row alone. The answer becomes an `AD-NNN` in `.specs/STATE.md` whose rationale quotes the question and the option chosen; each departure it approves lands in `## Differences from the source` citing that id.
-
-An assumption lands in `## Assumptions` with your default, the rationale and `Confirmed? n`. `y` means a human said so.
-
-Each answer goes into the plan in the turn it arrives - a criterion, an `Assumptions` row with `y`, or an `AD-NNN` - not at the end of the conversation: a compaction keeps the file, not the chat.
-
 ## Walk the surfaces
 
-Each kind of surface carries the same decisions every time. Walk the row for every surface this feature exposes; each item becomes a criterion, an existing behaviour you name, or nothing to decide. There is no table for it in the plan.
+Each kind of surface carries the same decisions every time. Walk the row for every surface this feature exposes; each item becomes a criterion, an existing behaviour you name, or nothing to decide. For a screen, write the walk in the plan's `## Screen states` table: one table per screen, one row per state, with the account, the data and the width that reach it; each row lands on a criterion, an existing behaviour you name, a question, or `nothing to decide - <why>`. An account gets one row for each data state in which it could see something different. The Verifier tests every row, so a state the table leaves out is a state nobody checks.
+
+Identify the pieces: before you draw a screen or write its criteria, read in full the design manual's list of existing pieces (the file `AGENTS.md` or `CLAUDE.md` names for screens, or a `DESIGN.md`). What existing piece can each element of the screen use? Write it on the screen's `**Pieces:**` line: the element, the piece and its variant, and the location of the piece's file. An element with no existing piece is a new piece, a gray area of [investigate.md](investigate.md). Once approved, the new piece is built once as a shared piece and added to the manual before any screen uses it. A reference from another product, sent for its look, uses the pieces the same way; its elements are never rebuilt by hand inside the screen, and its code is never copied.
 
 | Surface | The decisions it always has |
 | --- | --- |
-| a screen or view | empty, loading, error and unauthorised states; ordering of content; the window widths it must work at - the captures' sizes, or asked when no capture settles it; what a long list or a wide table does - what scrolls and what stays in view; what a destructive action confirms; what each control does when used - who acts, which control, what the page shows afterwards |
+| a screen or view | each account that opens it - owner, team member without the permission, patient - and what each one sees while the data is in each of its states, such as work another account has not saved yet or data saved before the current rule (who?); empty, loading, error and unauthorised states; the largest value and the longest text each field takes (how much?); ordering of content; the window widths it must work at - the references' sizes, or asked when no reference settles it; what a long list or a wide table does - what scrolls and what stays in view; what a destructive action confirms; what each control does when used - who acts, which control, what the page shows afterwards; data saved before the current rule (when?); two tabs or two clicks at once (at the same time?) |
 | an API or webhook | response shape, error shape with its codes, who may call it, versioning, rate limit behaviour |
 | a command or scheduled task | output format, every flag and its default, exit codes, what it prints when it fails halfway |
 | a document or copy | structure, tone, depth, what the reader does next |
@@ -74,11 +54,11 @@ One requirement per criterion, with a concrete value - a status code, a field, a
     `.specs/features/<f>/captures/cover.png` (`.specs/features/<f>/captures/cover.aria.yml`)
 ```
 
-The builder matches the image for composition and look. Do not retype the screen into criteria; add criteria only for what the source cannot show: what a control does, states nobody captured, the rules behind a form. Labels and sentences a capture draws are copied from it, character for character, in criteria and Assumptions alike; a state the capture does not draw reuses them, not a paraphrase. Its sample data - names, quantities, dates - is not transcribed: the builder recreates it with the capture open. A binding source is also the measure of scope: build what it draws, minus what `## Differences from the source` lists.
+The builder matches the image for composition and look. Do not retype the screen into criteria; add criteria only for what the source cannot show: what a control does, states nobody captured, the rules behind a form. Labels and sentences a capture draws are copied from it, character for character, in criteria and Assumptions alike; a state the capture does not draw reuses them, not a paraphrase. Its sample data - names, quantities, dates - is the data its `## Screen states` row names, so the builder and the Verifier reach the same picture. A binding source is also the measure of scope: build what it draws, minus what `## Differences from the source` lists.
 
-**Which references bind.** A capture, screenshot, design frame or live site that comes with the request binds: it is the result the user expects, and the user does not have to say so. It is `non-binding` only when the user called it inspiration - a mood board, "something like X", a product cited for its feel - and its `Sources` line quotes them: `non-binding - user: "<their words>"`. Something the source draws that the stored model cannot hold, such as a code or a field, is a departure asked as above, never a reason to make the source non-binding. A binding source lives in files: export each frame or state, open ones included, to `.specs/features/<f>/captures/` with its structure beside it where the tool gives one, keep the link in `Sources` with the date, and ask for the files as a `blocks` question when you cannot reach it. Each capture's `Sources` line shows the image, `![<name>](captures/<file>)`, so whoever approves the plan sees the screen beside the criteria.
+**What binds.** The prototype's photos bind: they are the captures, in `captures/` ([prototype.md](prototype.md)). A capture, screenshot, design frame or live site that comes with the request is a reference: the prototype follows it, held to the project's design manual. Export each frame or state of it, open ones included, to `.specs/features/<f>/references/`, keep the link in `Sources` with the date, show it there, `![<name>](references/<file>)`, and ask for the files as a `blocks` question when you cannot reach it. Each capture's `Sources` line shows the image, so whoever approves the plan sees the screen beside the criteria.
 
-**A screen with no reference gets outcomes, not layout.** Say what a user can see and do, never where things sit. Layout is the builder's call, held to the project's design manual: the file `AGENTS.md` or `CLAUDE.md` names for screens, or a `DESIGN.md`. When the project has one, add one criterion per changed screen, `The <screen> SHALL follow <manual path>: <rules>`, quoting the manual's rules, with their values, for the pieces that screen uses: space between rows, row height, text styles, control sizes. When a screen needs a piece or a value the manual does not have, ask it as a gray area, with your recommendation: reuse the nearest piece the manual has, or add the new piece and its rule to the manual.
+**A screen change gets a prototype**, as [prototype.md](prototype.md) says. A change with no prototype gets outcomes, not layout: say what a user can see and do, never where things sit. Layout is held to the project's design manual: the file `AGENTS.md` or `CLAUDE.md` names for screens, or a `DESIGN.md`. When the project has one, add one criterion per changed screen, `The <screen> SHALL follow <manual path>: <rules>`, quoting the manual's rules, with their values, for the pieces that screen uses: space between rows, row height, text styles, control sizes. A value a screen needs and the manual does not have is a gray area.
 
 **A backend criterion is a rule with examples under it.** One example is the strong case - the boundary, or the input where an implementation fitted to the obvious sample breaks.
 
@@ -93,17 +73,17 @@ The builder matches the image for composition and look. Do not retype the screen
 
 # What is being built
 
-Three sections, each with a rule about what stays out: no component catalogue, no columns, no types. Those are reversible and settled in the diff.
+Three sections, each with a rule about what stays out: no component catalogue, no columns, no types. Those are reversible and settled in design.md after the yes.
 
 ## Shape - the path and what it disturbs
 
 Open with one sentence on what this reuses instead of duplicating, and one on where the rules that change an outcome run: in a layer the repo's tests can reach, as its `AGENTS.md` or test docs say. Filtering, searching, sorting and counting decide what a user sees, so they are rules too, not presentation.
 
-**The path.** One numbered line per hop: what enters, which module it crosses, what it hands on, what persists or goes out at the end. Name only modules that exist today, marked `(exists)`, or that a `Landing` door creates, marked `(door <n>)`; a new module with no door is `(new)` and its placement is the builder's. `single module - <name>` is complete.
+**The path.** One numbered line per hop: what enters, which module it crosses, what it hands on, what persists or goes out at the end. Name only modules that exist today, marked `(exists)`, or that a `Landing` door creates, marked `(door <n>)`; a new module with no door is `(new)` and its placement is design.md's. `single module - <name>` is complete.
 
 **The drawing.** The person approving the plan reads a drawing before a list, so draw the path in mermaid, in the user's words: a `flowchart` of what happens for the people involved, with screens and people as the user knows them, before → after when a screen changes, and no module, table or code names. Draw it top to bottom. A box is a thing (a person, a screen, an outside service the user knows by name) in at most four words; what happens goes on the arrow. Colour and line style follow the template below and nothing else is coloured. Use only behaviors the list and the criteria already state. The list says which module does each hop; the drawing shows what the people see. Both stay true through the build.
 
-**The data.** An `erDiagram` of the entities this reads or writes and how they relate, then one line, `New: <entities and relations this adds>` (`New: nothing - read only` is complete). No attribute blocks. `Data: none - <why>` when nothing stored is touched.
+**The data.** An `erDiagram` of the entities this reads or writes and how they relate, then one line, `New: <entities and relations this adds>` (`New: nothing - read only` is complete). No attribute blocks. `Data: none - <why>` when nothing stored is touched. Then one line, `Sensitive data: <the personal or sensitive data this stores, and where>`, as [seguranca.md](seguranca.md) asks (`Sensitive data: none` is complete).
 
 **States**, only when an entity or a screen moves through states: a `stateDiagram-v2` with each transition and what triggers it. A missing transition shows in a drawing where it hides in a list of criteria.
 
@@ -152,7 +132,7 @@ Name what each row needs running (the app server, the functions server, the loca
 
 Mark each suite's `Gate level`: quick - after slices with unit tests only; full - after slices with e2e/integration tests; build - after config/entity-only slices. Each level also runs the suites of the levels below it.
 
-The whole table runs in the independent review (with skill `build-review`). The user confirms it with the plan's single approval; they are not asked to choose tests. `validate_plan.py` fails a plan with no table or with a suite row with no command.
+The whole table runs in the independent review (with skill `build-review`). The user confirms it with the plan's approval; they are not asked to choose tests. `validate_plan.py` fails a plan with no table or with a suite row with no command.
 
 # Before presenting
 
@@ -163,6 +143,8 @@ python3 <spec-plan>/scripts/validate_plan.py <feature>
 It checks the structure. What it cannot see stays yours: a hop marked `(exists)` only stands if that module already does what the criteria assign it. And read the request again, one sentence at a time: each one lands on a criterion, an `Out of scope` row or an open question. A sentence that lands nowhere is the requirement that goes missing, and nobody downstream reads the request again.
 
 Every unresolved decision is a criterion, an `Assumptions` row, or an open question marked `blocks`, `blocks go-live` or `open`.
+
+
 
 ## Template: `.specs/features/<feature>/plan.md`
 
@@ -223,6 +205,8 @@ erDiagram
 New: <entities and relations this adds, or `nothing - read only`>. One-way constraints: <field>
 unique (door <n>).
 
+Sensitive data: <the personal or sensitive data this stores, and where; or `none`>
+
 <Only when something moves through states:>
 
 ```mermaid
@@ -244,6 +228,18 @@ stateDiagram-v2
 | <what> | <the literal a reader copies> | <the option, and the property that disqualified it> |
 
 - Nothing else in this change is hard to reverse
+
+## Screen states
+
+### <screen>
+
+**Pieces:** <element> - `<piece> <variant>` (`<file of the piece>`); <element> - new piece - <capture>, approved in AD-NNN
+
+**Prototype:** `prototype/<screen>.html`, or none - <element> edited in place
+
+| State | Account, data and width | Criterion |
+| --- | --- | --- |
+| <state from the walk> | <who opens it, the data that reaches it, the width> | <criterion number, or `nothing to decide - <why>`> |
 
 ## Criteria
 
@@ -291,16 +287,44 @@ approved by the user.>
 
 <Or:> None - the product matches the source
 
+## Investigation
+
+| Step | Landed |
+| --- | --- |
+| Problem | |
+| Confirmed lessons | |
+| `.specs/STATE.md` decisions | |
+| References in `references/`; prototype and its photos in `captures/` | |
+| Explorer sub-agent | |
+| Open PRs and issues | |
+| Glossary | |
+| seguranca.md | <`done - ASVS chapter files opened: <list>`, or `n/a - <why>`> |
+| tanstack-query-best-practices | |
+| coding-principles.md | |
+| Surfaces walked | |
+| Pieces, and each new piece | |
+| Window widths | |
+| 1 input validation | |
+| 2 failure modes | |
+| 3 idempotency and retry | |
+| 4 authorization | |
+| 5 concurrency and ordering | |
+| 6 data lifecycle | |
+| 7 external dependency failure | |
+| 8 state transitions | |
+| 9 observability | |
+| Test battery | |
+
 ## Sources
 
-- <ticket or binding design> - binding - <what it settles>
-- ![<capture>](captures/<capture>.png) - binding - <what it draws>
-- <what the user called inspiration> - non-binding - user: "<their words>" - <what it informs>
+- <ticket> - binding - <what it settles>
+- ![<screen> row <n>, <width>](captures/<screen>-row<n>-<width>.png) - binding - prototype
+- ![<name>](references/<file>) - reference - <what the prototype took from it>
 `````
 
 ## Then confirm
 
-Present the plan and stop: this is the one default stop for a human. Name `Shape`, any `Landing` door with a live alternative, and anything that changes existing data or a consumed contract. Ask for that one yes with the local [approval message](approval-message.md). When the user approves, write `**Approved**: <YYYY-MM-DD> - user: "<their words>"` under the title; one the user did not give is never written, and `validate_checks.py` refuses to start without it. Then continue into [checks.md](checks.md).
+When no question is left, present the plan and stop for the yes. Name `Shape`, any `Landing` door with a live alternative, and anything that changes existing data or a consumed contract. Ask for that yes with the local [approval message](approval-message.md). When the user approves, write `**Approved**: <YYYY-MM-DD> - user: "<their words>"` under the title; one the user did not give is never written, and `validate_checks.py` refuses to start without it. Then continue into [design.md](design.md).
 
 ## Notes
 
