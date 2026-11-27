@@ -7,13 +7,13 @@ This copy is shared by the local entry points. Before choosing a phase, read onl
 Freeze the obligations. Free the plan. Prove it with someone who did not build it. Derived from tlc-spec-driven 3.3.0 (Felipe Rodrigues), tlc-plan, and tlc-implement.
 
 ```
-┌──────┐   ┌────────┐   ┌───────┐   ┌────────┐
-│ PLAN │ → │ CHECKS │ → │ BUILD │ → │ VERIFY │
-└──────┘   └────────┘   └───────┘   └────────┘
- read it    obligations   yours       always
+┌──────┐   ┌────────┐   ┌────────┐   ┌───────┐   ┌───────┐   ┌────────┐
+│ PLAN │ → │ DESIGN │ → │ CHECKS │ → │ TASKS │ → │ BUILD │ → │ VERIFY │
+└──────┘   └────────┘   └────────┘   └───────┘   └───────┘   └────────┘
+ yes 1      how          obligations  yes 2       one task    always
 ```
 
-The common failure of a coding agent is a requirement that never became an active obligation, followed by a completion claim. What works against it is a small, frozen, external obligation set and a verifier that is not the author, so the budget goes there and not into choreographing the model. A human confirms what must be true and how it is being built in one document; only then does it become obligations with proofs. There is no task breakdown and no component catalogue: what is hard to reverse gets a one-way door with its literal shape, and the rest is decided while building.
+The common failure of a coding agent is a requirement that never became an active obligation, followed by a completion claim. What works against it is a small, frozen, external obligation set and a verifier that is not the author, so the budget goes there and not into choreographing the model. A human confirms what must be true and how it is being built in one document; only then does it become obligations with proofs. What is hard to reverse gets a one-way door with its literal shape in the plan. After the plan's yes, design.md names the components and tasks.md breaks the work into tasks; the user approves the tasks before code.
 
 ## Rules
 
@@ -28,8 +28,9 @@ These hold even if no reference file is read. Each one lives here; the reference
 7. The completion gate is a script: `validate_verification.py` exits 0. The final report opens with its last line; a red gate is said first, never left for the reader to find.
 8. An approved spec authorizes local edits and local commits. `git push`, deploy and production data changes need an explicit go-ahead for that action.
 9. **A state a capture draws is one photo, taken and judged by the Verifier.** The Verifier reaches that state and photographs it from a browser window at the capture's size - its pixel size over its scale: a wider window lays the page out differently, and resizing the image afterwards hides it ([verify.md](../../implementar/references/verify.md), step 6b). It matches the capture except for what `## Differences from the source` lists; each difference is a finding. A state no capture draws, and an existing screen the feature does not change, are proven by a test or a `walk` proof.
-10. A capture, frame or live site that comes with the request binds unless the user called it inspiration. A binding source is changed only by the user. Removing, renaming or departing from something it draws is asked, recorded as a decision in `.specs/STATE.md`, and listed in the plan's `## Differences from the source` with `Confirmed: y - AD-NNN`.
-11. **The files hold the run; the chat does not survive a compaction.** The user's approval is written as `**Approved**: <date> - user: "<their words>"` in plan.md, or in checks.md when there is no plan - never one the user did not give. Before code, confirm the actual authorization is recorded; an authorization already given is not asked again. Each answer goes into its file in the turn it arrives. Each sub-agent goes on the `**Dispatched:**` line of `checks.md` `## Handoff` before it is sent. After a compaction or in a new session, re-read this file and the current phase's reference, then resume from the files ([memory.md](memory.md)).
+10. The prototype's photos, approved with the plan, are the binding source; a capture, frame or live site that comes with the request is a reference the prototype follows ([prototype.md](prototype.md)). A binding source is changed only by the user. Removing, renaming or departing from something it draws is asked, recorded as a decision in `.specs/STATE.md`, and listed in the plan's `## Differences from the source` with `Confirmed: y - AD-NNN`.
+11. **The files hold the run; the chat does not survive a compaction.** The user's approval is written as `**Approved**: <date> - user: "<their words>"` in plan.md, or in checks.md when there is no plan, and in tasks.md when it exists - never one the user did not give. Before code, confirm the actual authorization is recorded; an authorization already given is not asked again. Each answer goes into its file in the turn it arrives. Each sub-agent goes on the `**Dispatched:**` line of `checks.md` `## Handoff` before it is sent. After a compaction or in a new session, re-read this file and the current phase's reference, then resume from the files ([memory.md](memory.md)).
+12. **A finding is a fact its reviewer reproduced.** Each finding carries the steps that show it, the source it contradicts and the reviewer's own proof. An item without a source is a question for the user, not a finding: it stays open and blocks done until the user answers. Why: the executor fixes what the finding says, so a finding without proof becomes a wrong change. How to write it: [verify.md](../../implementar/references/verify.md), step "Create fix item".
 
 ## Who checks what
 
@@ -47,21 +48,28 @@ These hold even if no reference file is read. Each one lives here; the reference
 ├── lessons.json                # machine-owned
 └── features/<feature>/
     ├── plan.md                 # problem, shape, surface, doors, criteria
+    ├── design.md               # architecture, components, reuse, error handling, risks
     ├── checks.md               # claims + proofs, the coverage join, swept, handoff
-    ├── captures/               # binding source files, and the Verifier's review-*.png photos
+    ├── tasks.md                # atomic tasks, phases, the test coverage matrix
+    ├── prototype/              # <screen>.html and its stylesheet, approved with the plan
+    ├── references/             # what the user sent: captures, frames, prints - they do not bind
+    ├── captures/               # the prototype's photos (binding), <capture>.running.png pictures, and the Verifier's review-*.png photos
+    ├── screens.md              # the Verifier's inventory and verdict, per picture
     ├── proofs.md               # written by check_proofs.py: every proof at HEAD, and each run's output
     └── verification.md         # the Verifier's judgement of each check, and its findings closed by commits
 ```
 
-For a change under roughly three files with no one-way door, write only `checks.md` with an `## Intent` paragraph and skip `plan.md`. Record the user's actual authorization there before code; if none was given, present the checks and stop for approval.
+For a change under roughly three files, with no one-way door and no prototype ([prototype.md](prototype.md)), write only `checks.md` with an `## Intent` paragraph and skip `plan.md`. Record the user's actual authorization there before code; if none was given, present the checks and stop for approval.
 
 ## Phases
 
 | Phase | What it produces | Reference |
 | --- | --- | --- |
-| Plan | problem, shape, surface, doors, criteria; the one default stop for a human | [plan.md](plan.md) |
+| Plan | problem, shape, surface, doors, criteria; the first stop for a human | [plan.md](plan.md) |
+| Design | architecture, components, reuse, error handling, risks | [design.md](design.md) |
 | Checks | claims with proofs, every set joined member by member, the nine dimensions swept | [checks.md](checks.md) |
-| Build | tests from the checks, the code, commits, the screens walked | [build.md](../../implementar/references/build.md) |
+| Tasks | atomic tasks in phases, each with its files, reuse and checks; the second stop for a human | [tasks.md](tasks.md) |
+| Build | one task at a time: tests from the checks, the code, a commit, the screens walked | [build.md](../../implementar/references/build.md) |
 | Verify | rule 5 | [verify.md](../../implementar/references/verify.md) |
 
 Decisions and lessons: [memory.md](memory.md).
@@ -75,7 +83,8 @@ Run a script rather than read it: its messages say what to change. On Windows, w
 | When | Command |
 | --- | --- |
 | Before presenting the plan | `validate_plan.py <feature>` |
-| Before starting to build | `validate_checks.py <feature> --execute` - it also requires the plan's `**Approved**:` line, and runs the `Build:` line once: red before any change stops |
+| Before presenting the tasks | `validate_tasks.py <feature>` |
+| Before starting to build | `validate_checks.py <feature> --execute` - it also requires the plan's `**Approved**:` line, and runs the `Build:` line once: red before any change stops; then `validate_tasks.py <feature> --execute` when tasks.md exists - it requires the tasks' `**Approved**:` line |
 | Before each commit | `check_commit.py --message "<msg>"` - it also prints what follows the last commit |
 | Before dispatching the Verifier, and after the fix | `check_proofs.py <feature>` |
 | Before declaring done | `validate_verification.py <feature>` |

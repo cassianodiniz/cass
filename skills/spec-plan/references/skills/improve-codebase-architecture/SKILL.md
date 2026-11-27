@@ -26,4 +26,18 @@ Then spawn a sub-agent Haiku with a fresh context window to walk the codebase. D
 - Where do tightly-coupled modules leak across their seams?
 - Which parts of the codebase are untested, or hard to test through their current interface?
 
-Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want.
+Also list the code the work can reuse. Give each file's full path and its use.
+A partial fit counts: say what must change. If nothing fits, say what you checked.
+
+Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want. Each agent gets:
+
+1. Scope
+2. Clear goal
+3. Constraint
+4. Expected output
+### Good agent prompts are:
+
+- Focused - Clear problem domain.
+- Self-contained - All context needed to understand the problem.
+- Specific about output - What should the agent return?
+

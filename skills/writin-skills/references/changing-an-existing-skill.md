@@ -6,6 +6,9 @@ An existing skill already shapes behaviour, so a change is judged against what i
 
 1. **Read today's text and today's diff.** Read every file the change touches, and the skill's git diff since the last tested version. Done when each behaviour that changes is listed with its file and line.
 2. **Compare each proposed edit with what the skill already says.** An edit that repeats an existing rule is dropped, and the user is told which rule already covers it.
+   Then ask what the skill does today that the edit could change. A line of the skill
+   proves the rule exists. A passed test or a real session proves the behaviour.
+   Without that proof, mark it "not verified". The user decides which matters.
 3. **Write the smallest edit.** Start from the original sentence. When the user applies the change by hand, follow [change-guide-page.md](change-guide-page.md).
 4. **Test on the ladder below.**
 5. **Report** per scenario: passes out of runs for each version, the model used, and what the level you stopped at does not prove.

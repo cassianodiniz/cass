@@ -146,5 +146,5 @@ Nenhum ponto do GPT é aplicado cego (senão o confronto vira o novo dono da dec
 - **Filtro de frivolidade:** o ponto muda QUAL candidata vence, ou muda se ela funciona? Não (gosto,
   estilo, "eu faria diferente") → descarta na hora, não litiga.
 
-Registro obrigatório (mesma tabela de sempre — ver `../_shared/confronto-codex.md`
+Registro obrigatório (mesma tabela de sempre — ver `<SKILLS_DIR>/.shared/confronto/confronto-codex.md`
 seção 4 pro formato, que continua valendo como referência de formato).

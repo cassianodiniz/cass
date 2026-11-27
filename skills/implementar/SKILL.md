@@ -8,15 +8,15 @@ license: TLC-derived material under CC-BY-4.0; Matt Pocock-derived material unde
 
 Read only [Feature contract](../spec-plan/SKILL.md#feature-contract) to choose the approved contract; this does not start planning.
 
-Read the shared [core.md](../spec-plan/references/core.md), then [Checks](../spec-plan/references/checks.md) and [Build](references/build.md). Continue the approved feature with their artifacts and rules.
+Read the shared [core.md](../spec-plan/references/core.md), then [Design](../spec-plan/references/design.md), [Checks](../spec-plan/references/checks.md), [Tasks](../spec-plan/references/tasks.md) and [Build](references/build.md). Continue the approved feature with their artifacts and rules.
 
 Before writing code, follow “Project vocabulary” in [Spec Plan](../spec-plan/SKILL.md). Use its definitions in check and test descriptions, and include its path in any delegated-worker brief. If absent, record that absence instead of inventing a path.
 
-**One slice at a time.** Never in parallel. After each slice's commit, go on to the next slice without asking. One atomic commit per slice. Mark its checks complete in `checks.md` **before** that commit, and include those updates in the same commit. Never batch slices; never weaken, skip, or delete tests to make them pass.
+**One task at a time.** Never in parallel. After each task's commit, go on to the next task without asking. One atomic commit per task. Mark the task complete in `tasks.md` and its checks in `checks.md` **before** that commit, and include those updates in the same commit. Never batch tasks; never weaken, skip, or delete tests to make them pass.
 
-**Delegation.** When delegating construction or approved repairs, read [Delegation](references/delegation.md) completely before dispatch and apply its brief, return, reconciliation and stop contract. This applies to native workers and the Codex adapter; it does not impose delegation, tasks, phases or batches.
+**Delegation.** When delegating construction or approved repairs, read [Delegation](references/delegation.md) completely before dispatch and write the dispatch prompt by its instructions. This applies to native workers and the Codex adapter; it does not impose delegation.
 
-**PR body.** Before the first slice, read [PR.md](../build-review/references/PR.md). After each slice and each approved change of direction, update `pr.md` in the feature folder from actual evidence: progress, the change table, delivery and proofs, and the drawing. Keep unfinished work and the final review visible. The update goes into the slice's commit; the PR on GitHub is refreshed only at the next authorized push. Include this reference in delegated-worker briefs.
+**PR body.** Before the first task, read [PR.md](../build-review/references/PR.md). After each task and each approved change of direction, update `pr.md` in the feature folder from actual evidence: progress, the change table, delivery and proofs, and the drawing. Keep unfinished work and the final review visible. The update goes into the task's commit; the PR on GitHub is refreshed only at the next authorized push. Include this reference in delegated-worker briefs.
 
 **Verification.** When the feature is ready for verification, start `/build-review`; it dispatches the independent roles required by the shared core. Do not finish at the last commit.
 

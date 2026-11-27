@@ -32,6 +32,7 @@ What it checks:
   ERROR  - no `## Gate Check Commands` table with a command for each suite
   ERROR  - an acceptance criterion has no SHALL (not testable / not EARS-shaped)
   ERROR  - an Assumptions row has an empty "Chosen default" or "Rationale" cell
+  ERROR  - an Investigation row is not `done - `, `asked - ` or `n/a - ` with its reason
   ERROR  - Shape or Surface is empty, or still the template placeholder
            (each has a one-line "None - <why>" answer, so a blank is never "nothing to say")
   ERROR  - Shape has no `Changes underneath` part
@@ -49,8 +50,9 @@ What it checks:
   ERROR  - a Differences row whose Confirmed cell is not `y` - departing from a binding source
            is the user's call
   ERROR  - with a binding source, an image under the feature's captures/ that no criterion cites
-  ERROR  - an image under captures/ left non-binding with no Sources line quoting the user
-           calling it inspiration (`non-binding - user: "<their words>"`)
+           (the builder's `*.running.*` and the Verifier's `review-*` pictures are not checked)
+  ERROR  - an image under captures/ that no Sources line marks binding - captures/ holds the
+           prototype's photos; what the user sent goes to references/
   WARN   - an AC has SHALL but no recognizable EARS lead keyword
   WARN   - an AC carries a vague word instead of a concrete value
   WARN   - no numbered acceptance criteria found at all
@@ -60,6 +62,13 @@ What it checks:
   ERROR  - a Shape path with no mermaid drawing
   ERROR  - a Shape with no `erDiagram` and no `Data: none - <why>`, or an erDiagram with no `New:` line
   ERROR  - a capture under captures/ that the plan does not show as an image (`![..](captures/..)`)
+  ERROR  - a plan that shows a capture and has no `## Screen states`; a screen there with no
+           `**Pieces:**` line, no state rows, or a row naming no criterion and no
+           `nothing to decide - <why>` (a screen with no capture is not detected)
+  ERROR  - a screen there with no `**Prototype:**` line, a `none` that names no in-place edit
+           (`edited in place`, `hidden`, `shown`, `defect fixed`), a prototype that is not `prototype/<name>.html`
+           or does not exist, or a row with a criterion missing
+           `captures/<screen>-row<n>-<width>.png` at 375, 768 or 1280
   WARN   - a path hop, or a flowchart node, naming a module marked neither existing
            nor as a Landing door
 
@@ -91,6 +100,7 @@ REQUIRED_SECTIONS = [
     ("Criteria", "User Stories"),
     ("Out of scope", "Out of Scope"),
     ("Assumptions", "Assumptions & Open Questions"),
+    ("Investigation",),
 ]
 ADVISORY_SECTIONS = ["Sources"]
 DIFFERENCES = ("Differences from the source", "Differences")
@@ -104,6 +114,12 @@ CHANGES_RE = re.compile(r"changes underneath", re.IGNORECASE)
 CONFIRMED_RE = re.compile(r"^\W*y(es)?\b", re.IGNORECASE)
 AD_ID_RE = re.compile(r"\bAD-\d{3,}\b")
 IMAGE_EXT = (".png", ".jpg", ".jpeg", ".webp", ".gif")
+
+
+def plan_capture(f):
+    """An image in captures/ the plan answers for: not the builder's `*.running.*` picture, not
+    the Verifier's `review-*` photo - both arrive after the plan."""
+    return f.lower().endswith(IMAGE_EXT) and ".running." not in f and not f.startswith("review-")
 
 PLACEHOLDER_RE = re.compile(r"^\s*[\[<].+[\]>]\s*$")
 CID_RE = re.compile(r"\bC\d+\b")
@@ -368,7 +384,7 @@ def check_captures(lines, plan_path, binding):
         cdir = os.path.join(os.path.dirname(os.path.abspath(plan_path)), "captures")
         if os.path.isdir(cdir):
             for f in sorted(os.listdir(cdir)):
-                if not f.lower().endswith(IMAGE_EXT) or ".running." in f:
+                if not plan_capture(f):
                     continue
                 stem = f.split(".")[0]
                 if stem not in criteria_text:
@@ -379,12 +395,90 @@ def check_captures(lines, plan_path, binding):
     return errors
 
 
-USER_QUOTE_RE = re.compile(r"\buser\b[^\"“]*[\"“][^\"”]{3,}[\"”]", re.IGNORECASE)
-
 # A hop's module: the backticked name right before its marker.
 MARKED_MODULE_RE = re.compile(r"`([^`]+)`\s*\((?:exists|existing|new|door\s*\d+)\)", re.IGNORECASE)
 DATA_NONE_RE = re.compile(r"^\W*Data\W*:?\s*none\b", re.IGNORECASE)
 NEW_LINE_RE = re.compile(r"^\W*New\W*:", re.IGNORECASE)
+
+
+SHOWN_CAPTURE_RE = re.compile(r"!\[[^\]]*\]\(captures/")
+PIECES_RE = re.compile(r"^\**\s*Pieces\s*\**\s*:\s*\**\s*(.*)$", re.IGNORECASE)
+PIECES_PLACEHOLDER_RE = re.compile(r"<\s*(element|piece)\b", re.IGNORECASE)
+PROTOTYPE_RE = re.compile(r"^\**\s*Prototype\s*\**\s*:\s*\**\s*(.*)$", re.IGNORECASE)
+PROTOTYPE_NONE_RE = re.compile(r"^none\s*[-–—]\s*.*\b(in place|hidden|shown|defect fixed)\b", re.IGNORECASE)
+PROTOTYPE_PATH_RE = re.compile(r"^`?prototype/[\w.-]+\.html`?$")
+PROTOTYPE_WIDTHS = (375, 768, 1280)
+NOTHING_TO_DECIDE_RE = re.compile(r"^\W*nothing to decide\s*[-–—:]\s*\S", re.IGNORECASE)
+
+
+def check_screen_states(lines, plan_path):
+    """Each screen carries its walk as rows the Verifier reaches one by one, and the pieces it is
+    built from. A capture shown in the plan is a screen; a screen with no capture is not detected."""
+    errors = []
+    b = section_bounds(lines, ("Screen states",))
+    if b is None:
+        if any(SHOWN_CAPTURE_RE.search(ln) for ln in lines):
+            errors.append(
+                "the plan shows a screen capture and has no `## Screen states` - write one table per "
+                "screen, one row per state, with its `**Pieces:**` line"
+            )
+        return errors
+    heads = [i for i in range(*b) if re.match(r"^###\s+\S", lines[i])]
+    if not heads:
+        return errors + ["`## Screen states` has no `### <screen>` - one heading per screen, then its table"]
+    for k, start in enumerate(heads):
+        end = heads[k + 1] if k + 1 < len(heads) else b[1]
+        screen = lines[start].lstrip("#").strip()[:40]
+        pieces = [m.group(1).strip() for m in (PIECES_RE.match(lines[i].strip()) for i in range(start + 1, end)) if m]
+        if not pieces or not pieces[0] or PIECES_PLACEHOLDER_RE.search(pieces[0]):
+            errors.append(
+                f"screen '{screen}': no `**Pieces:**` line - each element, the piece and variant it uses, "
+                "and the manual line that names them"
+            )
+        rows = [split_row(r) for r in first_table(lines, (start + 1, end))]
+        rows = [r for r in rows if r and r[0] and not PLACEHOLDER_RE.match(r[0])]
+        if not rows:
+            errors.append(f"screen '{screen}' has no state rows - one row per state the walk found")
+        for r in rows:
+            crit = r[-1] if len(r) >= 3 else ""
+            if not re.search(r"\d", crit) and not NOTHING_TO_DECIDE_RE.match(crit):
+                errors.append(
+                    f"screen '{screen}', state '{r[0][:40]}': names no criterion - write its number, or "
+                    "`nothing to decide - <why>`"
+                )
+        errors += _check_prototype(lines, start, end, screen, rows, plan_path)
+    return errors
+
+
+def _check_prototype(lines, start, end, screen, rows, plan_path):
+    """Each screen names its prototype, or the in-place edit that needs none, and each row with a
+    criterion has its photo at every standard width (prototype.md)."""
+    proto = [m.group(1).strip() for m in (PROTOTYPE_RE.match(lines[i].strip()) for i in range(start + 1, end)) if m]
+    if not proto or not proto[0]:
+        return [f"screen '{screen}': no `**Prototype:**` line - `prototype/<screen>.html`, or "
+                "`none - <element> edited in place | hidden | shown | defect fixed` (prototype.md)"]
+    if PROTOTYPE_NONE_RE.match(proto[0]):
+        return []
+    if not PROTOTYPE_PATH_RE.match(proto[0]):
+        return [f"screen '{screen}': `**Prototype:**` names `{proto[0][:40]}` - write "
+                "`prototype/<screen>.html`, or `none - <element> edited in place | hidden | shown | defect fixed`"]
+    errors = []
+    fdir = os.path.dirname(os.path.abspath(plan_path))
+    rel = proto[0].strip("` ")
+    stem = os.path.splitext(os.path.basename(rel))[0]
+    if not os.path.isfile(os.path.join(fdir, rel)):
+        errors.append(f"screen '{screen}': the prototype `{rel}` does not exist")
+    cdir = os.path.join(fdir, "captures")
+    have = set(os.listdir(cdir)) if os.path.isdir(cdir) else set()
+    for n, r in enumerate(rows, 1):
+        crit = r[-1] if len(r) >= 3 else ""
+        if NOTHING_TO_DECIDE_RE.match(crit) or not re.search(r"\d", crit):
+            continue
+        for w in PROTOTYPE_WIDTHS:
+            if f"{stem}-row{n}-{w}.png" not in have:
+                errors.append(f"screen '{screen}', row {n}: no `captures/{stem}-row{n}-{w}.png` - each row "
+                              "with a criterion is photographed at 375, 768 and 1280 (prototype.md)")
+    return errors
 
 
 def raw_lines(path):
@@ -449,7 +543,7 @@ def check_drawings(lines, shape, plan_path):
     if os.path.isdir(cdir):
         shown = "\n".join(x for x in lines if "![" in x)
         for f in sorted(os.listdir(cdir)):
-            if f.lower().endswith(IMAGE_EXT) and ".running." not in f and f not in shown:
+            if plan_capture(f) and f"captures/{f}" not in shown:
                 errors.append(
                     f"the capture `{f}` is not shown in the plan - put `![<name>](captures/{f})` on its "
                     "Sources line so whoever approves sees the screen"
@@ -458,27 +552,24 @@ def check_drawings(lines, shape, plan_path):
 
 
 def check_unbound_captures(lines, plan_path, binding):
-    """A capture that came with the request binds. It is non-binding only on the user's word,
-    quoted on its Sources line - otherwise the planner can drop it to avoid asking."""
+    """Every image in captures/ binds: it is a prototype photo. What the user sent lives in
+    references/, so a capture marked anything else is a print in the wrong folder."""
     cdir = os.path.join(os.path.dirname(os.path.abspath(plan_path)), "captures")
     if not os.path.isdir(cdir):
         return []
     sources = _section(lines, "Sources")
     errors = []
     for f in sorted(os.listdir(cdir)):
-        if not f.lower().endswith(IMAGE_EXT) or ".running." in f:
+        if not plan_capture(f):
             continue
-        cited = [s for s in sources if f in s]
+        cited = [s for s in sources if f"captures/{f}" in s]
         if any(BINDING_RE.search(s) and not NOT_BINDING_RE.search(s) for s in cited):
-            continue
-        if cited and all(USER_QUOTE_RE.search(s) for s in cited):
             continue
         if not cited and binding:
             continue
         errors.append(
-            f"Sources: the capture `{f}` is not binding and no line quotes the user calling it "
-            "inspiration - a capture that comes with the request binds; write "
-            "`non-binding - user: \"<their words>\"` only when they said so"
+            f"Sources: the capture `{f}` is not marked binding - captures/ holds the prototype's "
+            "photos; move what the user sent to references/ (prototype.md)"
         )
     return errors
 
@@ -577,6 +668,15 @@ def check_file(path):
     errors += e
     warnings += w
 
+    b = present.get("Investigation")
+    if b:
+        for r in first_table(lines, b):
+            cells = split_row(r)
+            if len(cells) < 2 or cells[0].lower() == "step":
+                continue
+            if not re.match(r"(done|asked|n/a) - \S", cells[1]):
+                errors.append(f"Investigation line '{cells[0][:40]}' is empty: write done, asked or n/a with its reason")
+
     b = present.get("Assumptions")
     if b:
         template_seen = False
@@ -606,6 +706,7 @@ def check_file(path):
     binding = plan_marks_binding(lines)
     errors += check_captures(lines, path, binding)
     errors += check_unbound_captures(lines, path, binding)
+    errors += check_screen_states(lines, path)
     if binding:
         errors += check_differences(lines, path)
 

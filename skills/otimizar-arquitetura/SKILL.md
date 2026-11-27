@@ -6,6 +6,24 @@ description: Shared vocabulary for designing deep modules. Use when the user wan
 # Otimizar Arquitetura
 
 Design **deep modules**: a lot of behaviour behind a small interface, placed at a clean seam, testable through that interface. Use this language and these principles wherever code is being designed or restructured. The aim is leverage for callers, locality for maintainers, and testability for everyone.
+Delegate the tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+## The Pattern
+Prepare a well-defined task and provide it to the an agent Haiku high effort:
+- **Specific scope**
+- **Clear goal**
+- **Constraints**
+- **Expected output**
+
+Do not include connectors, MCP servers, plugins or skills in the request—provide only the context and references necessary for the task. If a task requires something beyond file access or the terminal, stop and state what is missing rather than attempting to improvise.
+
+## Agent Prompt Structure
+
+Good agent prompts are:
+1. **Focused** - One clear problem domain
+2. **Self-contained** - All context needed to understand the problem
+3. **Specific about output** - What should the agent return?
+
+
 
 ## Glossary
 
@@ -111,4 +129,4 @@ Good interfaces make testing natural:
 ## Going deeper
 
 - **Deepening a cluster given its dependencies**, see [DEEPENING.md](DEEPENING.md): dependency categories, seam discipline, and replace-don't-layer testing.
-- **Exploring alternative interfaces**, see [DESIGN-IT-TWICE.md](DESIGN-IT-TWICE.md): spin up parallel sub-agents to design the interface several radically different ways, then compare on depth, locality, and seam placement.
+- **Exploring alternative interfaces**, see [DESIGN-IT-TWICE.md](DESIGN-IT-TWICE.md): spin up parallel sub-agents model Haiku High to design the interface several radically different ways, then compare on depth, locality, and seam placement.

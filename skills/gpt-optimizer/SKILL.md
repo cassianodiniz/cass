@@ -1,6 +1,6 @@
 ---
 name: gpt-optimizer
-description: "Use SOMENTE quando o usuário invocar de propósito o comando /gpt-optimizer (ou /gpt) ou pedir pelo nome (\"chama o optimizer\", \"manda pro optimizer\"), querendo que o GPT tente derrubar uma decisão, um raciocínio ou um trecho de código que já está na conversa. NÃO dispare por palavras soltas como \"reflete\", \"contraponto\" ou \"advogado do diabo\" no meio de uma conversa normal. Não é pra revisar mensagem de WhatsApp nem código dentro de um fluxo de desenvolvimento com revisão própria."
+description: "Use SOMENTE quando o Cassiano invocar de propósito o comando /gpt-optimizer (ou /gpt) ou pedir pelo nome (\"chama o optimizer\", \"manda pro optimizer\"), querendo que o GPT tente derrubar uma decisão, um raciocínio ou um trecho de código que já está na conversa. As frases \"manda pro gpt\" e \"o que o gpt acha disso\" NÃO são gatilho desta skill — são da /gpt-review. NÃO dispare por palavras soltas como \"reflete\", \"contraponto\" ou \"advogado do diabo\" no meio de uma conversa normal. Não é pra revisar mensagem de WhatsApp nem código dentro de um fluxo de desenvolvimento com revisão própria."
 ---
 
 # Skill gpt-optimizer — segunda opinião adversarial do GPT pra você refletir, no meio da conversa
@@ -121,12 +121,12 @@ Dispare (síncrono, foreground — o usuário espera o resultado pronto, não v�
 
 ```bash
 rm -f "$GPT_SESSION_TMP/gpt_thread.txt"   # sessão nova a cada alvo
-bash "$GPT/scripts/run-gpt.sh" "$GPT_SESSION_TMP/gpt_input.md" "$GPT_SESSION_TMP/gpt_review.md" high "$GPT_SESSION_TMP/gpt_thread.txt"
+bash "$GPT/scripts/run-gpt.sh" "$GPT_SESSION_TMP/gpt_input.md" "$GPT_SESSION_TMP/gpt_review.md" xhigh "$GPT_SESSION_TMP/gpt_thread.txt"
 ```
 
 O 4º argumento (`gpt_thread.txt`) é a **memória do revisor**: na rodada 1 o script grava ali o número da sessão do GPT; na rodada 2 ele retoma essa MESMA sessão. Por isso o prompt da rodada 2 ("você é o MESMO revisor") passa a ser verdade — antes era simulado re-colando o histórico. O `resume` do Codex **não aceita `--sandbox`**: o script força `-c sandbox_mode="read-only"`, sem isso o revisor ganharia permissão de escrever. Verificado 09/07/2026.
 
-O `run-gpt.sh` roda **gpt-6.2-sol · `high`**, sem `service_tier` (o gpt-6.1-sol recusava `flex` com erro 400 — testado em 03/10/2026; o gpt-6-sol também recusava, 22/09/2026). Modelo padrão fixado em gpt-6.2-sol com esforço `high` (17/11/2026; antes foi gpt-6.1-sol, gpt-6-sol e gpt-6-astra). Roda como **só-leitura** (`--sandbox read-only`): o revisor recebe o alvo inteiro via stdin, não precisa nem pode tocar em arquivo. Se o Codex falhar, o script **tenta de novo sozinho** e só então desiste com o motivo — você não fica sem aviso (ver **Fallback**).
+O `run-gpt.sh` roda **gpt-6.2-sol · `high`**, sem `service_tier` (o gpt-6-sol recusa `flex` com erro 400 — testado em 22/09/2026). Modelo padrão fixado em gpt-6.2-sol com esforço `high` por pedido do Cassiano (17/11/2026; antes foi gpt-6.1-sol, gpt-6-sol e gpt-6-astra). Exige Codex CLI 0.169 ou mais novo: o 0.165 recusa o gpt-6.2-sol. Roda como **só-leitura** (`--sandbox read-only`): o revisor recebe o alvo inteiro via stdin, não precisa nem pode tocar em arquivo. Se o Codex falhar, o script **tenta de novo sozinho** e só então desiste com o motivo — você não fica sem aviso (ver **Fallback**).
 
 ## Passo 3 — Regra de ouro (filtrar a rodada 1) e decidir se vale a rodada 2
 
@@ -141,7 +141,7 @@ Leia `$GPT_SESSION_TMP/gpt_review.md`. Para **cada** ponto do GPT, decida com pr
 - Você **descartou ao menos um ponto** → **roda a 2** (Passo 4), qualquer que tenha sido o veredito do GPT (SEGUIR com pontos descartados também roda): é justo o seu descarte que precisa de um segundo par de olhos.
 - Você **aceitou todos os pontos** — inclusive quando ajustou o rascunho por causa deles — ou o GPT não trouxe ponto nenhum → **não roda a 2**. Não há descarte seu pra auditar. Vai pro Passo 5.
 
-(Regra única desde 25/09/2026; antes o texto dava duas leituras para "aceitei e ajustei" e para "SEGUIR com descarte".)
+(Regra única decidida pelo Cassiano em 25/09/2026; antes o texto dava duas leituras para "aceitei e ajustei" e para "SEGUIR com descarte".)
 
 ## Passo 4 — Rodada 2 (condicional): o GPT audita o SEU filtro
 
@@ -166,7 +166,7 @@ SEGUIR | AJUSTAR | BLOQUEAR
 
 ```bash
 # MESMO gpt_thread.txt = o GPT retoma a sessão da rodada 1 e lembra o que apontou
-bash "$GPT/scripts/run-gpt.sh" "$GPT_SESSION_TMP/gpt_input2.md" "$GPT_SESSION_TMP/gpt_review2.md" high "$GPT_SESSION_TMP/gpt_thread.txt"
+bash "$GPT/scripts/run-gpt.sh" "$GPT_SESSION_TMP/gpt_input2.md" "$GPT_SESSION_TMP/gpt_review2.md" xhigh "$GPT_SESSION_TMP/gpt_thread.txt"
 ```
 
 Filtra a rodada 2 pela mesma regra de ouro. Ponto novo que procede e é grave → sobe pro usuário em A/B. Se a rodada 2 confirmar que seu filtro se sustentou (pontos vazios), fecha com mais confiança.

@@ -119,8 +119,49 @@ Replay of a delivery is a no-op; a payload without a subscription id or a valid 
 
 **Open questions:** none - all resolved or logged above.
 
+## Screen states
+
+### Billing
+
+**Pieces:** card form - `Card default` (`app/components/card.rb`)
+
+**Prototype:** none - the card form's text edited in place
+
+| State | Account, data and width | Criterion |
+| --- | --- | --- |
+| charge failed | member whose last charge failed, 375 and 1280 | 1 |
+| never charged | member with no charge yet, 375 | nothing to decide - the screen shows no charge state |
+
+## Investigation
+
+| Step | Landed |
+| --- | --- |
+| Problem | done - TLC-412 |
+| Confirmed lessons | n/a - no lessons store yet |
+| `.specs/STATE.md` decisions | done - no active AD touches billing |
+| References in `references/`; prototype and its photos in `captures/` | n/a - no reference came with the request |
+| Explorer sub-agent | done - explorer report on app/billing |
+| Open PRs and issues | done - `gh pr list`, none in this area |
+| Glossary | done - GLOSSARY.md, no new term |
+| seguranca.md | done - ASVS chapter files opened: V8.2.md |
+| tanstack-query-best-practices | n/a - the project does not use TanStack Query |
+| coding-principles.md | done - Before Coding read |
+| Surfaces walked | done - the billing screen and the webhook |
+| Pieces, and each new piece | done - no new piece |
+| Window widths | asked - round 1, question 4 |
+| 1 input validation | done - webhook signature check |
+| 2 failure modes | asked - round 1, question 2 |
+| 3 idempotency and retry | asked - round 1, question 3 |
+| 4 authorization | done - member only |
+| 5 concurrency and ordering | asked - round 2, question 1 |
+| 6 data lifecycle | n/a - no new stored data |
+| 7 external dependency failure | asked - round 1, question 2 |
+| 8 state transitions | done - the 9 provider statuses |
+| 9 observability | n/a - existing billing log covers it |
+| Test battery | done - Gate Check Commands |
+
 ## Sources
 
 - TLC-412 - the suspension rule and the 11-day evidence
 - provider webhook reference - the 9 statuses and the 5 event types
-- ![card form](captures/billing--card-form.png) `captures/billing--card-form.png` - non-binding - user: "only the tone, the layout is ours" - the card form's wording
+- ![card form](references/billing--card-form.png) - reference - the card form's wording
